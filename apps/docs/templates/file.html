@@ -1,0 +1,9 @@
+{% extends base_template %}
+
+{% block content %}
+  <h1>{{ file.description }}</h1>
+  <h2>Activities</h2>
+  {% for activity in activities %}
+    <p>{{ activity }}</p>
+  {% endfor %}
+{% endblock %}

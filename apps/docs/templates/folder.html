@@ -1,0 +1,24 @@
+{% extends base_template %}
+{% block content %}
+<h1 class="my-3">{{ folder.name }}</h1>
+<h2>Files</h2>
+<ul class="list-group mb-3">
+  {% for file in files %}
+  <li class="list-group-item">{{ file.description }}</li>
+  {% empty %}
+  <li class="list-group-item">No files in this folder.</li>
+  {% endfor %}
+</ul>
+<h2>Activities</h2>
+<ul class="list-group mb-3">
+  {% for activity in activities %}
+  <li class="list-group-item">{{ activity }}</li>
+  {% empty %}
+  <li class="list-group-item">No activities recorded for this folder.</li>
+  {% endfor %}
+</ul>
+<form method="post" action="{% url 'docs:folder_delete' folder.id %}">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-danger">Delete this folder</button>
+</form>
+{% endblock %}
