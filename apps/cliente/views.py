@@ -2,8 +2,6 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views import View
 from apps.cliente.models import Cliente, ClienteDoc
-from apps.docs.models import FileActivity
-
 from apps.docs.views import FileUploadView
 from apps.docs.forms import FileForm
 from django.views.generic.edit import CreateView
@@ -122,8 +120,7 @@ class ClientFileUploadView(FileUploadView):
                 new_file = form.save(commit=False)
                 new_file.owner = request.user
                 new_file.save()
-                FileActivity.objects.create(file=new_file, user=request.user, action='C')
-
+ 
                 ClienteDoc.objects.create(file=new_file, client=client)
 
         docs = ClienteDoc.objects.filter(client=client)

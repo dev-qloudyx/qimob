@@ -1,11 +1,12 @@
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views import View
 from django.shortcuts import render, redirect
 
 from apps.docs.forms import FileForm, FolderForm
-from .models import Folder, File, FolderActivity, FileActivity
+from .models import Folder, File
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib import messages
 
 
@@ -17,7 +18,6 @@ class FolderCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.owner = self.request.user
         response = super().form_valid(form)
-        FolderActivity.objects.create(folder=self.object, user=self.request.user, action='C')
         messages.success(self.request, 'Folder created successfully.')
         
         return response
@@ -39,7 +39,6 @@ class FolderUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'folder_update.html'
 
     def form_valid(self, form):
-        FolderActivity.objects.create(folder=self.object, user=self.request.user, action='U')
         messages.success(self.request, 'Folder updated successfully.')
        
         return super().form_valid(form)
@@ -61,8 +60,10 @@ class FolderView(LoginRequiredMixin, View):
     def get(self, request, pk):
         folder = Folder.objects.get(id=pk)
         files = File.objects.filter(folder=folder)
-        activities = FolderActivity.objects.filter(folder=folder)
-        context = {'folder': folder, 'files': files, 'activities': activities}
+        context = {
+            'folder': folder, 
+            'files': files
+            }
         
         if self.request.htmx:
             context['base_template'] = "partial_base.html"
@@ -79,23 +80,32 @@ class FolderView(LoginRequiredMixin, View):
             new_file.folder = Folder.objects.get(id=pk)
             new_file.owner = request.user
             new_file.save()
-            FileActivity.objects.create(file=new_file, user=request.user, action='C')
         return redirect('docs:folder', folder_id=pk)
     
+class FileDeleteView(DeleteView):
+    model = File
+    success_url = reverse_lazy('users:profile')
 
+    def form_valid(self, form):
+        self.object = self.get_object()
+        self.object.delete()
+        return HttpResponseRedirect(self.get_success_url())
+    
 class FileView(LoginRequiredMixin, View):
     def get(self, request, file_id):
-        file = File.objects.get(id=file_id)
-        activities = FileActivity.objects.filter(file=file)
         if request.htmx:
             base_template = "partial_base.html"
         else:
             base_template = "base.html"
         context = {
-            'file': file, 
-            'activities': activities,
             'base_template': base_template
         }
+        try:
+            file = File.objects.get(id=file_id)
+            context['file'] = file
+        except Exception as e:
+            messages.error(self.request, f'{e}')
+            return render(request, 'file.html', context)
         return render(request, 'file.html', context)
 
     def post(self, request, file_id):
@@ -103,12 +113,10 @@ class FileView(LoginRequiredMixin, View):
         form = FileForm(request.POST, request.FILES, instance=file)
         if form.is_valid():
             form.save()
-            FileActivity.objects.create(file=file, user=request.user, action='U')
         return redirect('docs:file', file_id=file_id)
     
     def delete(self, request, file_id):
         file = File.objects.get(id=file_id)
-        FileActivity.objects.create(file=file, user=request.user, action='D')
         file.delete()
         return redirect('docs:folder', folder_id=file.folder.id)
     
@@ -135,6 +143,5 @@ class FileUploadView(LoginRequiredMixin, View):
                 new_file = form.save(commit=False)
                 new_file.owner = request.user
                 new_file.save()
-                FileActivity.objects.create(file=new_file, user=request.user, action='C')
         return redirect('docs:file', file_id=new_file.id)
 
