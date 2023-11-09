@@ -1,9 +1,13 @@
 {% extends base_template %}
 
 {% block content %}
-  <h1>{{ file.description }}</h1>
+  <h1>{{ file }}</h1>
   <h2>Activities</h2>
   {% for activity in activities %}
     <p>{{ activity }}</p>
   {% endfor %}
+  <form method="POST" action="{% url 'docs:file_update' file.id %}">
+    {% csrf_token %}
+    <input type="submit" value="Update">
+  </form>
 {% endblock %}

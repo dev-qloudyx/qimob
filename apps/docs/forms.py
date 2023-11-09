@@ -23,7 +23,8 @@ class FileForm(forms.ModelForm):
     upload = MultipleFileField()
     class Meta:
         model = File
-        fields = ['description', 'folder', 'upload']
+        fields = ['folder', 'upload']
+        
 
 class FolderForm(forms.ModelForm):
     class Meta:

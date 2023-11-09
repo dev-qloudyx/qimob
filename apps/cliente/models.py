@@ -4,7 +4,6 @@ from apps.docs.models import File
 
 # Create your models here.
 
-
 class Cliente(models.Model):
     name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)

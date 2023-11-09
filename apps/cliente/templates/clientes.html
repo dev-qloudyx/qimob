@@ -1,0 +1,35 @@
+{% extends base_template %}
+{% block content %}
+<table id="cliente-table" class="table">
+    {% include '_alert.html' %}
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Created At</th>
+        <th scope="col">Updated At</th>
+        <th scope="col">Docs</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cliente in clientes %}
+        <tr>
+          <td>
+            <form method="POST" hx-post="{% url 'cliente:cliente_view' %}" hx-target="#cliente-table" hx-swap="outerHTML">
+                {% csrf_token %}
+              <input type="hidden" name="id" value="{{ cliente.id }}">
+              <input type="text" name="name" value="{{ cliente.name }}">
+              <input type="submit" value="Update">
+            </form>
+          </td>
+          <td>{{ cliente.created_at }}</td>
+          <td>{{ cliente.updated_at }}</td>
+          <td>
+            {% for doc in cliente.clientedoc_set.all %}
+              <a href="{{ doc.file.upload.url }}">{{ doc.file.description }}</a><br>
+            {% endfor %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

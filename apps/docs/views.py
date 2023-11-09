@@ -5,13 +5,9 @@ from django.shortcuts import render, redirect
 from apps.docs.forms import FileForm, FolderForm
 from .models import Folder, File, FolderActivity, FileActivity
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView
 from django.contrib import messages
-from django.contrib.contenttypes.models import ContentType
-from .models import Activity
 
-from django.core.files.storage import FileSystemStorage
-from django.views.generic import TemplateView
 
 class FolderCreateView(LoginRequiredMixin, CreateView):
     model = Folder
@@ -20,15 +16,10 @@ class FolderCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
-        response = super().form_valid(form)  # Save the Folder instance first
-        FolderActivity.objects.create(folder=self.object, user=self.request.user, action='C')  # Now you can save the FolderActivity instance
+        response = super().form_valid(form)
+        FolderActivity.objects.create(folder=self.object, user=self.request.user, action='C')
         messages.success(self.request, 'Folder created successfully.')
-        Activity.objects.create(
-            user=self.request.user,
-            action='C',
-            content_type=ContentType.objects.get_for_model(self.object),
-            object_id=self.object.id,
-        )
+        
         return response
 
     def get_success_url(self):
@@ -50,12 +41,7 @@ class FolderUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         FolderActivity.objects.create(folder=self.object, user=self.request.user, action='U')
         messages.success(self.request, 'Folder updated successfully.')
-        Activity.objects.create(
-            user=self.request.user,
-            action='U',
-            content_type=ContentType.objects.get_for_model(self.object),
-            object_id=self.object.id,
-        )
+       
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -69,38 +55,6 @@ class FolderUpdateView(LoginRequiredMixin, UpdateView):
             context['base_template'] = "base.html"
         return context
 
-class FolderDeleteView(LoginRequiredMixin, DeleteView):
-    model = Folder
-    success_url = reverse_lazy('users:profile')
-
-    def delete(self, request, *args, **kwargs):
-        
-        file_path = self.object.file.path
-
-        fs = FileSystemStorage()
-
-        if fs.exists(file_path):
-            fs.delete(file_path)
-        
-        FolderActivity.objects.create(folder=self.object, user=self.request.user, action='D')
-        messages.success(self.request, 'Folder deleted successfully.')
-        Activity.objects.create(
-            user=self.request.user,
-            action='D',
-            content_type=ContentType.objects.get_for_model(self.object),
-            object_id=self.object.id,
-        )
-        return super().delete(request, *args, **kwargs)
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['folder'] = self.get_object()
-        if self.request.htmx:
-            context['base_template'] = "partial_base.html"
-        else:
-            context['base_template'] = "base.html"
-        return context
-    
     
 class FolderView(LoginRequiredMixin, View):
 
@@ -118,7 +72,7 @@ class FolderView(LoginRequiredMixin, View):
         return render(request, 'folder.html', context)
 
     def post(self, request, pk):
-        # Assuming you have a form for creating a new file
+        
         form = FileForm(request.POST, request.FILES)
         if form.is_valid():
             new_file = form.save(commit=False)
@@ -128,7 +82,6 @@ class FolderView(LoginRequiredMixin, View):
             FileActivity.objects.create(file=new_file, user=request.user, action='C')
         return redirect('docs:folder', folder_id=pk)
     
-   
 
 class FileView(LoginRequiredMixin, View):
     def get(self, request, file_id):

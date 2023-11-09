@@ -56,21 +56,21 @@
         </a>
       </li>
       <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi pe-none me-2" width="16" height="16">
-            <use xlink:href="#speedometer2" />
-          </svg>
-          <span x-show="!sidebarClosed && !isMobile">Dashboard</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
+        <a href="{% url 'cliente:cliente_create' %}" class="nav-link text-white">
           <svg class="bi pe-none me-2" width="16" height="16">
             <use xlink:href="#table" />
           </svg>
-          <span x-show="!sidebarClosed && !isMobile">Orders</span>
+          <span x-show="!sidebarClosed && !isMobile">Cliente</span>
         </a>
       </li>
+      <li>
+        <a href="{% url 'cliente:client_file_upload' %}" class="nav-link text-white">
+            <svg class="bi pe-none me-2" width="16" height="16">
+                <use xlink:href="#speedometer2" />
+            </svg>
+            <span x-show="!sidebarClosed && !isMobile">Upload</span>
+        </a>
+    </li>
       <li>
         <a href="#" class="nav-link text-white">
           <svg class="bi pe-none me-2" width="16" height="16">
