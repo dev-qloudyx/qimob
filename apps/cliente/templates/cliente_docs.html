@@ -1,6 +1,6 @@
 {% extends base_template %}
 {% block content %}
-<div id="docs-list" class="py-5">
+<div id="reload" class="py-5">
     <h1 class="mb-4">Documents for {{ cliente.name }}</h1>
     <div class="mt-5">
       <h2 class="mb-3">Uploaded Files</h2>
@@ -29,30 +29,6 @@
     </div>
 
     <!-- Pagination -->
-    <nav aria-label="Page navigation example">
-        <ul class="pagination justify-content-center">
-            {% if page_obj.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page=1" hx-get="?page=1" hx-target="#docs-list" hx-swap="outerHTML">First</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" hx-get="?page={{ page_obj.previous_page_number }}" hx-target="#docs-list" hx-swap="outerHTML">Previous</a>
-                </li>
-            {% endif %}
-
-            <li class="page-item disabled">
-                <a class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</a>
-            </li>
-
-            {% if page_obj.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" hx-get="?page={{ page_obj.next_page_number }}" hx-target="#docs-list" hx-swap="outerHTML">Next</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" hx-get="?page={{ page_obj.paginator.num_pages }}" hx-target="#docs-list" hx-swap="outerHTML">Last</a>
-                </li>
-            {% endif %}
-        </ul>
-    </nav>
+    {% include '_pagination.html' %}
 </div>
 {% endblock %}

@@ -1,6 +1,6 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views import View
 from apps.cliente.models import Cliente, ClienteDoc
 from apps.docs.models import File
@@ -80,12 +80,14 @@ class ClienteListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        base_url = self.request.build_absolute_uri(reverse('cliente:cliente_listview'))
         if self.request.htmx:
             base_template = "partial_base.html"
         else:
             base_template = "base.html"
  
         context.update({
+            'base_url': base_url,
             'clientes': context['object_list'],
             'base_template': base_template, 
         })
@@ -102,6 +104,7 @@ class ClienteDocsListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        base_url = self.request.build_absolute_uri(reverse('cliente:clientedocs_listview', kwargs={'pk': self.kwargs['pk']}))
         if self.request.htmx:
             base_template = "partial_base.html"
         else:
@@ -112,6 +115,7 @@ class ClienteDocsListView(ListView):
         except:
             cliente = None
         context.update({
+            'base_url': base_url,
             'docs': context['object_list'],
             'cliente': cliente,
             'base_template': base_template, 
