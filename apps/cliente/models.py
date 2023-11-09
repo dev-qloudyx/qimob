@@ -1,6 +1,6 @@
 from django.db import models
 
-from apps.docs.models import File
+from apps.docs.models import BaseModel, BaseModelManager, File
 
 # Create your models here.
 
@@ -12,6 +12,8 @@ class Cliente(models.Model):
     def __str__(self):
         return self.name
     
-class ClienteDoc(models.Model):
+class ClienteDoc(BaseModel):
     file = models.ForeignKey(File, on_delete=models.CASCADE)
     client = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+
+    objects = BaseModelManager()

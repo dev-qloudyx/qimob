@@ -1,8 +1,10 @@
-from django.shortcuts import redirect, render
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import View
 from apps.cliente.models import Cliente, ClienteDoc
-from apps.docs.views import FileUploadView
+from apps.docs.models import File
+from apps.docs.views import FileDeleteView, FileUploadView
 from apps.docs.forms import FileForm
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
@@ -67,14 +69,36 @@ class ClienteView(View):
 
         messages.success(self.request, 'Cliente created successfully!')
         return render(request, 'clientes.html', context)
-        
+
 class ClienteListView(ListView):
+    model = Cliente
+    paginate_by = 5
+    template_name = 'cliente_list.html'
+
+    def get_queryset(self):
+        return Cliente.objects.all().order_by('id')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.htmx:
+            base_template = "partial_base.html"
+        else:
+            base_template = "base.html"
+ 
+        context.update({
+            'clientes': context['object_list'],
+            'base_template': base_template, 
+        })
+        return context
+            
+class ClienteDocsListView(ListView):
     model = ClienteDoc
-    paginate_by = 10
+    paginate_by = 5
     template_name = 'cliente_docs.html'
 
     def get_queryset(self):
-        return ClienteDoc.objects.filter(client=1)
+        pk = self.kwargs.get('pk')
+        return ClienteDoc.objects.filter(client=pk).order_by('id')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -83,8 +107,10 @@ class ClienteListView(ListView):
         else:
             base_template = "base.html"
         
-        docs = self.object_list
-        cliente =  self.object_list[0].client
+        try:
+            cliente =  self.object_list[0].client
+        except:
+            cliente = None
         context.update({
             'docs': context['object_list'],
             'cliente': cliente,
@@ -135,3 +161,13 @@ class ClientFileUploadView(FileUploadView):
         context['base_template'] = base_template
 
         return render(request, 'cliente_docs.html', context)
+
+class ClientFileDeleteView(FileDeleteView):
+    model = File
+    success_url = reverse_lazy('cliente:cliente_listview')
+
+    def form_valid(self, form):
+        self.object = self.get_object()
+        self.object.delete()
+        #self.object.hard_delete()
+        return HttpResponseRedirect(self.get_success_url())

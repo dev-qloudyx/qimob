@@ -9,13 +9,19 @@
           <li class="list-group-item d-flex justify-content-between">
               <strong>Name</strong>
               <strong>Uploaded At</strong>
+              <strong>Action</strong>
           </li>
           <!-- Documents -->
           {% for doc in docs %}
               <li class="list-group-item d-flex justify-content-between align-items-center">
                   <a href="{{ doc.file.upload.url }}">{{ doc.file }}</a>
                   <small class="text-muted">{{ doc.file.created_at }}</small>
+                  <form method="post" action="{% url 'cliente:file_delete' pk=doc.file.pk %}">
+                    {% csrf_token %}
+                    <button type="submit">Delete</button>
+                  </form>
               </li>
+
           {% empty %}
               <li class="list-group-item">No files uploaded yet.</li>
           {% endfor %}

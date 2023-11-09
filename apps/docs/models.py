@@ -9,6 +9,18 @@ class BaseModel(models.Model):
         abstract = True
 
     def delete(self):
+        for rel in self._meta.get_fields():
+            try:
+                if rel.one_to_many or rel.one_to_one:
+                    related = getattr(self, rel.get_accessor_name())
+                    if rel.one_to_many:
+                        related.update(deleted=True)
+                    else:
+                        related.deleted = True
+                        related.save()
+            except Exception as e:
+                continue
+
         self.deleted = True
         self.save()
     
