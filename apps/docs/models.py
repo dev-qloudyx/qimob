@@ -1,6 +1,7 @@
 import os
 from django.db import models
 from apps.users.models import User
+from django.utils.translation import gettext_lazy as _
 
 class BaseModel(models.Model):
     deleted = models.BooleanField(default=False)
@@ -9,18 +10,6 @@ class BaseModel(models.Model):
         abstract = True
 
     def delete(self):
-        for rel in self._meta.get_fields():
-            try:
-                if rel.one_to_many or rel.one_to_one:
-                    related = getattr(self, rel.get_accessor_name())
-                    if rel.one_to_many:
-                        related.update(deleted=True)
-                    else:
-                        related.deleted = True
-                        related.save()
-            except Exception as e:
-                continue
-
         self.deleted = True
         self.save()
     
@@ -39,28 +28,17 @@ class BaseModelManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(deleted=False)
     
-class Folder(BaseModel):
-    name = models.CharField(max_length=255)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    
-    objects = BaseModelManager()
-
-    def __str__(self):
-        return self.name
-
 def user_directory_path(instance, filename):
-    return 'uploads/{0}/{1}'.format(instance.folder.name, filename)
+    return f'uploads/{filename}'
 
 class File(BaseModel):
-    folder = models.ForeignKey(Folder, on_delete=models.CASCADE)
+    token = models.CharField(max_length=255, unique=True)
+    app = models.CharField(max_length=255)
+    model = models.CharField(max_length=255)
     upload = models.FileField(upload_to=user_directory_path)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
-
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("updated at"), auto_now=True)
+    
     objects = BaseModelManager()
 
     def __str__(self):

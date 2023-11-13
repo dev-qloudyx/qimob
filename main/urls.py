@@ -26,8 +26,8 @@ urlpatterns = [
     path('', include('apps.users.urls', namespace='users')),
     path('docs/', include('apps.docs.urls', namespace='docs')),
     path('accounts/', include('allauth.urls')),
-    path('cliente/', include('apps.cliente.urls', namespace='cliente')),
-     
+    path('crm/', include('apps.crm.urls', namespace='crm')),
+  
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + \
     static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # media files

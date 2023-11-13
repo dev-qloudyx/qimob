@@ -1,5 +1,7 @@
 from django import forms
-from .models import File, Folder
+
+from apps.docs.token import TokenGenerator
+from .models import File
 
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
@@ -21,12 +23,16 @@ class MultipleFileField(forms.FileField):
 
 class FileForm(forms.ModelForm):
     upload = MultipleFileField()
+    
     class Meta:
         model = File
-        fields = ['folder', 'upload']
+        fields = ['upload']
         
-
-class FolderForm(forms.ModelForm):
-    class Meta:
-        model = Folder
-        fields = ['name', 'parent']
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        token_generator = TokenGenerator()
+        token = token_generator.generate_token()
+        instance.token = token
+        if commit:
+            instance.save()
+        return instance

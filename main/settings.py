@@ -38,11 +38,9 @@ AUTHENTICATION_BACKENDS = [
 INSTALLED_APPS = [
     'apps.users.apps.UsersConfig',
     'apps.agenda.apps.AgendaConfig',
-    'apps.cliente.apps.ClienteConfig',
-    'apps.consultor.apps.ConsultorConfig',
     'apps.docs.apps.DocsConfig',
     'apps.imovel.apps.ImovelConfig',
-    'apps.lead.apps.LeadConfig',
+    'apps.crm.apps.CrmConfig',
     'apps.morada.apps.MoradaConfig',
     'django_htmx',
     'crispy_bootstrap5',

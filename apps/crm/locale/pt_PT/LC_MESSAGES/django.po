@@ -1,0 +1,67 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-11-10 10:20+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: apps/lead/models.py:8 apps/lead/models.py:27
+msgid "name"
+msgstr "nome"
+
+#: apps/lead/models.py:9 apps/lead/models.py:28
+msgid "email"
+msgstr ""
+
+#: apps/lead/models.py:10 apps/lead/models.py:18 apps/lead/models.py:31
+msgid "created at"
+msgstr "criado às"
+
+#: apps/lead/models.py:17 apps/lead/models.py:30
+msgid "message"
+msgstr "mensagem"
+
+#: apps/lead/models.py:19 apps/lead/models.py:32 apps/lead/models.py:40
+#: apps/lead/models.py:49
+msgid "updated on"
+msgstr "atualizado em"
+
+#: apps/lead/models.py:20
+msgid "owner"
+msgstr "proprietário"
+
+#: apps/lead/models.py:29
+msgid "phone"
+msgstr "telefone"
+
+#: apps/lead/models.py:38
+msgid "desc"
+msgstr "descrição"
+
+#: apps/lead/models.py:39 apps/lead/models.py:48
+msgid "created on"
+msgstr "criado em"
+
+#: apps/lead/models.py:46
+msgid "lead desc"
+msgstr "descrição da lead"
+
+#: apps/lead/models.py:47 apps/lead/models.py:56
+msgid "lead"
+msgstr ""
+
+#: apps/lead/models.py:55
+msgid "file"
+msgstr "ficheiro"

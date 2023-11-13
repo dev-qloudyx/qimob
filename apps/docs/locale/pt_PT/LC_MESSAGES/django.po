@@ -17,27 +17,26 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: templates/_logout_modal.html:10 templates/_logout_modal.html:21
-msgid "Logout"
-msgstr ""
+#: apps/docs/models.py:45
+msgid "name"
+msgstr "nome"
 
-#: templates/_logout_modal.html:14
-msgid "Are you sure you want to logout?"
-msgstr ""
+#: apps/docs/models.py:46
+msgid "parent"
+msgstr "Diretório Pai"
 
-#: templates/_logout_modal.html:17
-msgid "Cancel"
-msgstr ""
+#: apps/docs/models.py:47 apps/docs/models.py:62
+msgid "created at"
+msgstr "criado em"
 
-#: templates/_navbar.html:16
-msgid "Home"
-msgstr ""
+#: apps/docs/models.py:48 apps/docs/models.py:63
+msgid "updated at"
+msgstr "atualizado em"
 
-#~ msgid "Profile"
-#~ msgstr "Profile"
+#: apps/docs/models.py:49 apps/docs/models.py:64
+msgid "owner"
+msgstr "proprietário"
 
-#~ msgid "Register"
-#~ msgstr "Registo"
-
-#~ msgid "Pages"
-#~ msgstr "Páginas"
+#: apps/docs/models.py:60
+msgid "folder"
+msgstr "pasta"

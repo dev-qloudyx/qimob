@@ -45,6 +45,14 @@
     </symbol>
 </svg>
 <script src="{% static 'js/alert_timeout.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/helpers.js' %}"></script>
+<script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.store('config', {
+        userIsAuthenticated: "{{ user.is_authenticated|yesno:'true,false' }}"
+      })
+    });
+</script>
 {% if title %}
     <title>QIMOB - {{ title }}</title>
 {% else %}

@@ -1,0 +1,20 @@
+{% extends base_template %}
+{% block content %}
+<div id="client-create" class="col-md-6">
+  {% include '_alert.html' %}
+  <div class="card">
+    <div class="card-header">
+      <h5 class="card-title">Client Creation</h5>
+    </div>
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data" hx-post="{% url 'crm:client_create' %}" hx-target="#client-create" hx-swap="outerHTML">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

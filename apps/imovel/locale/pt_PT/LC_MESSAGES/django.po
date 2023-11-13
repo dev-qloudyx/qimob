@@ -17,27 +17,30 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: templates/_logout_modal.html:10 templates/_logout_modal.html:21
-msgid "Logout"
-msgstr ""
+#: apps/imovel/models.py:5
+msgid "name"
+msgstr "nome"
 
-#: templates/_logout_modal.html:14
-msgid "Are you sure you want to logout?"
-msgstr ""
+#: apps/imovel/models.py:6
+msgid "address"
+msgstr "morada"
 
-#: templates/_logout_modal.html:17
-msgid "Cancel"
-msgstr ""
+#: apps/imovel/models.py:7
+msgid "price"
+msgstr "preço"
 
-#: templates/_navbar.html:16
-msgid "Home"
-msgstr ""
+#: apps/imovel/models.py:8
+msgid "description"
+msgstr "descrição"
 
-#~ msgid "Profile"
-#~ msgstr "Profile"
+#: apps/imovel/models.py:9
+msgid "bedrooms"
+msgstr "quartos"
 
-#~ msgid "Register"
-#~ msgstr "Registo"
+#: apps/imovel/models.py:10
+msgid "bathrooms"
+msgstr "casas de banho"
 
-#~ msgid "Pages"
-#~ msgstr "Páginas"
+#: apps/imovel/models.py:11
+msgid "square footage"
+msgstr "m²"

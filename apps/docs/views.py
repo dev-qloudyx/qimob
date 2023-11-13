@@ -1,147 +1,122 @@
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 
-from apps.docs.forms import FileForm, FolderForm
-from .models import Folder, File
+from apps.docs.forms import FileForm
+from apps.docs.token import TokenGenerator
+from .models import  File
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import DeleteView
 from django.contrib import messages
 
 
-class FolderCreateView(LoginRequiredMixin, CreateView):
-    model = Folder
-    form_class = FolderForm
-    template_name = 'folder_create.html'
-
-    def form_valid(self, form):
-        form.instance.owner = self.request.user
-        response = super().form_valid(form)
-        messages.success(self.request, 'Folder created successfully.')
-        
-        return response
-
-    def get_success_url(self):
-        return reverse_lazy('docs:folder', kwargs={'pk': self.object.id})
+class FileDeleteView(LoginRequiredMixin, View):
+    base_template = "base.html"
+    template_name = 'files.html'
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = {}
         if self.request.htmx:
             context['base_template'] = "partial_base.html"
         else:
-            context['base_template'] = "base.html"
+            context['base_template'] = self.base_template
         return context
-
-class FolderUpdateView(LoginRequiredMixin, UpdateView):
-    model = Folder
-    form_class = FolderForm
-    template_name = 'folder_update.html'
-
-    def form_valid(self, form):
-        messages.success(self.request, 'Folder updated successfully.')
-       
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse_lazy('docs:folder', kwargs={'folder_id': self.object.id})
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.request.htmx:
-            context['base_template'] = "partial_base.html"
-        else:
-            context['base_template'] = "base.html"
-        return context
-
+    def get_template_name(self):
+        return self.template_name
     
-class FolderView(LoginRequiredMixin, View):
-
-    def get(self, request, pk):
-        folder = Folder.objects.get(id=pk)
-        files = File.objects.filter(folder=folder)
-        context = {
-            'folder': folder, 
-            'files': files
-            }
+    def post(self, request, *args, **kwargs):
+        token = kwargs.get('token')
+        file = get_object_or_404(File, token=token)
+        file.delete()
+        return file if file else None
+    
+    def multiple_delete(self, request, *args, **kwargs):
+        tokens = request.POST.getlist('tokens')
+        deleted_files = []
+        for token in tokens:
+            file = get_object_or_404(File, token=token)
+            file.delete()
+            deleted_files.append(file)
+        return deleted_files if deleted_files else None
+    
+    def dispatch(self, request, *args, **kwargs):
         
-        if self.request.htmx:
-            context['base_template'] = "partial_base.html"
-        else:
-            context['base_template'] = "base.html"
+        handler = self.http_method_not_allowed
 
-        return render(request, 'folder.html', context)
+        if request.method.lower() in self.http_method_names:
+            handler = getattr(self, request.method.lower())
 
-    def post(self, request, pk):
-        
-        form = FileForm(request.POST, request.FILES)
-        if form.is_valid():
-            new_file = form.save(commit=False)
-            new_file.folder = Folder.objects.get(id=pk)
-            new_file.owner = request.user
-            new_file.save()
-        return redirect('docs:folder', folder_id=pk)
-    
-class FileDeleteView(DeleteView):
-    model = File
-    success_url = reverse_lazy('users:profile')
+        if request.method.lower() == 'post' and 'multiple' in request.path:
+            handler = self.multiple_delete
 
-    def form_valid(self, form):
-        self.object = self.get_object()
-        self.object.delete()
-        return HttpResponseRedirect(self.get_success_url())
+        return handler(request, *args, **kwargs)
     
 class FileView(LoginRequiredMixin, View):
-    def get(self, request, file_id):
-        if request.htmx:
-            base_template = "partial_base.html"
+    base_template = "base.html"
+    template_name = 'file.html'
+
+    def get_template_name(self):
+        return self.template_name
+    
+    def get_context_data(self, **kwargs):
+        context = {}
+        if self.request.htmx:
+            context['base_template'] = "partial_base.html"
         else:
-            base_template = "base.html"
-        context = {
-            'base_template': base_template
-        }
+            context['base_template'] = self.base_template
+        return context
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data()
+        token = kwargs['token']
         try:
-            file = File.objects.get(id=file_id)
+            file = File.objects.get(token=token)
             context['file'] = file
         except Exception as e:
             messages.error(self.request, f'{e}')
-            return render(request, 'file.html', context)
-        return render(request, 'file.html', context)
+            return render(request, self.get_template_name(), context)
+        return render(request, self.get_template_name(), context)
 
-    def post(self, request, file_id):
-        file = File.objects.get(id=file_id)
-        form = FileForm(request.POST, request.FILES, instance=file)
-        if form.is_valid():
-            form.save()
-        return redirect('docs:file', file_id=file_id)
-    
-    def delete(self, request, file_id):
-        file = File.objects.get(id=file_id)
-        file.delete()
-        return redirect('docs:folder', folder_id=file.folder.id)
-    
 
 class FileUploadView(LoginRequiredMixin, View):
+    form_class = FileForm
+    base_template = "base.html"
+    template_name = 'upload.html'
 
-    def get(self, request):
-        form = FileForm()
-        if request.htmx:
-            base_template = "partial_base.html"
+    def get_context_data(self, **kwargs):
+        context = {}
+        if self.request.htmx:
+            context['base_template'] = "partial_base.html"
         else:
-            base_template = "base.html"
-        context = {
-            'form': form,
-            'base_template': base_template,
-        }
-        return render(request, 'cliente_upload.html', context)
+            context['base_template'] = self.base_template
+        return context
+    
+    def get_form(self):
+        return self.form_class()
 
-    def post(self, request):
+    def get_template_name(self):
+        return self.template_name
+
+    def get(self, request, *args, **kwargs):
+        form = self.get_form()
+        context = self.get_context_data()
+        context['form'] = form
+        return render(request, self.get_template_name(), context)
+    
+    def post(self, request, *args, **kwargs):
         files = request.FILES.getlist('upload')
+        tokens = []
         for file in files:
-            form = FileForm(request.POST, {'upload': file})
+            form = self.form_class(data=request.POST, files={'upload': file})
             if form.is_valid():
                 new_file = form.save(commit=False)
-                new_file.owner = request.user
+                new_file.app = kwargs.get('app')
+                new_file.model = kwargs.get('model')
                 new_file.save()
-        return redirect('docs:file', file_id=new_file.id)
+                tokens.append(new_file.token)
+        return tokens
+
+    
 

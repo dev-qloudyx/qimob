@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-04 14:25+0000\n"
+"POT-Creation-Date: 2023-11-10 10:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,7 +33,7 @@ msgstr "Nome Completo"
 msgid "About"
 msgstr "Informação Adicional"
 
-#: apps/users/models.py:80
+#: apps/users/models.py:78
 msgid "Photo"
 msgstr "Foto"
 
@@ -41,24 +41,23 @@ msgstr "Foto"
 msgid "Permission denied. You do not have the required role(s)."
 msgstr "Permissão negada. Você não tem a função necessária(s)."
 
-#: apps/users/templates/account/login.html:13
-#: apps/users/templates/account/login.html:17
+#: apps/users/templates/account/login.html:21
+#: apps/users/templates/account/login.html:25
 msgid "Sign In"
 msgstr "Iniciar Sessão"
 
-#: apps/users/templates/account/password_change.html:11
-#: apps/users/templates/account/password_change.html:19
-#: apps/users/templates/profile/profile.html:33
+#: apps/users/templates/account/password_change.html:10
+#: apps/users/templates/account/password_change.html:18
+#: apps/users/templates/profile/profile.html:37
 msgid "Change Password"
 msgstr "Redefinir Palavra-passe"
 
-#: apps/users/templates/account/password_reset.html:10
-#: apps/users/templates/account/password_reset_done.html:11
-#: apps/users/templates/account/password_reset_done.html:18
+#: apps/users/templates/account/password_reset.html:16
+#: apps/users/templates/account/password_reset_done.html:21
 msgid "Password Reset"
 msgstr "Redefinição de Palavra-passe"
 
-#: apps/users/templates/account/password_reset.html:17
+#: apps/users/templates/account/password_reset.html:23
 msgid ""
 "\"Forgotten your password? Enter your email address below, and we'll send "
 "you an email allowing you to reset it.\""
@@ -66,17 +65,17 @@ msgstr ""
 "\"Esqueceu a sua palavra-passe? Insira o seu endereço de email abaixo, e nós "
 "enviaremos um email permitindo que você a redefina.\""
 
-#: apps/users/templates/account/password_reset.html:24
+#: apps/users/templates/account/password_reset.html:30
 msgid "\"Reset My Password\""
 msgstr "Esqueceu a sua Palavra-passe?"
 
-#: apps/users/templates/account/password_reset.html:27
+#: apps/users/templates/account/password_reset.html:33
 msgid "\"Please contact us if you have any trouble resetting your password.\""
 msgstr ""
 "\"Por favor, entre em contato conosco se tiver algum problema para redefinir "
 "sua palavra-passe.\""
 
-#: apps/users/templates/account/password_reset_done.html:24
+#: apps/users/templates/account/password_reset_done.html:31
 msgid ""
 "We have sent you an email. If you have not received it please check your "
 "spam folder. Otherwise contact us if you do not receive it in a few minutes."
@@ -93,11 +92,11 @@ msgstr "Registar"
 msgid "New Photo"
 msgstr "Nova Foto"
 
-#: apps/users/templates/profile/profile.html:19
+#: apps/users/templates/profile/profile.html:23
 msgid "Profile Info"
 msgstr "Informação do Perfil"
 
-#: apps/users/templates/profile/profile.html:32
+#: apps/users/templates/profile/profile.html:36
 msgid "Update"
 msgstr "Atualizar"
 

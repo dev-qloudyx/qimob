@@ -1,10 +1,11 @@
 {% extends base_template %}
 {% load crispy_forms_tags %}
 {% block content %}
-<form method="post" enctype="multipart/form-data" hx-post="{% url 'docs:upload' %}" hx-trigger="submit" @submit.prevent="isUploading = true">
+<h1>DOCS UPLOAD</h1>
+<form method="post" enctype="multipart/form-data" hx-post="{% url 'docs:upload' %}" >
   {% csrf_token %}
   {{ form|crispy }}
-  <button type="submit" class="btn btn-primary" :disabled="isUploading">Upload</button>
+  <button type="submit" class="btn btn-primary">Upload</button>
 </form>
 {% endblock %}
 
