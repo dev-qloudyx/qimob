@@ -1,0 +1,19 @@
+{% extends base_template %}
+{% block content %}
+<div id="file-list" class="container py-5">
+    <h2>Files</h2>
+    <ul>
+    {% for file in files %}
+        <li>
+            <p>Token: {{ file.token }}</p>
+            <p>App: {{ file.app }}</p>
+            <p>Model: {{ file.model }}</p>
+            <p>Created at: {{ file.created_at }}</p>
+            <p>Updated at: {{ file.updated_at }}</p>
+        </li>
+    {% empty %}
+        <li>No files found.</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endblock %}

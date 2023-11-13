@@ -1,13 +1,8 @@
-from django.http import HttpResponseRedirect
-from django.urls import reverse_lazy
 from django.views import View
-from django.shortcuts import get_object_or_404, render, redirect
-
+from django.shortcuts import get_object_or_404, render
 from apps.docs.forms import FileForm
-from apps.docs.token import TokenGenerator
 from .models import  File
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.edit import DeleteView
 from django.contrib import messages
 
 
@@ -16,12 +11,9 @@ class FileDeleteView(LoginRequiredMixin, View):
     template_name = 'files.html'
     
     def get_context_data(self, **kwargs):
-        context = {}
-        if self.request.htmx:
-            context['base_template'] = "partial_base.html"
-        else:
-            context['base_template'] = self.base_template
+        context = {'base_template': self.base_template}
         return context
+        
     
     def get_template_name(self):
         return self.template_name
@@ -41,18 +33,6 @@ class FileDeleteView(LoginRequiredMixin, View):
             deleted_files.append(file)
         return deleted_files if deleted_files else None
     
-    def dispatch(self, request, *args, **kwargs):
-        
-        handler = self.http_method_not_allowed
-
-        if request.method.lower() in self.http_method_names:
-            handler = getattr(self, request.method.lower())
-
-        if request.method.lower() == 'post' and 'multiple' in request.path:
-            handler = self.multiple_delete
-
-        return handler(request, *args, **kwargs)
-    
 class FileView(LoginRequiredMixin, View):
     base_template = "base.html"
     template_name = 'file.html'
@@ -61,11 +41,7 @@ class FileView(LoginRequiredMixin, View):
         return self.template_name
     
     def get_context_data(self, **kwargs):
-        context = {}
-        if self.request.htmx:
-            context['base_template'] = "partial_base.html"
-        else:
-            context['base_template'] = self.base_template
+        context = {'base_template': self.base_template}
         return context
 
     def get(self, request, *args, **kwargs):
@@ -79,6 +55,24 @@ class FileView(LoginRequiredMixin, View):
             return render(request, self.get_template_name(), context)
         return render(request, self.get_template_name(), context)
 
+class FileListView(LoginRequiredMixin, View):
+    base_template = "base.html"
+    template_name = 'file_list.html'
+
+    def get_template_name(self):
+        return self.template_name
+    
+    def get_context_data(self, **kwargs):
+        context = {'base_template': self.base_template}
+        return context
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data()
+        files = File.objects.all()
+        context['files'] = files
+        return render(request, self.get_template_name(), context)
+
+
 
 class FileUploadView(LoginRequiredMixin, View):
     form_class = FileForm
@@ -86,11 +80,7 @@ class FileUploadView(LoginRequiredMixin, View):
     template_name = 'upload.html'
 
     def get_context_data(self, **kwargs):
-        context = {}
-        if self.request.htmx:
-            context['base_template'] = "partial_base.html"
-        else:
-            context['base_template'] = self.base_template
+        context = {'base_template': self.base_template}
         return context
     
     def get_form(self):

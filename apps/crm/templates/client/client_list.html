@@ -2,25 +2,44 @@
 {% block content %}
 <div id="cliente-list" class="py-5">
     <div class="mt-5">
-      <h2 class="mb-3">Cliente List</h2>
-      <a href="{% url 'crm:client_create' %}" hx-get="{% url 'crm:client_create' %}" hx-target="#cliente-list" hx-swap="outerHTML">Add Client</a> 
-      <ul class="list-group">
-          <!-- Header -->
-          <li class="list-group-item d-flex justify-content-between">
-              <strong>Name</strong>
-              <strong>Docs</strong>
-          </li>
-          <!-- Documents -->
-          {% for client in clients %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <a href="#">{{ client.name }}</a>
-                  <a href="{% url 'crm:client_file_upload' pk=client.pk %}" hx-get="{% url 'crm:client_file_upload' pk=client.pk %}" hx-target="#cliente-list" hx-swap="outerHTML">Upload Doc</a> 
-                  <a href="{% url 'crm:clientdocs_listview' pk=client.pk %}" hx-get="{% url 'crm:clientdocs_listview' pk=client.pk %}" hx-target="#cliente-list" hx-swap="outerHTML">Docs</a> 
-                </li>
-          {% empty %}
-              <li class="list-group-item">No files uploaded yet.</li>
-          {% endfor %}
-      </ul>
+        <h2 class="mb-3">Cliente List</h2>
+        <a href="{% url 'crm:client_create' %}" hx-get="{% url 'crm:client_create' %}" hx-target="#cliente-list"
+            hx-swap="outerHTML" class="btn btn-primary mb-3">Add Client</a>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Docs</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'crm:client_view' client.id %}" hx-get="{% url 'crm:client_view' client.id %}" hx-target="#cliente-list"
+                                hx-swap="outerHTML">{{ client.name }}</a>
+                        </td>
+                        <td>
+                            <a href="{% url 'crm:clientdocs_listview' pk=client.pk %}"
+                                hx-get="{% url 'crm:clientdocs_listview' pk=client.pk %}" hx-target="#cliente-list"
+                                hx-swap="outerHTML" class="btn btn-info">Docs</a>
+                        </td>
+                        <td>
+                            <a href="{% url 'crm:client_file_upload' pk=client.pk %}"
+                                hx-get="{% url 'crm:client_file_upload' pk=client.pk %}" hx-target="#cliente-list"
+                                hx-swap="outerHTML" class="btn btn-success">Upload Doc</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No files uploaded yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Pagination -->

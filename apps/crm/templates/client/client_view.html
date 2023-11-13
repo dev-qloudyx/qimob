@@ -1,0 +1,44 @@
+{% extends base_template %}
+{% block content %}
+<div id="client-page" class="container py-5">
+    <div class="card">
+        <div class="card-header">
+            <h1>{{ client.name }}</h1>
+            <p>Created at: {{ client.created_at }}</p>
+            <p>Updated at: {{ client.updated_at }}</p>
+        </div>
+        <div class="card-body">
+            <ul class="nav nav-tabs" id="clientTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="documents-tab" data-bs-toggle="tab" data-bs-target="#documents" type="button" role="tab" aria-controls="documents" aria-selected="true">Documents</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tasks-tab" data-bs-toggle="tab" data-bs-target="#tasks" type="button" role="tab" aria-controls="tasks" aria-selected="false">Tasks</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="clientTabContent">
+                <div class="tab-pane fade show active" id="documents" role="tabpanel" aria-labelledby="documents-tab">
+                    <ul>
+                    {% for doc in client_docs %}
+                        <li>
+                            <p>Token: {{ doc.token }}</p>
+                            <p>Created at: {{ doc.created_at }}</p>
+                            <p>Updated at: {{ doc.updated_at }}</p>
+                        </li>
+                    {% empty %}
+                        <li>No documents found.</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+                <div class="tab-pane fade" id="tasks" role="tabpanel" aria-labelledby="tasks-tab">
+                    <li>
+                        <p>1</p>
+                        <p>2</p>
+                        <p>3</p>
+                    </li>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

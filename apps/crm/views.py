@@ -1,5 +1,5 @@
 
-from apps.docs.views import FileDeleteView, FileUploadView, FileView
+from apps.docs.views import FileDeleteView, FileListView, FileUploadView, FileView
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django.contrib import messages
@@ -31,25 +31,29 @@ class ClientCreateView(CreateView):
         context['base_template'] = base_template
         return context
 
-class ClientView(View):
-    def get(self, request, *args, **kwargs):
-        clientes = Client.objects.all()
-        
-        if request.htmx:
-            base_template = "partial_base.html"
-        else:
-            base_template = "base.html"
-        context = {
-            'clientes': clientes,
-            'base_template': base_template
-                
-        }
-        context['base_template'] = base_template
+class ClientView(FileListView):
+    template_name = 'client/client_view.html'
 
-        return render(request, 'client/clients.html', context)
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        if self.request.htmx:
+            context['base_template'] = "partial_base.html"
+        return context
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(*args, **kwargs)
+        client = get_object_or_404(Client, pk=kwargs['pk'])
+        client_docs = ClientDoc.objects.filter(client=client)
+        context.update ({
+            'client': client, 
+            'client_docs': client_docs,
+        })
+        super().get(request, *args, **kwargs)
+        return render(request, self.template_name, context)
         
 
     def post(self, request, *args, **kwargs):
+        context = self.get_context_data(self, *args, **kwargs)
         client = Client.objects.get(id=request.POST['id'])
         client.name = request.POST['name']
         client.save()
@@ -60,12 +64,9 @@ class ClientView(View):
         else:
             base_template = "base.html"
         
-        context = {
-            'clients': clients,
-            'base_template': base_template
-                
-        }
-        context['base_template'] = base_template
+        context.update ({
+            'client': client, 
+        })
 
         messages.success(self.request, 'Client created successfully!')
         return render(request, 'client/clients.html', context)
@@ -92,15 +93,19 @@ class ClientListView(ListView):
             'base_template': base_template, 
         })
         return context
-            
+
+
+###########################
+# Docs Integration Below. #
+########################### 
+       
 class ClientDocsListView(ListView):
     model = ClientDoc
     paginate_by = 5
     template_name = 'client/client_docs.html'
 
     def get_queryset(self):
-        pk = self.kwargs.get('pk')
-        return ClientDoc.objects.filter(client=pk).order_by('id')
+        return ClientDoc.objects.filter(client=self.kwargs.get('pk')).order_by('id')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -110,10 +115,8 @@ class ClientDocsListView(ListView):
         else:
             base_template = "base.html"
         
-        try:
-            client =  get_object_or_404(Client, pk=self.kwargs.get('pk'))
-        except:
-            client = None
+        client =  get_object_or_404(Client, pk=self.kwargs.get('pk'))
+
         context.update({
             'base_url': base_url,
             'docs': context['object_list'],
@@ -121,14 +124,21 @@ class ClientDocsListView(ListView):
             'base_template': base_template, 
         })
         return context
-    
-     
+        
 class ClientFileUploadView(FileUploadView):
     base_template = "base.html"
     template_name = 'client/client_upload.html'
     
-    def get(self, request, *args, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        if self.request.htmx:
+            context['base_template'] = "partial_base.html"
+        else:
+            context['base_template'] = self.base_template
+        return context
+    
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
         form = super().get_form()
         client = get_object_or_404(Client, pk=kwargs['pk'])
         context['client'] = client
@@ -149,24 +159,40 @@ class ClientFileView(FileView):
     base_template = "base.html"
     template_name = 'client/client_doc.html'
 
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.htmx:
+            context['base_template'] = "partial_base.html"
+        else:
+            context['base_template'] = self.base_template
+        return context
+    
 class ClientFileDeleteView(FileDeleteView):
     template_name = 'client/client_docs.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.htmx:
+            context['base_template'] = "partial_base.html"
+        else:
+            context['base_template'] = self.base_template
+        return context
     
     def post(self, request, *args, **kwargs):
-        files_deleted = super().post(request, *args, **kwargs)
-        if files_deleted:
-            context = self.get_context_data()
-            client_doc = get_object_or_404(ClientDoc, token=kwargs.get('token'))
-            docs = ClientDoc.objects.filter(client=client_doc.client).order_by('id')
-            context.update({
-                'docs': docs,
-                'client': client_doc.client,
-            })
-            client_doc.delete()
-            return render(request, self.get_template_name(), context)
+        if 'multiple_delete' in request.POST:
+            return self.multiple_delete(request, *args, **kwargs)
+        else:
+            files_deleted = super().post(request, *args, **kwargs)
+            if files_deleted:
+                context = self.get_context_data()
+                client_doc = get_object_or_404(ClientDoc, token=kwargs.get('token'))
+                docs = ClientDoc.objects.filter(client=client_doc.client).order_by('id')
+                context.update({
+                    'docs': docs,
+                    'client': client_doc.client,
+                })
+                client_doc.delete()
+                return render(request, self.get_template_name(), context)
 
     def multiple_delete(self, request, *args, **kwargs):
         files_deleted = super().multiple_delete(request, *args, **kwargs)
