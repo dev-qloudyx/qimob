@@ -13,8 +13,12 @@ crispy-bootstrap5 = "*"
 django-allauth = "*"
 pillow = "*"
 django-htmx = "*"
+pandas = "*"
 
 [dev-packages]
+django-extensions = "*"
+graphviz = "*"
+pydotplus = "*"
 
 [requires]
 python_version = "3.11"

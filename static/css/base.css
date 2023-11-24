@@ -14,8 +14,9 @@
 ----------------------------------------------------- */
 
 #content {
+  display: flex;
   padding: 0px;
-  flex-grow: 1;
+  flex: 1; 
   margin-left: 20px; 
   transition: all 0.3s;
 }
@@ -26,7 +27,19 @@
   border: 1px solid #dddddd;
   border-bottom-left-radius: 3px; 
   border-bottom-right-radius: 3px;
+  flex: 1; 
 }
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+footer {
+  margin-top: auto;
+}
+
+
 
 /* ---------------------------------------------------
   MEDIAQUERIES

@@ -19,9 +19,9 @@
             <div class="tab-content" id="clientTabContent">
                 <div class="tab-pane fade show active" id="documents" role="tabpanel" aria-labelledby="documents-tab">
                     <ul>
-                    {% for doc in client_docs %}
+                    {% for doc in files %}
                         <li>
-                            <p>Token: {{ doc.token }}</p>
+                            <p>Document: {{ doc }}</p>
                             <p>Created at: {{ doc.created_at }}</p>
                             <p>Updated at: {{ doc.updated_at }}</p>
                         </li>

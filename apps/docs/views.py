@@ -4,7 +4,7 @@ from apps.docs.forms import FileForm
 from .models import  File
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-
+from django.views.generic.list import ListView
 
 class FileDeleteView(LoginRequiredMixin, View):
     base_template = "base.html"
@@ -14,7 +14,6 @@ class FileDeleteView(LoginRequiredMixin, View):
         context = {'base_template': self.base_template}
         return context
         
-    
     def get_template_name(self):
         return self.template_name
     
@@ -55,25 +54,25 @@ class FileView(LoginRequiredMixin, View):
             return render(request, self.get_template_name(), context)
         return render(request, self.get_template_name(), context)
 
-class FileListView(LoginRequiredMixin, View):
+class FileListView(LoginRequiredMixin, ListView):
     base_template = "base.html"
-    template_name = 'file_list.html'
+    model = File
+    paginate_by = 5
+    ordering = "id"
 
-    def get_template_name(self):
-        return self.template_name
-    
-    def get_context_data(self, **kwargs):
-        context = {'base_template': self.base_template}
-        return context
+    def get_queryset(self):
+        query_set = super().get_queryset()
+        tokens = getattr(self, 'tokens', [])
+        query_set = query_set.filter(token__in=tokens)
+        return query_set
 
     def get(self, request, *args, **kwargs):
+        query_set = self.get_queryset()
+        self.object_list = query_set
         context = self.get_context_data()
-        files = File.objects.all()
-        context['files'] = files
-        return render(request, self.get_template_name(), context)
-
-
-
+        return self.render_to_response(context)
+  
+    
 class FileUploadView(LoginRequiredMixin, View):
     form_class = FileForm
     base_template = "base.html"
@@ -96,12 +95,14 @@ class FileUploadView(LoginRequiredMixin, View):
         return render(request, self.get_template_name(), context)
     
     def post(self, request, *args, **kwargs):
-        files = request.FILES.getlist('upload')
+        #files = request.FILES.getlist('upload')
+        files = request.FILES.getlist('file')
         tokens = []
         for file in files:
             form = self.form_class(data=request.POST, files={'upload': file})
             if form.is_valid():
                 new_file = form.save(commit=False)
+                new_file.project = kwargs.get('project')
                 new_file.app = kwargs.get('app')
                 new_file.model = kwargs.get('model')
                 new_file.save()

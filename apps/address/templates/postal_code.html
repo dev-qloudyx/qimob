@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block content %}
+
+<form id="postalCodeForm"></form>
+<form id="addressForm"></form>
+<script>
+
+
+    function findField(items, fieldName) {
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].field === fieldName) {
+                return items[i];
+            }
+            if (items[i].items) {
+                var found = findField(items[i].items, fieldName);
+                if (found) return found;
+            }
+        }
+        return null;
+    }
+
+    function postDataAndSetOptions(form, formData) {
+        $.post("{% url 'address:postal_code_json' %}", formData, function (data) {
+            var streets = data.ART_TIPO_ART_DESIG;
+            var newOptions = {
+                ...form.options,
+                formData: {
+                    ...form.options.formData,
+                    postal_code: data.CP4 + "-" + data.CP3,
+                    cp4: data.CP4,
+                    cp3: data.CP3,
+                    district: data.DD__DESIG,
+                    county: data.CC__DESIG,
+                    locality: data.LOCALIDADE,
+                    street: "",
+                    number: "",
+                    more_info: ""
+                }
+            };
+
+            var streetField = findField(newOptions.items, 'street');
+            if (streetField && streetField.editorOptions) {
+                streetField.editorOptions.dataSource = streets;
+            }
+
+            form.setOptions(newOptions);
+            $(".hidden-field").removeClass("hidden-field");
+        });
+    }
+
+    
+    function postAddressData(formData) {
+
+        $.post("{% url 'address:address_json' %}", formData, function (data) {
+            console.log(data);
+            if (data.error) {
+                console.log("Error: ", data.error);
+            } else {
+                console.log("Token: ", data);
+            }
+            console.log(formData);
+        });
+    }
+
+    $(document).ready(function () {
+
+        $("#postalCodeForm").kendoForm({
+            orientation: "horizontal",
+            items: [
+                { field: "postal_code", label: "Postal Code", validation: { required: true }, editor: "MaskedTextBox", editorOptions: { mask: "0000-000" } }
+            ],
+            submit: function (e) {
+                e.preventDefault();
+                var postal_code = e.sender.element.find('[name="postal_code"]').val();
+                var [cp4, cp3] = postal_code.split('-');
+                var formData = "&cp4=" + cp4 + "&cp3=" + cp3 + "&csrfmiddlewaretoken={{ csrf_token }}";
+                var form = $("#addressForm").data("kendoForm");
+                postDataAndSetOptions(form, formData);
+                $("#addressForm").show();
+                $("#postalCodeForm").hide();
+            }
+        });
+
+        $("#addressForm").kendoForm({
+            orientation: "horizontal",
+            formData: {
+                postal_code: ""
+            },
+            items: [
+                {
+                    type: "group",
+                    label: "Address",
+                    items: [
+                        { field: "postal_code", label: "Postal Code", validation: { required: true }, editor: "MaskedTextBox", editorOptions: { mask: "0000-000" } },
+                        { field: "district", label: "District", editor: "TextBox", editorOptions: { readonly: true } },
+                        { field: "county", label: "County", editor: "TextBox", editorOptions: { readonly: true } },
+                        { field: "locality", label: "Locality", editor: "TextBox", editorOptions: { readonly: true } },
+                        { field: "street", label: "Street", validation: { required: true }, editor: "ComboBox", editorOptions: { filter: "contains", placeholder: "Select street...", separator: ", " } },
+                        { field: "number", label: "Number", validation: { required: true }, editor: "TextBox" },
+                        { field: "more_info", label: "More Info", editor: "TextArea" },
+                    ]
+                },
+
+            ],
+            submit: function (e) {
+                e.preventDefault();
+                var formElement = e.sender.element;
+                var postal_code = formElement.find('[name="postal_code"]').val();
+                var [cp4, cp3] = postal_code.split('-');
+                var formData = formElement.serialize() + "&cp4=" + cp4 + "&cp3=" + cp3 + "&csrfmiddlewaretoken={{ csrf_token }}";
+
+                postAddressData(formData)
+
+
+
+            },
+            clear: function (e) {
+                var formElement = e.sender.element;
+                var form = formElement.data("kendoForm");
+                var streetComboBox = form.element.find('[name="street"]').data("kendoComboBox");
+                streetComboBox.value("");
+                streetComboBox.setDataSource([]);
+                $("#addressForm").hide();
+                $("#postalCodeForm").show();
+            }
+        }).hide();
+
+    });
+
+
+</script>
+
+
+{% endblock %}

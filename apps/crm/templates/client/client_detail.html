@@ -1,0 +1,22 @@
+{% extends base_template %}
+{% block content %}
+<div id="client-detail" class="col-md-6">
+  {% include '_alert.html' %}
+  <div class="card">
+    <div class="card-header">
+      <h5 class="card-title">Client Detail</h5>
+    </div>
+    <div class="card-body">
+      <p>Name: {{ object.name }}</p>
+      <p>Email Address: {{ object.email_address }}</p>
+      <p>Phone Number: {{ object.phone_number }}</p>
+      <div class="d-grid gap-2">
+        <button hx-get="{% url 'crm:client_update_view' object.pk %}" class="btn btn-primary" hx-target="#client-detail"
+          hx-swap="outerHTML">
+          Click To Edit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

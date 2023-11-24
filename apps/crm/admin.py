@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from apps.crm.models import Lead, LeadStatusDesc, LeadStatus, LeadDoc, Message, Contact, Client, ClientDoc
+from apps.crm.models import ClientDocStatus, ClientDocStatusDesc, Lead, LeadStatusDesc, LeadStatus, LeadDoc, Message, Contact, Client, ClientDoc
 
 # Register your models here.
 
@@ -12,3 +12,5 @@ admin.site.register(Message)
 admin.site.register(Contact)
 admin.site.register(Client)
 admin.site.register(ClientDoc)
+admin.site.register(ClientDocStatusDesc)
+admin.site.register(ClientDocStatus)

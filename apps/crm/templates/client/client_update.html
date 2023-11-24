@@ -1,0 +1,21 @@
+{% extends base_template %}
+{% block content %}
+<div id="client-update" class="col-md-6">
+  {% include '_alert.html' %}
+  <div class="card">
+    <div class="card-header">
+      <h5 class="card-title">Client Update</h5>
+    </div>
+    <div class="card-body">
+      <form hx-post="{% url 'crm:client_update_view' client.pk %}" hx-target="#client-update"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' hx-swap="outerHTML">
+        {{ form.as_p }}
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-primary" id="btn">Submit</button>
+          <button class="btn btn-secondary" hx-get="{% url 'crm:client_detail_view' client.pk %}">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

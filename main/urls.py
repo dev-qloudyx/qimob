@@ -27,6 +27,7 @@ urlpatterns = [
     path('docs/', include('apps.docs.urls', namespace='docs')),
     path('accounts/', include('allauth.urls')),
     path('crm/', include('apps.crm.urls', namespace='crm')),
+    path('address/', include('apps.address.urls', namespace='address')),
   
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + \

@@ -1,0 +1,53 @@
+{% extends base_template %}
+{% block content %}
+<div id="reload" class="py-5">
+    <h1 class="mb-4">Documents for {{ client.name }}</h1>
+    <a title="Adicionar"
+        class="btn btn-md" 
+        href="{% url 'crm:client_file_upload_view' pk=client.pk %}"
+        hx-get="{% url 'crm:client_file_upload_view' pk=client.pk %}"
+        hx-target="#reload"
+        hx-swap="outerHTML">
+        <i class="fas fa-plus"></i></a>
+    <div class="mt-5">
+        <h2 class="mb-3">Uploaded Files</h2>
+        <ul class="list-group">
+            <!-- Header -->
+            <li class="list-group-item d-flex justify-content-between">
+                <strong>Select</strong>
+                <strong>Name</strong>
+                <strong>Uploaded At</strong>
+                <strong>Status</strong>
+                <strong>Action</strong>
+            </li>
+            <!-- Documents -->
+            <form hx-post="{% url 'crm:client_files_delete_view' %}" hx-trigger="submit" hx-target="#reload" hx-swap="outerHTML">
+                <input type="hidden" name="multiple_delete" value="True">
+                {% csrf_token %}
+                {% for doc in object_list %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <input type="checkbox" name="tokens" value="{{ doc.token }}">
+                        <a>{{ doc }}</a>
+                        <a>{{ doc.created_at }}</a>
+                        {% for doc_status in status %}
+                            {% for key, value in doc_status.items %}
+                                {% if doc.token == key %}
+                                <span>{{ value }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                        <a href="{% url 'crm:client_file_view' token=doc.token %}">View File</a>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">No files uploaded yet.</li>
+                {% endfor %}
+                <button class="btn btn-primary" type="submit">Delete Selected</button>
+            </form>
+        </ul>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% include '_pagination.html' %}
+</div>
+{% endblock %}

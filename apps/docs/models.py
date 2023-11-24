@@ -1,4 +1,5 @@
 import os
+import uuid
 from django.db import models
 from apps.users.models import User
 from django.utils.translation import gettext_lazy as _
@@ -32,9 +33,10 @@ def user_directory_path(instance, filename):
     return f'uploads/{filename}'
 
 class File(BaseModel):
-    token = models.CharField(max_length=255, unique=True)
-    app = models.CharField(max_length=255)
-    model = models.CharField(max_length=255)
+    token = models.UUIDField(default=uuid.uuid4, editable=False)
+    project = models.CharField(max_length=255, null=True)
+    app = models.CharField(max_length=255, null=True)
+    model = models.CharField(max_length=255, null=True)
     upload = models.FileField(upload_to=user_directory_path)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)

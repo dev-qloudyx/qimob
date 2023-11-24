@@ -26,7 +26,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.getenv('DEBUG', default=0))
 
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS').split(' ')
+ALLOWED_HOSTS = ['*'] #os.getenv('DJANGO_ALLOWED_HOSTS').split(' ')
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'apps.docs.apps.DocsConfig',
     'apps.imovel.apps.ImovelConfig',
     'apps.crm.apps.CrmConfig',
-    'apps.morada.apps.MoradaConfig',
+    'apps.address.apps.AddressConfig',
     'django_htmx',
     'crispy_bootstrap5',
     'bootstrap5',
@@ -97,24 +97,24 @@ WSGI_APPLICATION = 'main.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": "qimobi",
-#     }
-# }
-
 DATABASES = {
-    'default': {
-        'ENGINE': os.getenv('POSTGRES_ENGINE',
-                    'django.db.backends.postgresql'),
-        'NAME': os.getenv('POSTGRES_DATABASE'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': os.getenv('POSTGRES_PORT'),
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "qimobi",
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': os.getenv('POSTGRES_ENGINE',
+#                     'django.db.backends.postgresql'),
+#         'NAME': os.getenv('POSTGRES_DATABASE'),
+#         'USER': os.getenv('POSTGRES_USER'),
+#         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+#         'HOST': os.getenv('POSTGRES_HOST'),
+#         'PORT': os.getenv('POSTGRES_PORT'),
+#     }
+# }
 
 
 # Password validation
@@ -228,3 +228,8 @@ LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'locale'),
 )
 
+URL = os.getenv('URL')
+
+X_FRAME_OPTIONS = 'ALLOWALL'
+
+XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']

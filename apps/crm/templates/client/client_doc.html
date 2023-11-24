@@ -4,7 +4,7 @@
   {% include '_alert.html' %}
   {% if file %}
   <h1>{{ file }}</h1>
-  <form method="post" action="{% url 'crm:client_file_delete' token=file.token %}">
+  <form method="post" action="{% url 'crm:client_file_delete_view' token=file.token %}">
     {% csrf_token %}
     <button type="submit">Delete</button>
   </form>

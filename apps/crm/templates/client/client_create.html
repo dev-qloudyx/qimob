@@ -1,20 +1,58 @@
 {% extends base_template %}
 {% block content %}
-<div id="client-create" class="col-md-6">
-  {% include '_alert.html' %}
-  <div class="card">
-    <div class="card-header">
-      <h5 class="card-title">Client Creation</h5>
-    </div>
-    <div class="card-body">
-      <form method="post" enctype="multipart/form-data" hx-post="{% url 'crm:client_create' %}" hx-target="#client-create" hx-swap="outerHTML">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <div class="d-grid gap-2">
-          <button type="submit" class="btn btn-primary">Submit</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+<form id="client_create_view"></form>
+<form id="postalCodeForm"></form>
+<form id="addressForm"></form>
+<script>
+  $(document).ready(function () {
+
+    function postClientData(formData) {
+      $.post("{% url 'crm:client_create_view' %}", formData, function (data) {
+        console.log(data);
+        if (data.error) {
+          console.log("Error: ", data.error);
+        } else {
+          console.log("Token: ", data);
+        }
+        console.log(formData);
+      });
+    }
+
+    $("#client_create_view").kendoForm({
+      orientation: "horizontal",
+      formData: {
+        name: "",
+        email_address: "",
+        phone_number: "",
+      },
+      items: [
+        { field: "name", label: "Name", validation: { required: true } },
+        { field: "email_address", label: "Email Address", validation: { required: true, email: true } },
+        {
+          field: "phone_number",
+          label: "Phone Number",
+          validation: { required: true },
+          editor: function (container, options) {
+            $('<input type="phone_number" id="PhoneNumber" name="' + options.field + '" title="PhoneNumber" required="required" autocomplete="off" />')
+              .appendTo(container)
+              .kendoMaskedTextBox({
+                mask: "+351 000 000 000"
+              });
+
+          },
+        },
+      ],
+      submit: function (e) {
+        e.preventDefault();
+        var formElement = e.sender.element;
+        var formData = formElement.serialize() + "&csrfmiddlewaretoken={{ csrf_token }}";
+        postClientData(formData);
+        //form.clear();
+      },
+    });
+  });
+
+
+
+</script>
 {% endblock %}

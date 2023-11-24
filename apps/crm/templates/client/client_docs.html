@@ -1,39 +1,379 @@
 {% extends base_template %}
 {% block content %}
-<div id="reload" class="py-5">
-    <h1 class="mb-4">Documents for {{ client.name }}</h1>
-    <a title="Adicionar" class="btn btn-md" href="{% url 'crm:client_file_upload' pk=client.pk %}"
-        hx-get="{% url 'crm:client_file_upload' pk=client.pk %}" hx-target="#reload" hx-swap="outerHTML"><i
-            class="fas fa-plus"></i></a>
-    <div class="mt-5">
-        <h2 class="mb-3">Uploaded Files</h2>
-        <ul class="list-group">
-            <!-- Header -->
-            <li class="list-group-item d-flex justify-content-between">
-                <strong>Select</strong>
-                <strong>Name</strong>
-                <strong>Uploaded At</strong>
-                <strong>Action</strong>
-            </li>
-            <!-- Documents -->
-            <form hx-post="{% url 'crm:client_files_delete' %}" hx-trigger="submit" hx-target="#reload" hx-swap="outerHTML">
-                <input type="hidden" name="multiple_delete" value="True">
-                {% csrf_token %}
-                {% for doc in docs %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <input type="checkbox" name="tokens" value="{{ doc.token }}">
-                    <a href="{% url 'crm:client_file_view' token=doc.token %}">View File</a>
-                    <a href="{{ doc.file.upload.url }}">{{ doc.file }}</a>
-                    <a>{{ doc.created_at }}</a>
-                </li>
-                {% empty %}
-                <li class="list-group-item">No files uploaded yet.</li>
-                {% endfor %}
-                <button type="submit">Delete Selected</button>
-            </form>
+<div id="client-filemanager">
+    <div id="filemanager">
     </div>
+    <div id="dialog"></div>
+    <div id="dialog2" data-fetch-url="{% url 'crm:client_status_desc_view' %}"></div>
+    <script>
 
-    <!-- Pagination -->
-    {% include '_pagination.html' %}
+        window.addEventListener('touchstart', function(event) {
+            event.preventDefault();
+        });
+
+        function initializeGroupButtons() {
+            $("#group-btns").kendoButtonGroup({
+                index: 0
+            });
+        };
+
+        function initializeStatusButton() {
+            $("#statusButton").kendoButton({
+                icon: "arrow-rotate-cw"
+            });
+        };
+
+        function initializeDownloadButton() {
+            $("#dowloadButton").kendoButton({
+                icon: "download"
+            });
+        };
+
+        function initializeClientButton() {
+            $("#clientName").kendoButton({
+                icon: "user"
+            });
+        };
+
+        var win, pdfViewer;
+
+        function initializeOpenButtonAndHandlePDF() {
+            $.when(
+                $.getScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.2.2/pdf.js"),
+                $.getScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.2.2/pdf.worker.js")
+            )
+            .done(function () {
+                window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.2.2/pdf.worker.js';           
+            }).then(function(){
+                $("#openButton").kendoButton({
+                    icon: "hyperlink-open",
+                    click: function(e) {
+                        var path = $("#openButton").val();
+                        console.log(path);
+
+                        if (win) {
+                            win.destroy();
+                        }
+                        if (pdfViewer) {
+                            pdfViewer.destroy();
+                        }
+
+                        win = $("<div />").kendoWindow({
+                            title: "PDF Viewer",
+                            modal: true,
+                        }).data("kendoWindow");
+
+                        win.content('<div id="pdfViewer"></div>');
+                        pdfViewer = $("#pdfViewer").kendoPDFViewer({
+                            pdfjsProcessing: {
+                                file: path
+                            },
+                        }).data("kendoPDFViewer");
+
+                        win.center().open();
+                    }
+                });
+            });
+        }
+
+        function initializeOpenButtonAndHandleOpen() {
+            
+            $("#openButton").kendoButton({
+                
+                icon: "hyperlink-open",
+                click: function(e) {
+                    var path = $("#openButton").val();
+                    var width = $("#openButton").data('width') * 1.09;
+                    var height = $("#openButton").data('height') * 1.12;
+                    console.log(width, height)
+                    
+                    var win = $("<div />").kendoWindow({
+                        title: "File Viewer",
+                        width: width,
+                        height: height,
+                        modal: true
+                    }).data("kendoWindow");
+
+                    
+                    win.refresh({
+                        url: path,
+                        iframe: true
+                    });
+                    
+                    win.center().open();
+                }
+            });
+        }
+
+        function checkFileViewExtension(){
+            var filePath = $("#openButton").val();
+            var fileExtension = filePath.split('.').pop().toLowerCase();
+            if (fileExtension === 'pdf') {
+                initializeOpenButtonAndHandlePDF();
+            } else {
+                initializeOpenButtonAndHandleOpen();
+            }
+        }
+
+        var buttonToken;
+        var dialog2 = $("#dialog2").kendoDialog({
+            width: "450px",
+            title: "Document Status",
+            closable: true,
+            modal: true,
+            content: `<p>Do you really want to change the status?</p>
+            <select id="myDropDown" style="width: 100%;"></select>`,
+            visible: false,
+            actions: [
+                { text: 'Cancel' },
+                {
+                    text: 'Submit',
+                    primary: true,
+                    action: function (e) {
+                        var dropdownStatusDesc = $("#myDropDown").data("kendoDropDownList").value();
+                        var url = "{% url 'crm:client_status_change_view' %}";
+                        var client_id = "{{ client.pk }}";
+
+                        var requestBody = {
+                            client_id: client_id,
+                            status_desc: dropdownStatusDesc,
+                            token: buttonToken
+                        };
+
+                        fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            body: JSON.stringify(requestBody)
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                var filemanager = $("#filemanager").getKendoFileManager();
+                                filemanager.refresh();
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                            });
+                        return true;
+                    },
+                }
+            ],
+            open: function (e) {
+                var url = $("#dialog2").data("fetch-url");
+                $.get(url, { token: buttonToken }, function (response) {
+                    $("#myDropDown").kendoDropDownList({
+                        dataTextField: "desc",
+                        dataValueField: "id",
+                        dataSource: response,
+                        index: 0
+                    });
+                });
+            }
+        }).data("kendoDialog");
+
+        $(document).on("click", "#statusButton", function () {
+            buttonToken = $(this).attr("value");
+            dialog2.open();
+        });
+
+        $(document).on("click", "#dowloadButton", function () {
+            var downloadPath = $(this).val();
+            window.location.href = downloadPath;
+        });
+
+        $("#filemanager").kendoFileManager({
+            culture: "pt-PT",
+            initialView: "grid",
+            views: {
+                grid: {
+                    columns: [
+                        { field: "name", title: "Nome", width: "auto" },
+                        { field: "status", title: "Estado", width: "auto" }
+                    ]
+                },
+                tree: false
+            },
+            previewPane: {
+                singleFileTemplate: kendo.template($("#custom-preview-template").html()),
+                metaFields: ["name", "extension", "size", "status", "created", "height", "width"]
+
+            },
+            dataSource: {
+                schema: kendo.data.schemas.filemanager,
+                transport: {
+                    read: {
+                        url: "{% url 'crm:client_docs_kendo_file_manager_view' pk=client.pk %}",
+                        method: "GET",
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                    },
+                    create: {
+                        url: "{% url 'crm:client_file_upload_view' pk=client.pk %}",
+                        method: "POST",
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                    },
+                    update: {
+                        url: "https://demos.telerik.com/kendo-ui/service/FileManager/Update",
+                        method: "POST",
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                    },
+                    destroy: {
+                        url: function (data) {
+                            var urlTemplate = "{% url 'crm:client_file_delete_view' token='__token__' %}";
+                            return urlTemplate.replace('__token__', data.token);
+                        },
+                        method: "POST",
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                    }
+                }
+            },
+            uploadUrl: "{% url 'crm:client_file_upload_view' pk=client.pk %}",
+
+            toolbar: {
+                items: [
+                    { template: '<a role="button" id="clientName" class="k-button k-button-solid-base k-button-solid k-button-md k-rounded-md" href="{% url "crm:client_detail_view" pk=client.pk %}" disabled><span class="k-icon k-i-user"></span>' + '{{ client.name }}' + "</a>" },
+                    "upload",
+                    "sortDirection",
+                    "sortField",
+                    "changeView",
+                    "spacer",
+                    "details",
+                    "search"
+                ]
+                    },
+            
+            contextMenu: {
+                items: [
+                    { name: "delete" },
+                ],
+            },
+
+            draggable: true,
+            resizable: true,
+
+        });
+        
+        var filemanagerNS = kendo.ui.filemanager;
+        
+        var originalSearchCommandExec = filemanagerNS.commands.SearchCommand.prototype.exec;
+
+        filemanagerNS.commands.SearchCommand.prototype.exec = function () {
+            var that = this,
+                options = that.options;
+        		options.operator = "contains";
+            originalSearchCommandExec.call(this);
+        };
+
+        initializeClientButton();
+    </script>
+    <script id="custom-preview-template" type="text/kendo-ui-template">
+    <div class="#=styles.fileInfo#">
+        #if(metaFields){#
+            <dl class="#=styles.fileMetaWrapper#">
+                #for(var i = 0; i < metaFields.length; i+=1){#
+                    #var field = metaFields[i]#
+                    #if(field !== "width" && field !== "height"){#
+                        <dt class="#=styles.metaLabel#">#=field.charAt(0).toUpperCase() + field.slice(1)#: </dt>
+                        <dd class="#=styles.metaValue# #=styles[field]#">
+                            #if(field == "size"){#
+                            #=kendo.getFileSizeMessage(selection[0][field])#
+                            #} else if(selection[0][field] instanceof Date) {#
+                            #=kendo.toString(selection[0][field], "G")#
+                            #} else if(field == "extension") {#
+                            #=selection[0][field]#
+                            #}
+                             else {#
+                            #=selection[0][field]#
+                            #}#
+                        </dd>
+                        <dd class="line-break"></dd>
+                    #}#
+                # } #
+            </dl>
+        #}#
+        <div class="btn-group" role="group" aria-label="Button group">
+            
+        </div>
+        <div id="group-btns">
+            <button id="dowloadButton" type="button" value="#=selection[0].download_path#">Download</button>
+            <button id="openButton" type="button" value="#=selection[0].download_path#" data-width="#=selection[0].width#" data-height="#=selection[0].height#">View</button>
+            <button id="statusButton" type="button" value="#=selection[0].token#">Change Status</button>
+        </div>
+    </div>
+    <script>
+        initializeGroupButtons();
+        initializeStatusButton();
+        initializeDownloadButton();
+        checkFileViewExtension();
+    </script>
+    </script>
+
+    <style>
+        @media only screen and (max-width: 600px) {
+            .k-dialog {
+                left: 50% !important;
+                transform: translateX(-50%);
+            }
+        }
+
+        .k-filemanager-navigation {
+            display: none;
+        }
+
+        .k-splitbar-horizontal {
+            display: none;
+        }
+
+        .k-filemanager-breadcrumb {
+            display: none;
+        }
+     
+    </style>
+    <style>
+
+        .fileInfo {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+        }
+
+        .filePreviewWrapper {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .fileTitleWrapper {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .fileTitle {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .fileMetaWrapper {
+            margin-top: 20px;
+        }
+
+        .metaLabel {
+            font-weight: bold;
+        }
+
+        .metaValue {
+            margin-left: 10px;
+        }
+
+        .line-break {
+            border-bottom: 1px solid #ddd;
+            margin: 10px 0;
+        }
+    </style>
+
 </div>
 {% endblock %}
