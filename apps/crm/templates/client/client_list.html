@@ -27,8 +27,8 @@
                                 hx-swap="outerHTML" class="btn btn-info">Docs</a>
                         </td>
                         <td>
-                            <a href="{% url 'crm:client_file_upload_view' pk=client.pk %}"
-                                hx-get="{% url 'crm:client_file_upload_view' pk=client.pk %}" hx-target="#cliente-list"
+                            <a href="{% url 'crm:client_docs_upload_view' pk=client.pk %}"
+                                hx-get="{% url 'crm:client_docs_upload_view' pk=client.pk %}" hx-target="#cliente-list"
                                 hx-swap="outerHTML" class="btn btn-success">Upload Doc</a>
                         </td>
                     </tr>

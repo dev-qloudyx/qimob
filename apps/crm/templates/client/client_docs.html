@@ -4,7 +4,7 @@
     <div id="filemanager">
     </div>
     <div id="dialog"></div>
-    <div id="dialog2" data-fetch-url="{% url 'crm:client_status_desc_view' %}"></div>
+    <div id="dialog2" data-fetch-url="{% url 'crm:client_status_desc_all_view' %}"></div>
     <script>
 
         window.addEventListener('touchstart', function(event) {
@@ -205,12 +205,12 @@
                 schema: kendo.data.schemas.filemanager,
                 transport: {
                     read: {
-                        url: "{% url 'crm:client_docs_kendo_file_manager_view' pk=client.pk %}",
+                        url: "{% url 'crm:client_docs_list_view_json' pk=client.pk %}",
                         method: "GET",
                         headers: { 'X-CSRFToken': '{{ csrf_token }}' }
                     },
                     create: {
-                        url: "{% url 'crm:client_file_upload_view' pk=client.pk %}",
+                        url: "{% url 'crm:client_docs_upload_view_json' pk=client.pk %}",
                         method: "POST",
                         headers: { 'X-CSRFToken': '{{ csrf_token }}' }
                     },
@@ -221,7 +221,7 @@
                     },
                     destroy: {
                         url: function (data) {
-                            var urlTemplate = "{% url 'crm:client_file_delete_view' token='__token__' %}";
+                            var urlTemplate = "{% url 'crm:client_docs_delete_view' token='__token__' %}";
                             return urlTemplate.replace('__token__', data.token);
                         },
                         method: "POST",
@@ -229,7 +229,7 @@
                     }
                 }
             },
-            uploadUrl: "{% url 'crm:client_file_upload_view' pk=client.pk %}",
+            uploadUrl: "{% url 'crm:client_docs_upload_view_json' pk=client.pk %}",
 
             toolbar: {
                 items: [

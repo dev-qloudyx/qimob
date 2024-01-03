@@ -1,4 +1,6 @@
 
+from django.http import JsonResponse
+from apps.users.models import User
 from .forms import UserUpdateForm, ProfileUpdateForm
 from apps.users.roles import roles_required
 from allauth.account.views import  SignupView, PasswordChangeView
@@ -26,7 +28,10 @@ class CustomRedirectMixin(RedirectAuthenticatedUserMixin):
         else:
             return super().dispatch(request, *args, **kwargs)
 
-
+class UserListViewJson(View):
+    def get(self, request, *args, **kwargs):
+        users = User.objects.all().values('id', 'username', 'email')
+        return JsonResponse(list(users), safe=False)
 
 class CustomPasswordChangeView(PasswordChangeView):
     template_name = "account/password_change.html"

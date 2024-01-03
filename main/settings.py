@@ -38,10 +38,12 @@ AUTHENTICATION_BACKENDS = [
 INSTALLED_APPS = [
     'apps.users.apps.UsersConfig',
     'apps.agenda.apps.AgendaConfig',
-    'apps.docs.apps.DocsConfig',
     'apps.imovel.apps.ImovelConfig',
     'apps.crm.apps.CrmConfig',
-    'apps.address.apps.AddressConfig',
+    'qaddress',
+    'qdocs',
+    'qmessages',
+    'django_filters',
     'django_htmx',
     'crispy_bootstrap5',
     'bootstrap5',
@@ -71,6 +73,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
+    'qajax_middleware.middleware.AjaxMiddleware',
 ]
 
 ROOT_URLCONF = 'main.urls'

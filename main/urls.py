@@ -24,10 +24,11 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('apps.users.urls', namespace='users')),
-    path('docs/', include('apps.docs.urls', namespace='docs')),
     path('accounts/', include('allauth.urls')),
     path('crm/', include('apps.crm.urls', namespace='crm')),
-    path('address/', include('apps.address.urls', namespace='address')),
+    path('docs/', include('qdocs.urls', namespace='docs')),
+    path('address/', include('qaddress.urls', namespace='address')),
+    path('messages/', include('qmessages.urls', namespace='messages')),
   
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + \

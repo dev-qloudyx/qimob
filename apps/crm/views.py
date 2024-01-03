@@ -1,27 +1,28 @@
 import json
 import os
-from typing import Any
-from urllib.parse import urljoin
+from apps.crm.forms import ClientForm
+from apps.crm.models import Client, ClientAddress, ClientDoc, ClientDocStatus, ClientDocStatusDesc, ClientMessage
+from apps.crm.utils import handle_not_found, is_image
+from qaddress.views import AddressView, retrieveAddressDataByToken, updateAddressDataByToken
+from qdocs.views import FileDeleteView, FileListView, FileUploadView, FileView
+from qmessages.views import MessageCreateView, MessageListView
+
 from django.conf import settings
+from django.contrib import messages
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.views import View
-from apps.address.forms import AddressForm
-from apps.address.views import AddressView
-from apps.crm.forms import ClientForm
-from apps.crm.utils import get_image_dimensions, is_image
-from apps.docs.views import FileDeleteView, FileListView, FileUploadView, FileView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
-from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
-from apps.crm.models import Client, ClientAddress, ClientDoc, ClientDocStatus, ClientDocStatusDesc
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.core.files.storage import default_storage
+from typing import Any
+from urllib.parse import urljoin
 
 # Create your views here.
+
 class ClientCreateView(CreateView):
     model = Client
     form_class = ClientForm
@@ -32,12 +33,10 @@ class ClientCreateView(CreateView):
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
-        response = super().form_valid(form)
-        #form2.instance = self.object
-        #ClientAddressView().post(self.request, pk=self.object.pk, form2_data=form2.cleaned_data)
+        super().form_valid(form)
         messages.success(self.request, 'Client created successfully!')
-        return response
-    
+        pk = self.object.pk
+        return HttpResponse(json.dumps( pk, ensure_ascii=False), content_type="application/json")
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -54,6 +53,8 @@ class ClientUpdateView(UpdateView):
     form_class = ClientForm
     template_name = 'client/client_update.html'
     
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -71,9 +72,21 @@ class ClientUpdateView(UpdateView):
     def get_success_url(self):
         return reverse_lazy('crm:client_detail_view', kwargs={'pk': self.object.pk})
 
-class ClientDetailView(DetailView):
+class ClientUpdateViewJson(UpdateView):
     model = Client
-    template_name = 'client/client_detail.html'
+    form_class = ClientForm
+    template_name = 'client/client_update.html'
+    
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+        
+    def form_valid(self, form):
+        super().form_valid(form)
+        return JsonResponse({'success': 'Client updated successfully!'}, status=200)
+    
+    def form_invalid(self, form):
+        super().form_invalid(form)
+        return JsonResponse({'error': form.errors}, status=400)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -83,6 +96,45 @@ class ClientDetailView(DetailView):
             context['base_template'] = "base.html"
         return context
     
+    def get_success_url(self):
+        return reverse_lazy('crm:client_detail_view', kwargs={'pk': self.object.pk})
+    
+class ClientDetailView(DetailView):
+    model = Client
+    template_name = 'client/client_detail.html'
+
+    def get(self, request, *args, **kwargs):
+        client_id = request.GET.get('client_id', None) or kwargs.get('pk', None)
+        self.object = get_object_or_404(Client, pk=client_id)
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.htmx:
+            context['base_template'] = "partial_base.html"
+        else:
+            context['base_template'] = "base.html"
+        return context
+
+class ClientDetailViewJson(View):
+    model = Client
+
+    def get(self, request, *args, **kwargs):
+        try:
+            client_id = request.GET.get('client_id', None) or kwargs.get('pk', None)
+            client = self.model.objects.get(id=client_id)
+            data = {}
+            data['client'] = {
+                'id': client.id,
+                'name': client.name,
+                'email_address': client.email_address,
+                'phone_number': client.phone_number
+            }
+            return JsonResponse(data, safe=False)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=404)
+        
 class ClientListView(ListView):
     model = Client
     paginate_by = 5
@@ -104,10 +156,8 @@ class ClientListView(ListView):
         })
         return context
 
+# Document Integration Below.
 
-###########################
-# Docs Integration Below. #
-###########################
 class ClientChangeStatusView(View):
     
     def post(self, request, *args, **kwargs):
@@ -130,7 +180,7 @@ class ClientChangeStatusView(View):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     
-class StatusDescJsonView(View):
+class StatusDescAllViewJson(View):
     def get(self, request, *args, **kwargs):
         token = request.GET.get('token')
         clientdoc = ClientDoc.objects.get(token=token)
@@ -141,7 +191,7 @@ class StatusDescJsonView(View):
         status_desc_list = [d for d in status_desc_list if d['desc'] != last_status.doc_desc.desc]
         return JsonResponse(status_desc_list, safe=False)
     
-class ClientDocskendoFileManagerListView(FileListView):
+class ClientDocsListViewJson(FileListView):
     paginate_by = 105
     template_name = 'client/client_docs.html'
 
@@ -179,7 +229,13 @@ class ClientDocskendoFileManagerListView(FileListView):
             directory, full_filename = file_path.rsplit('/', 1)
             base = settings.URL
             full_url = urljoin(base, i.upload.url)
-            name, extension = full_filename.split('.', 1)
+            
+            try:
+                name, extension = full_filename.split('.', 1)
+            except:
+                name = os.path.splitext(full_filename)[0]
+                extension = None
+
             for status in status_list:
                 for token, status_value in status.items():
                     if token == str(i.token):
@@ -193,7 +249,7 @@ class ClientDocskendoFileManagerListView(FileListView):
                 'name': name,
                 'isDirectory': False,
                 'hasDirectories': False,
-                'path': f"{i.upload.url}/{i.upload}",
+                'path': i.upload.url,
                 'extension': extension,
                 'size': i.upload.size,
                 'created': i.created_at.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
@@ -206,7 +262,7 @@ class ClientDocskendoFileManagerListView(FileListView):
                 response['width'] = width
                 response['height'] = height
             data.append(response)
-        return JsonResponse(data, safe=False)
+        return JsonResponse(data, safe=False, status=200)
 
 class ClientDocsListView(FileListView):
     paginate_by = 5
@@ -242,9 +298,8 @@ class ClientDocsListView(FileListView):
     def get(self, request, *args, **kwargs):
         self.tokens = [obj.token for obj in ClientDoc.objects.filter(client=self.kwargs.get('pk')).order_by('id')]
         return super().get(request, *args, **kwargs)
-
-@method_decorator(csrf_exempt, name='dispatch')      
-class ClientFileUploadView(FileUploadView):
+     
+class ClientDocsUploadView(FileUploadView):
     base_template = "base.html"
     template_name = 'client/client_upload.html'
     
@@ -273,16 +328,51 @@ class ClientFileUploadView(FileUploadView):
         client = get_object_or_404(Client, pk=kwargs['pk'])
         for token in tokens:
             client_doc = ClientDoc.objects.create(token=token, client=client)
-            client_doc_status_desc = ClientDocStatusDesc.objects.get(desc="Created")
+            client_doc_status_desc = ClientDocStatusDesc.objects.get(desc="New")
             client_doc_status = ClientDocStatus.objects.create(client_doc=client_doc, doc_desc=client_doc_status_desc)
-            client_doc_status.next_status()
+            #client_doc_status.next_status()
         
         data = [{"size":454536,"name":"test.png","type":"f"}]
         
-        return JsonResponse(data, safe=False)
-        #return redirect('crm:client_docs_list_view', pk=kwargs['pk'])
+        return redirect('crm:client_docs_list_view', pk=kwargs['pk'])
 
-class ClientFileView(FileView):
+class ClientDocsUploadViewJson(FileUploadView):
+    base_template = "base.html"
+    template_name = 'client/client_upload.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.htmx:
+            context['base_template'] = "partial_base.html"
+        else:
+            context['base_template'] = self.base_template
+        return context
+    
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        form = super().get_form()
+        client = get_object_or_404(Client, pk=kwargs['pk'])
+        context['client'] = client
+        context['form'] = form
+        return JsonResponse(context, safe=False)
+        
+    def post(self, request, *args, **kwargs):
+        kwargs['project'] = 'qimob'
+        kwargs['app'] = 'crm'
+        kwargs['model'] = 'Client'
+        tokens = super().post(request, *args, **kwargs)
+        client = get_object_or_404(Client, pk=kwargs['pk'])
+        for token in tokens:
+            client_doc = ClientDoc.objects.create(token=token, client=client)
+            client_doc_status_desc = ClientDocStatusDesc.objects.get(desc="New")
+            client_doc_status = ClientDocStatus.objects.create(client_doc=client_doc, doc_desc=client_doc_status_desc)
+            #client_doc_status.next_status()
+        
+        data = [{"size":454536,"name":"test.png","type":"f"}]
+        
+        return JsonResponse({"success":"upload finished"}, safe=False, status=200)
+
+class ClientDocsView(FileView):
     base_template = "base.html"
     template_name = 'client/client_doc.html'
 
@@ -294,7 +384,7 @@ class ClientFileView(FileView):
             context['base_template'] = self.base_template
         return context
 
-class ClientFileDeleteView(FileDeleteView):
+class ClientDocsDeleteView(FileDeleteView):
     template_name = 'client/client_docs.html'
 
     def get_context_data(self, **kwargs):
@@ -328,11 +418,9 @@ class ClientFileDeleteView(FileDeleteView):
                 client = get_object_or_404(Client, pk=client_doc.client.id)
             return redirect('crm:client_docs_list_view', pk=client.pk)
         
-##############################
-# Address Integration Below. #
-##############################
+# Address Integration Below.
 
-class ClientAddressView(AddressView):
+class ClientAddressCreateView(AddressView):
     base_template = "base.html"
     template_name = 'client/client_address.html'
 
@@ -352,16 +440,78 @@ class ClientAddressView(AddressView):
         context['form'] = form
         return render(request, self.template_name, context)
     
-    def post(self, request, form2_data, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
+        client_id = request.POST.get('client_id')
+        client = get_object_or_404(Client, pk=client_id)
         kwargs['project'] = 'qimob'
         kwargs['app'] = 'crm'
         kwargs['model'] = 'Client'
         response = super().post(request, *args, **kwargs)
-
+        
         if response.get('success'):
-            client = get_object_or_404(Client, pk=kwargs['pk'])
-            ClientAddress.objects.create(token=response['success'], client=client, **form2_data)
-            return response.get('success')
-        else:
-            return response.get('error')
             
+            ClientAddress.objects.create(token=response['success'], client=client)
+            return JsonResponse(response.get('success'), safe=False)
+        else:
+            return JsonResponse(response.get('error'), safe=False)
+
+class ClientAddressView(retrieveAddressDataByToken):
+    
+    def get(self, request, pk, *args, **kwargs):
+        client = Client.objects.get(id=pk)
+        client_address = ClientAddress.objects.filter(client=client).order_by('id')
+        tokens = [obj.token for obj in client_address]
+        kwargs['tokens'] = tokens
+        response = super().get(request, *args, **kwargs)
+        data = {}
+        if response.get('success'):
+            data['address'] = response.get('success')
+            return JsonResponse(data, safe=False, status=200)
+        else:
+            data['error'] = response.get('error')
+            return JsonResponse(data, safe=False, status=404)
+    
+class ClientUpdateAddressDataByTokenJsonView(updateAddressDataByToken):
+    
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+    
+# Notes Integration Below.
+
+class ClientMessageCreateView(MessageCreateView):
+     
+    def post(self, request, *args, **kwargs):
+        client_id = request.POST.get('client_id') or kwargs.get('pk')
+        client = get_object_or_404(Client, pk=client_id)
+        kwargs['project'] = 'qimob'
+        kwargs['app'] = 'crm'
+        kwargs['model'] = 'Client'
+        response = super().post(request, *args, **kwargs)
+        if 'error' not in response:
+            ClientMessage.objects.create(token=response['success'], client=client)
+            return JsonResponse({"success":"Message created successfully."}, safe=False)
+        else:
+            return JsonResponse({"error": "Message not created successfully."}, safe=False)
+
+class ClientMessageListView(MessageListView):
+
+    def get(self, request, pk, *args, **kwargs):
+        try:
+            client = Client.objects.get(id=pk)
+        except Client.DoesNotExist:
+            return handle_not_found(request, "Client not found.")
+        
+        client_message = ClientMessage.objects.filter(client=client).order_by('id')
+        if not client_message:
+            handle_not_found(request, "ClientMessage not found.")
+        client_tokens = [str(msg.token) for msg in client_message]
+        kwargs['tokens'] = client_tokens
+        return super().get(request, *args, **kwargs)
+
+    
+        
+
+        
+        
+            
+        

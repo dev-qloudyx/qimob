@@ -13,12 +13,17 @@ crispy-bootstrap5 = "*"
 django-allauth = "*"
 pillow = "*"
 django-htmx = "*"
-pandas = "*"
+QAddress = {file = "packages/QAddress-0.0.1.tar.gz"}
+QDocs = {file = "packages/QDocs-0.0.1.tar.gz"}
+QMessages = {file = "packages/QMessages-0.0.1.tar.gz"}
+QAjaxMiddleware = {file = "packages/QAjaxMiddleware-0.0.1.tar.gz"}
+django-filter = "*"
 
 [dev-packages]
 django-extensions = "*"
 graphviz = "*"
 pydotplus = "*"
+pipdeptree = "*"
 
 [requires]
 python_version = "3.11"

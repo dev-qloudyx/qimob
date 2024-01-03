@@ -13,8 +13,15 @@
   CONTENT STYLE
 ----------------------------------------------------- */
 
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 #content {
   display: flex;
+  flex-direction: column;
   padding: 0px;
   flex: 1; 
   margin-left: 20px; 
@@ -27,18 +34,17 @@
   border: 1px solid #dddddd;
   border-bottom-left-radius: 3px; 
   border-bottom-right-radius: 3px;
-  flex: 1; 
+  flex: 1;
 }
 
-body {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+#tabstrip {
+  flex-grow: 1;
+  flex: 1;
 }
+
 footer {
   margin-top: auto;
 }
-
 
 
 /* ---------------------------------------------------

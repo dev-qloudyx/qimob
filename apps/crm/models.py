@@ -56,15 +56,6 @@ class Contact(models.Model):
     def __str__(self):
         return self.name
 
-class Message(models.Model):
-    message = models.CharField(_("message"), max_length=500, blank=True)
-    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
-    updated_on = models.DateTimeField(_("updated on"), auto_now=True)
-    contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.message
-
 
 class Client(models.Model):
     name = models.CharField(_("name"), max_length=255)
@@ -77,6 +68,15 @@ class Client(models.Model):
         return self.name
 
 class ClientAddress(models.Model):
+    token =  models.CharField(_("token"), max_length=255)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("updated at"), auto_now=True)
+    deleted = models.BooleanField(default=False)
+
+    objects = BaseModelManager()
+
+class ClientMessage(models.Model):
     token =  models.CharField(_("token"), max_length=255)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
