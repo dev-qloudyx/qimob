@@ -1,113 +1,54 @@
 {% load static %}
 {% load i18n %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/base_sidebar.css' %}">
-<style>
- .sidebar-fixed {
-  position: fixed !important;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  height: 100vh;
-  overflow: auto;
-  overflow-x: hidden;
-  background-color: black;
-  box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
-}
-.sidebar-flex {
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  padding: 3px;
-  color: white;
-  justify-content: center;
-  align-items: center;
-}
-</style>
-<div x-cloak x-data="sidebar()" class="sidebar-flex">
-  <div x-cloak wire:ignore
-    :class="{'w-56': (sidebarClosed && !isMobile), 'w-16': (!sidebarClosed && !isMobile), 'd-none': isMobile}"
-    class="sidebar-fixed">
-    <div class="fixed top-0 z-50 transition-all duration-300">
-      <div class="flex justify-end">
-        <a @click="toggleSidebar()" :class="{'hover:bg-gray-300': !sidebarClosed, 'hover:bg-gray-700': sidebarClosed}"
-          class="transition-all duration-300 w-8 p-1 mx-3 my-2 rounded-full focus:outline-none" :disabled="isMobile" style="color:white">
-          
-          <!-- Left Arrow Icon -->
-          <svg x-show="!sidebarClosed && !isMobile" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-          </svg>
 
-          <!-- Right Arrow Icon -->
-          <svg x-show="sidebarClosed && !isMobile" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
-          </svg>
-        </a>
-      </div>
-    </div>
-    <hr>
-    <ul class="nav nav-pills flex-column mb-auto">
-      <li class="nav-item">
-        <a href="#" class="nav-link active" aria-current="page">
-          <svg class="bi pe-none me-2" width="16" height="16">
-            <use xlink:href="#home" />
-          </svg>
-          <span x-show="!sidebarClosed && !isMobile">Home</span>
-        </a>
-      </li>
-      <li>
-        <a href="{% url 'crm:client_list_view' %}" class="nav-link text-white">
-          <svg class="bi pe-none me-2" width="16" height="16">
-            <use xlink:href="#table" />
-          </svg>
-          <span x-show="!sidebarClosed && !isMobile">Clientes</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-            <svg class="bi pe-none me-2" width="16" height="16">
-                <use xlink:href="#speedometer2" />
-            </svg>
-            <span x-show="!sidebarClosed && !isMobile">CRM</span>
-        </a>
-    </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi pe-none me-2" width="16" height="16">
-            <use xlink:href="#grid" />
-          </svg>
-          <span x-show="!sidebarClosed && !isMobile">Products</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi pe-none me-2" width="16" height="16">
-            <use xlink:href="#people-circle" />
-          </svg>
-          <span x-show="!sidebarClosed && !isMobile">Customers</span>
-        </a>
-      </li>
-    </ul>
-    <hr>
-    <div class="dropdown">
-      <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-        data-bs-toggle="dropdown" aria-expanded="false" @click="sidebarClosed ? toggleSidebar() : null">
-        <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-        <strong x-show="!sidebarClosed && !isMobile">Profile</strong>
+<div id="mySidenav" class="sidenav">
+  <div class="sideover">
+    <div class="link">
+      <a href="#" >
+        Agenda 
+        <img class="icon" src="{% static 'images/calendar.png' %}" alt="Table Icon">
       </a>
-      <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-        <li><a class="dropdown-item" href="#">New project...</a></li>
-        <li><a class="dropdown-item" href="#">Settings</a></li>
-        <li><a class="dropdown-item" href="#">Profile</a></li>
-        <li>
-          <hr class="dropdown-divider">
-        </li>
-        <li>
-          <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal"><i class="bi bi-box-arrow-right"></i> Logout</a>
-        </li>
-      </ul>
+    </div>
+      
+        
+    <div class="link">
+      <a href="#">Leads
+        <img class="icon" src="{% static 'images/table_icon.png' %}" alt="Table Icon">
+      </a>
+      </div>
+    
+    <div class="link">
+        <a href="#">Imóveis
+          <img class="icon" src="{% static 'images/house.png' %}" alt="Table Icon">
+     </a>
+    </div>
+    
+    <div class="link">
+      <a href="{% url 'crm:client_list_view' %}">Clientes
+        <img class="icon" src="{% static 'images/client.png' %}" alt="Table Icon">
+      </a>
+    </div>
+  
+    <div class="link">
+      <a href="#">Equipa
+        <img class="icon" src="{% static 'images/team.png' %}" alt="Table Icon">
+      </a>
     </div>
   </div>
+    <div class="options link">
+      <a href="#">Opções
+        
+        <img class="icon" src="{% static 'images/settings.png' %}" alt="Table Icon">
+      </a>
+    </div>
+
+
+    <div class=" footer">
+      <a href="https://qloudyx.pt" target="_blank" style="font-size: 15px; text-align: justify;">
+        &copy; {% now "Y" %}, <br> eXcellerated <br> by qloudyx.
+      </a>
+    </div>
+
 </div>
 
-  <script src="{% static 'js/sidebar_bootstrap5.js' %}"></script>

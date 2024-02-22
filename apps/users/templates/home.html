@@ -1,10 +1,80 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
+{% load static %}
 {% load i18n %}
 
 
 {% block content%}
-    <div class="content-section">
-        <h1>HOME</h1>
+<div class="container1">
+      
+    <div class="grid3">
+
+
+      
+      <h1>
+        <img src="{% static 'images/table_color.png' %}" alt=""> Leads (0)
+      </h1>
+
+      <div class="leadfilters">
+        <div class="boxfilter"><h4>Compra <br> (0)</h4></div>
+        <div class="boxfilter"><h4>Venda <br> (0)</h4></div>
+        <div class="boxfilter"><h4>Aberto <br> (0)</h4></div>
+        <div class="boxfilter"><h4>Em Progresso <br> (0)</h4></div>
+        <div class="boxfilter"><h4>Fechado <br> (0)</h4></div>
+        <div class="boxfilter"><h4>Compra <br> (0)</h4></div>
+        <div class="boxfilter"><h4>Compra <br> (0)</h4></div>
+        <div class="boxfilter"><h4>Compra <br> (0)</h4></div>
+      </div>
+
     </div>
+    <div class="grid2">
+      <h1><img src="{% static 'images/calendar-color.png' %}" alt=""> Hoje</h1>
+      <div class=today>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur a maximus mauris, et
+         ultricies justo. Donec sapien nisl, tempus a ultrices sed, condimentum in est. Aliquam erat volutpat. 
+         Curabitur ac urna massa. Duis et efficitur felis, id pharetra neque. Sed in justo vel lectus aliquam hendrerit. 
+         Proin at porttitor lorem. Proin dignissim nibh quam, sit amet imperdiet tortor finibus malesuada. Suspendisse nibh mi, lobortis ac cursus 
+         vitae, sollicitudin id mauris. Integer consequat, n
+        ulla ac tristique dapibus, sapien tortor auctor neque, sed rutrum risus quam vitae libero.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur a maximus mauris, et
+         ultricies justo. Donec sapien nisl, tempus a ultrices sed, condimentum in est. Aliquam erat volutpat. 
+         Curabitur ac urna massa. Duis et efficitur felis, id pharetra neque. Sed in justo vel lectus aliquam hendrerit. 
+         Proin at porttitor lorem. Proin dignissim nibh quam, sit amet imperdiet tortor finibus malesuada. Suspendisse nibh mi, lobortis ac cursus 
+         vitae, sollicitudin id mauris. Integer consequat, n
+        ulla ac tristique dapibus, sapien tortor auctor neque, sed rutrum risus quam vitae libero.
+        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Alias voluptates doloribus eaque, et suscipit qui dolor autem quis praesentium. Perferendis excepturi vel aspernatur, accusantium quae officiis architecto ex aliquid molestias.
+        Veritatis tenetur, repudiandae illum nemo perferendis dolorem enim voluptas est quos ipsum error exercitationem vitae blanditiis quia temporibus asperiores? Veritatis perspiciatis unde tempora nam soluta animi ducimus harum magnam cumque?
+        Eveniet dolor ea, eligendi ad, hic praesentium vel incidunt, corrupti repellat repellendus placeat qui possimus a? Possimus, blanditiis at qui quod deserunt aliquam itaque ducimus expedita, porro, inventore iste ad.
+        Nemo optio iure aliquam veniam. Quaerat labore nisi eum voluptatibus est quo, blanditiis, in quidem incidunt sapiente placeat consequatur obcaecati ab, provident alias nobis? Cumque reiciendis numquam molestiae consectetur! Iure.
+        Numquam, nisi! Incidunt quisquam ab doloremque, repellat inventore optio voluptate? Labore vel ab, quaerat ipsa asperiores aliquam odit assumenda facere dicta delectus cumque incidunt adipisci pariatur maiores. Beatae, ipsa ullam!
+      </div>
+     
+    </div>
+    <div class="grid3">
+      <div>
+        <h1><img src="{% static 'images/urgent-color.png' %}" alt=""> Urgente</h1>
+        <div class="notifurg">
+          <div style="overflow-y: scroll; height: 100%; ">
+            <a href="#"><h3>Notificaçao Urgente</h3></a>
+            <a href="#"><h3>Notificaçao Urgente</h3></a>
+            <a href="#"><h3>Notificaçao Urgente</h3></a>
+
+          </div>
+          
+        </div>
+      </div>
+      <h1>
+        <img src="{% static 'images/plus-color.png' %}" alt=""> Adicionar
+      </h1>
+      <div class="addmenu">
+        <div class="boxfilter"><h3>Lead</h3> </div>
+        <div class="boxfilter"><h3>Ação</h3> </div>
+        <div class="boxfilter"><h3>Cliente</h3> </div>
+        <div class="boxfilter"><h3>Imóvel</h3> </div>
+        <div class="boxfilter"><h3>Staff</h3> </div>
+        <div class="boxfilter"><h3>User</h3> </div>
+
+      </div>
+    </div>
+  </div>
 {% endblock content%}

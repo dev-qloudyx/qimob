@@ -1,0 +1,40 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+
+<head>
+  {% include '_head.html' %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+  <link rel="icon" href="" type="image/png" sizes="16x16">
+</head>
+
+<body>
+  <header>
+    <!-- Logout Modal  -->
+    {% include '_logout_modal.html' %}
+   <!-- Navbar  -->
+    {% include '_navbar.html' %}
+  </header>
+  
+  <div class="d-flex flex-nowrap">
+   
+    <!-- Sidebar  -->
+    {% include '_sidebar.html' %}
+
+    <!-- Page Content  -->
+    <div id="content">
+      <div class="content-section">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+  
+  <!-- Footer -->
+  <footer
+    style="color: rgb(0, 0, 0); text-align: center; padding-bottom: 10px; display: flex; flex-direction: column; align-items: center;">
+    {% include '_footer.html' %}
+  </footer>
+</body>
+
+</html>

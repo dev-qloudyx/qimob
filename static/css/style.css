@@ -1,0 +1,331 @@
+/* 
+  
+  @media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+  } */
+  html, body {
+    height: 100svh;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #e6e6e6 !important;
+    width: 100%;
+}
+
+/* Top menu */
+.topnav {
+    background-color: #ffffff;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 15px 22px;
+}
+
+
+
+.topnav img {
+  float: left;
+  display: block;
+
+}
+
+.topnav a{
+  float: left;
+  display: block;
+  font-size: 25px;
+  text-align: center;
+  padding: 14px 30px;
+  text-decoration: none;
+  color: #000000;
+  transition: 0.3s;
+}
+.topnav a:hover{
+ 
+  text-decoration: none;
+  color: #FF8647;
+}
+
+.topnav img:hover {
+  transition: 0.3s;
+  transform: scale(1.1); /* Increase size on hover */
+
+}
+
+.topmenu{
+  float: right;
+  display: flex;
+  
+}
+.topmenu form{
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: row;
+}
+
+.topmenu a {
+  float: left;
+  display: block;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+
+}
+.topmenu img {
+  width: 40px;
+
+}
+
+
+/* The dropdown container */
+.dropdown {
+  float: right;
+
+}
+
+/* Dropdown button */
+.dropdown .dropbtn {
+  padding-top: 14px;
+  border: none;
+  outline: none;
+  background-color: inherit;
+  font-family: inherit; /* Important for vertical align on mobile phones */
+  margin: 0; /* Important for vertical align on mobile phones */
+}
+.dropbtn:hover{
+  color: #FF8647;
+}
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0px;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 9999;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  float: none;
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+/* Add a grey background color to dropdown links on hover */
+.dropdown-content a:hover {
+  background-color: #FF8647;
+  color: #ffffff;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.topnav .btn-primary{
+  background-color: #FF8647 ;
+  border-color: #FF7C00;
+  border-radius: 50px;
+}
+
+.topnav .btn-primary:hover{
+  background-color: #ffffff ;
+  border-color: #FF7C00;
+  color: #FF8647 ;
+}
+
+.topnav .searchbar{
+  padding: 5px ;
+  margin-right:12px ;
+  border-radius: 50px;
+  border-color: #FF8647;
+}
+
+
+
+
+
+
+
+
+
+/* Sidebar */
+
+
+
+
+
+
+
+
+
+
+.containermain {
+  width: 85%;
+  height: 80%;
+  position: fixed;
+  top: 15%;
+  left: 10%;
+  /* background-color: #FF8647; */
+
+}
+
+
+
+
+/*  styles for homepage  */
+
+.container1 {
+  width: 85%;
+  height: 80%;
+  position: fixed;
+  top: 15%;
+  left: 10%;
+  display: grid;
+  column-gap:4%;
+  grid-template-columns: 30% 30% 30%;
+
+
+}
+
+.grid1{
+
+  overflow-y:auto ;
+  text-wrap:balance;
+  margin: auto;
+  margin-top: 0px;
+
+}
+
+
+
+.grid3{
+
+  overflow-y:auto ;
+  text-wrap:balance;
+  margin: auto;
+  margin-top: 0px;
+
+}
+
+.grid2{
+  margin: auto;
+  margin-top: 0px;
+  overflow-y:hidden ;
+  text-wrap:balance;
+  border-radius: 20px;
+  height: 100%;
+  width: 90%;
+
+ 
+  
+}
+.today{
+  overflow-y:auto;
+  border-radius: 20px;
+  background-color: #ffffff;
+  height: 100%;
+  width: 100%;
+  padding: 20px;
+  padding-bottom: 70px;
+
+}
+
+.leadfilters{
+  display: grid;
+  grid-template-columns: 40% 40%;
+  gap: 30px;
+
+}
+
+.addmenu{
+  display: grid;
+  grid-template-columns: 40% 40%;
+  gap: 30px;
+
+}
+
+.boxfilter{
+  padding: 10px;
+  background-color: rgb(255, 255, 255);
+  border-radius: 20px;
+  width: 150px;
+  height: 100px;
+  transition: 0.3s;
+
+}
+
+.boxfilter:hover{
+  padding: 10px;
+  background-color: #FF8647;
+  color: #ffffff;
+
+}
+
+.notifurg{
+  padding: 10px;
+  background-color: #ffffff !important;
+  border-radius: 20px;
+  max-width: 95%;
+  height: 100px;
+  transition: 0.3s;
+}
+
+.notifurg a{
+  color: #FF7C00;
+  text-decoration: underline;
+  transition: 0.5s;
+}
+
+.notifurg a:hover{
+  color: #000000;
+  text-decoration: underline;
+}
+
+h1 img{
+  width: 45px;
+}
+
+
+
+
+
+
+/*  scrollbar  */ 
+
+
+
+
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 90%;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f180;
+  border-radius: 10px;
+  padding-top: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #FF8647;
+  border-radius: 10px;
+  height: 20px !important;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #FF7C00;
+}

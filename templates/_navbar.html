@@ -1,39 +1,33 @@
 {% load static %}
 {% load i18n %}
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container">
-        <!-- Brand -->
-        <a class="navbar-brand" href="#">QIMOB</a>
-        <!-- Navbar Toggle Button -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <!-- Nav Links -->
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'users:profile' %}">{% trans "Home" %}</a>
-                </li>
-                <!-- Logout -->
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal"><i class="bi bi-box-arrow-right"></i> Logout</a>
-                </li>
-            </ul>
+
+
+<div class="topnav">
+    <img src="{% static 'images/qimob_logo2.png' %}" alt="" width="100px" onclick="openNav()">
+    <a  href="{% url 'users:home' %}">{% trans "Home" %}</a>
+
+    <div class="topmenu"> 
+
+      <form >
+        {% csrf_token %}
+        <input type="text" class="searchbar" placeholder="Search..">
+        <input type="submit" class="btn btn-primary">
+      </form>
+
+      <a href="#notif"><img src="{% static 'images/bell.png' %}" alt=""></a>
+      <a href="#messages"><img src="{% static 'images/mail.png' %}" alt=""></a>
+
+      <div class="dropdown">
+
+        <button class="dropbtn"><img src="{% static 'images/client.png' %}" alt=""></button>
+        <div class="dropdown-content">
+          <a href="{% url 'users:profile' %}">Perfil</a>
+          <a href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a>
         </div>
+
+      </div>
+
     </div>
-</nav>
-
-<script>
-    let showMenu = false;
-
-    function isMobileResolution() {
-        return window.innerWidth <= 768;
-    }
-
-    window.addEventListener('resize', function() {
-        if (!isMobileResolution() && showMenu) {
-            showMenu = false;
-        }
-    });
-</script>
+    
+  </div>
