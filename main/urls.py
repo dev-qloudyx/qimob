@@ -26,6 +26,7 @@ urlpatterns = [
     path('', include('apps.users.urls', namespace='users')),
     path('accounts/', include('allauth.urls')),
     path('crm/', include('apps.crm.urls', namespace='crm')),
+    path('imovel/', include('apps.imovel.urls', namespace='imovel')),
     path('docs/', include('qdocs.urls', namespace='docs')),
     path('address/', include('qaddress.urls', namespace='address')),
     path('messages/', include('qmessages.urls', namespace='messages')),
