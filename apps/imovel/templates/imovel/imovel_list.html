@@ -3,8 +3,7 @@
 <div id="imovel-list" class="py-5">
     <div class="mt-5">
         <h2 class="mb-3">Imovel List</h2>
-        <a href="{% url 'imovel:imovel_create' %}" hx-get="{% url 'imovel:imovel_create' %}" hx-target="#imovel-list"
-            hx-swap="outerHTML" class="btn btn-primary mb-3">Add Imovel</a>
+        <a href="{% url 'imovel:imovel_create' %}" class="btn btn-primary mb-3">Add Imovel</a>
         <div class="table-responsive">
             <table class="table">
                 <thead>
@@ -13,6 +12,8 @@
                         <th>username</th>
                         <th>price</th>
                         <th>square_footage</th>
+                        <th>view</th>
+                        <th>edit</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -29,6 +30,16 @@
                         </td>
                         <td>
                             {{ imovel.square_footage }}
+                        </td>
+                        <td>
+                            <a href="{% url 'imovel:imovel_detail' imovel.id %}" hx-get="{% url 'imovel:imovel_detail' imovel.id %}" hx-target="#imovel-list"
+                                hx-swap="outerHTML">VIEW</a>
+                        </td>
+                        <!-- <td>
+                            <a href="#" hx-get="#" hx-target="#imovel-list" hx-swap="outerHTML">VIEW</a>
+                        </td> -->
+                        <td>
+                            <a href="{% url 'imovel:imovel_update' imovel.id %}">EDIT </a>
                         </td>
                     </tr>
                     {% empty %}

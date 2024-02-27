@@ -1,0 +1,25 @@
+{% extends base_template %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% load allauth %}
+
+{% block content %}
+
+<span id="notification"></span>
+<div id="tabstrip">
+  <div>
+    <p style="font-weight: bold;"><b class="main-title">Nome:</b> {{ object.name }}</p>
+    <hr>
+    <p><b class="title">address:</b> {{ object.address }}</p>
+    <p><b class="title">price:</b> {{ object.price }}</p>
+    <p><b class="title">description:</b> {{ object.description }}</p>
+    <p><b class="title">bedrooms:</b> {{ object.bedrooms }}</p>
+    <p><b class="title">bathrooms:</b> {{ object.bathrooms }}</p>
+    <p><b class="title">square_footage:</b> {{ object.square_footage }}</p>
+  </div>
+  <div>
+    <a class="btn btn-size base-but btn-sm mt-1 mb-1" href="{% url 'imovel:imovel_list' %}">{% trans "Cancel" %}</a>
+  </div>
+</div>
+
+{% endblock %}
