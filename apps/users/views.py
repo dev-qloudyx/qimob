@@ -1,18 +1,18 @@
 
 from django.http import JsonResponse
+from apps.users.allauth_utils import custom_form_valid
 from apps.users.models import Profile, User
-from .forms import UserUpdateForm, ProfileUpdateForm
+from .forms import CustomSignupForm, UserUpdateForm, ProfileUpdateForm
 from apps.users.roles import roles_required
 from allauth.account.views import  SignupView, PasswordChangeView
-
-from allauth.account.views import RedirectAuthenticatedUserMixin, PasswordResetFromKeyView
+from allauth.account.views import RedirectAuthenticatedUserMixin
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import PasswordResetForm
 from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic.list import ListView
 from django.utils.decorators import method_decorator
+from allauth.account.views import PasswordResetView
 
 # Create your views here.
 
@@ -52,7 +52,6 @@ class ListUsersView(ListView):
         }
         return context
 
-
 class CustomPasswordChangeView(PasswordChangeView):
     template_name = "account/password_change.html"
 
@@ -65,11 +64,16 @@ class CustomPasswordChangeView(PasswordChangeView):
         context['base_template'] = base_template
 
         return context
-
-# @method_decorator(roles_required(['admin']), name='dispatch')
+    
+@method_decorator(roles_required(['admin']), name='dispatch')
 class CustomSignupView(CustomRedirectMixin, SignupView):
-   template_name = "account/signup.html"
-
+    template_name = "account/signup.html"
+    form_class = CustomSignupForm
+    
+    def form_valid(self, form):
+        custom_form_valid(self, form)
+        PasswordResetView.as_view()(self.request)
+        return redirect('users:users_list')
 
 @method_decorator(login_required, name='dispatch')
 class ProfileView(View):
