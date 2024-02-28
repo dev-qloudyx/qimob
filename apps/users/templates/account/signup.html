@@ -2,13 +2,26 @@
 {% load crispy_forms_tags %}
 {% load i18n %}
 {% load allauth %}
+
 {% block content %}
-<form method="post" action="{% url 'account_signup' %}" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-    {% csrf_token %}
-    {{ form|crispy }}
-    {% if redirect_field_value %}
-        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-    {% endif %}
-    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit">{% trans "Sign Up" %}</button>
-</form>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{% url 'account_signup' %}">
+                        {% csrf_token %}
+                        <h3 class="text-center mb-4">Create User</h3>
+                        {{ form|crispy }}
+                        {% if redirect_field_value %}
+                            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                        {% endif %}
+                        <button type="submit" class="btn btn-danger btn-block mt-3">{% trans "Sign Up" %}</button>
+                        <a class="btn btn-size base-but btn-sm mt-1 mb-1" href="{% url 'users:users_list' %}">Cancelar</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}

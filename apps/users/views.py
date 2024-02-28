@@ -1,16 +1,17 @@
 
 from django.http import JsonResponse
-from apps.users.models import User
+from apps.users.models import Profile, User
 from .forms import UserUpdateForm, ProfileUpdateForm
 from apps.users.roles import roles_required
 from allauth.account.views import  SignupView, PasswordChangeView
 
-from allauth.account.views import RedirectAuthenticatedUserMixin
+from allauth.account.views import RedirectAuthenticatedUserMixin, PasswordResetFromKeyView
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.contrib.auth.forms import PasswordResetForm
+from django.shortcuts import redirect, render
 from django.views import View
-from django.utils.decorators import method_decorator
+from django.views.generic.list import ListView
 from django.utils.decorators import method_decorator
 
 # Create your views here.
@@ -20,7 +21,7 @@ class HomeView(View):
         context = {}
         return render(request, 'home.html', context )
 
-   
+
 class CustomRedirectMixin(RedirectAuthenticatedUserMixin):
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -28,10 +29,29 @@ class CustomRedirectMixin(RedirectAuthenticatedUserMixin):
         else:
             return super().dispatch(request, *args, **kwargs)
 
+# USERS
 class UserListViewJson(View):
     def get(self, request, *args, **kwargs):
         users = User.objects.all().values('id', 'username', 'email')
         return JsonResponse(list(users), safe=False)
+
+
+# @method_decorator([login_required, roles_required(['admin'])], name='dispatch')
+class ListUsersView(ListView):
+    queryset = Profile.objects.all()
+    template_name = 'users/user_list.html'
+    paginate_by = 25
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        base_template = "base.html"
+ 
+        context = {
+            'users': context['object_list'],
+            'base_template': base_template, 
+        }
+        return context
+
 
 class CustomPasswordChangeView(PasswordChangeView):
     template_name = "account/password_change.html"
@@ -46,9 +66,10 @@ class CustomPasswordChangeView(PasswordChangeView):
 
         return context
 
-@method_decorator(roles_required(['admin']), name='dispatch')
+# @method_decorator(roles_required(['admin']), name='dispatch')
 class CustomSignupView(CustomRedirectMixin, SignupView):
    template_name = "account/signup.html"
+
 
 @method_decorator(login_required, name='dispatch')
 class ProfileView(View):

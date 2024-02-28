@@ -1,0 +1,50 @@
+{% extends base_template %}
+{% block content %}
+<div id="user-list" class="py-5">
+    <div class="mt-5">
+        <h2 class="mb-3">User List</h2>
+        <a href="{% url 'users:account_signup' %}" class="btn btn-primary mb-3">Add User</a>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>image</th>
+                        <th>username</th>
+                        <th>email</th>
+                        <th>role</th> 
+                        <th>edit user</th> 
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td>
+                            <img class="rounded-circle article-svg" src="">
+                        </td>
+                        <td>
+                            {{ u.user.username }}
+                        </td>
+                        <td>
+                            {{ u.user.email }}
+                        </td>
+                        <td>
+                            {{ u.user.role }}
+                        </td>
+                        <td>
+                            <a href="{% url 'users:profile' %}">EDIT </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No files uploaded yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% include '_pagination.html' %}
+</div>
+{% endblock %}

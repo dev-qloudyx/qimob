@@ -48,6 +48,8 @@ class User(AbstractBaseUser):
     last_login = models.DateTimeField(verbose_name='last login', auto_now=True)
     is_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    # last_active = models.DateTimeField(verbose_name='Data Última Activação', auto_now_add=True)
+    # last_inactive = models.DateTimeField(verbose_name='Data Última Activação', auto_now_add=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     

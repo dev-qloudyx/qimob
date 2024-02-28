@@ -226,6 +226,8 @@ AUTH_USER_MODEL = 'users.User'
 ACCOUNT_EMAIL_REQUIRED=True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_LOGOUT_REDIRECT_URL ="/accounts/login"
+ACCOUNT_FORMS = {'signup':'apps.users.forms.CustomSignupForm'}
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'locale'),
