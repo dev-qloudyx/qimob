@@ -21,6 +21,8 @@ from django.utils.decorators import method_decorator
 from typing import Any
 from urllib.parse import urljoin
 
+from qaddress.models import Address
+from qdocs.models import File
 # Create your views here.
 
 class ClientCreateView(CreateView):
@@ -103,18 +105,62 @@ class ClientDetailView(DetailView):
     model = Client
     template_name = 'client/client_detail.html'
 
-    def get(self, request, *args, **kwargs):
-        client_id = request.GET.get('client_id', None) or kwargs.get('pk', None)
-        self.object = get_object_or_404(Client, pk=client_id)
-        context = self.get_context_data(object=self.object)
-        return self.render_to_response(context)
-    
+    def get_object(self, queryset=None):
+        client_id = self.request.GET.get('client_id') or self.kwargs.get('pk')
+        return get_object_or_404(Client, pk=client_id)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        client_tokens = self.object.clientdoc_set.values_list('token', flat=True)
+        doc_files = []
+        if client_tokens:
+            for token in client_tokens:
+                print(token)
+                doc = get_object_or_404(File, token=token)
+                print(doc.upload)
+                doc_files.append(doc)
+            #print(doc_token)
+            #doc = get_object_or_404(File, token = doc_token)
+            #print(doc.upload)
+            #context['doc_file'] = doc
+
+            context['doc_files'] = doc_files
+        else:
+            context['doc_files'] = None
+    
+
+        client_address = self.object.clientaddress_set.first() 
+        if client_address:
+            address_token = client_address.token
+            print(address_token)
+            if address_token:
+                # Query the Address model based on the token
+                address = get_object_or_404(Address, token=address_token)
+                print(address.postal_code)
+
+                # Create a dictionary to store address data
+                address_data = {
+                    'district': address.district,
+                    'county': address.county,
+                    'locality': address.locality,
+                    'postal_code': address.postal_code,
+                    'street': address.street,
+                    'number': address.number,
+                    'more_info': address.more_info,
+                    # Add more fields as needed
+                }
+                context['address_data'] = address_data
+            else:
+                context['address_data'] = None
+        else:
+            context['address_data'] = None
+
         if self.request.htmx:
             context['base_template'] = "partial_base.html"
         else:
             context['base_template'] = "base.html"
+
         return context
 
 class ClientDetailViewJson(View):
@@ -302,6 +348,7 @@ class ClientDocsListView(FileListView):
 class ClientDocsUploadView(FileUploadView):
     base_template = "base.html"
     template_name = 'client/client_upload.html'
+    #success_url = reverse_lazy('crm:client_detail_view', kwargs={'pk': self.object.pk})
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
