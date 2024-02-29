@@ -1,46 +1,32 @@
 {% extends base_template %}
 {% block content %}
-<div id="cliente-list" class="py-5">
-    <div class="mt-5">
-        <h2 class="mb-3">Cliente List</h2>
-        <a href="{% url 'crm:client_create_view' %}" hx-get="{% url 'crm:client_create_view' %}" hx-target="#cliente-list"
-            hx-swap="outerHTML" class="btn btn-primary mb-3">Add Client</a>
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Docs</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for client in clients %}
-                    <tr>
-                        <td>
-                            <a href="{% url 'crm:client_detail_view' client.id %}" hx-get="{% url 'crm:client_detail_view' client.id %}" hx-target="#cliente-list"
-                                hx-swap="outerHTML">{{ client.name }}</a>
-                        </td>
-                        <td>
-                            <a href="{% url 'crm:client_docs_list_view' pk=client.pk %}"
-                                hx-get="{% url 'crm:client_docs_list_view' pk=client.pk %}" hx-target="#cliente-list"
-                                hx-swap="outerHTML" class="btn btn-info">Docs</a>
-                        </td>
-                        <td>
-                            <a href="{% url 'crm:client_docs_upload_view' pk=client.pk %}"
-                                hx-get="{% url 'crm:client_docs_upload_view' pk=client.pk %}" hx-target="#cliente-list"
-                                hx-swap="outerHTML" class="btn btn-success">Upload Doc</a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3">No files uploaded yet.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+
+<span style="display: flex; "><h2 class="listtitle">Client List</h2><a href="{% url 'crm:client_create_view' %}" class="btn btn-primary mb-3">Add Client</a> 
+    <button class="btn btn-primary mb-3">Filters</button>
+    <button class="btn btn-primary mb-3">Order By</button></span>
+
+<div id="cliente-list" class="viewlist">
+    
+        
+        <!--<a href="{% url 'crm:client_create_view' %}" hx-get="{% url 'crm:client_create_view' %}" hx-target="#cliente-list"
+            hx-swap="outerHTML" class="btn btn-primary mb-3">Add Client</a>-->
+        
+       
+        {% for client in clients %}
+            <div class="card">
+                <div class="cardcontent">
+                  <a href="{% url 'crm:client_detail_view' client.id %}"><h4><b>{{ client.name }}</b></h4></a>
+                    <div class="cardtable">
+                        <p>{{ client.phone_number }}</p>
+                        <p>{{ client.email_address }}</p>
+                        <p>{{ client.nif }}</p>
+                        <p>{{ client.postal_code }}</p>
+
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    
 
     <!-- Pagination -->
     {% include '_pagination.html' %}

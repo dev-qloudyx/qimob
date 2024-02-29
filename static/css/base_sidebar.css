@@ -1,11 +1,14 @@
 
+
+
+
 .sidenav {
   height: 100svh;
   width: 200px;
   position: fixed;
   top: 0;
   left: -125px;
-  background-color: #FF8647;
+  background-color: var(--secondary);
   overflow-x: hidden;
   transition: 0.5s;
   padding-top: 125px;
@@ -20,17 +23,13 @@ z-index: 999;
   padding: 10px 8px 10px 16px;
   text-decoration: none;
   font-size: 22px;
-  color: #ffffff;
+  color: var(--primary);
   display: block;
   transition: 0.3s;
 }
 
 
 
-.sidenav .closebtn {
-  font-size: 20px;
-  color: aliceblue;
-}
 
 .sidenavgrid{
 display: grid;
@@ -40,7 +39,7 @@ grid-column-gap: 20px;
 
 
 .icons{
-fill: #ffffff;
+fill: var(--primary);
 transition: 0.3s;
 
 }

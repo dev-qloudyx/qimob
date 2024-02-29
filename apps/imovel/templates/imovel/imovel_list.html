@@ -1,55 +1,39 @@
 {% extends base_template %}
 {% block content %}
-<div id="imovel-list" class="py-5">
-    <div class="mt-5">
-        <h2 class="mb-3">Imovel List</h2>
-        <a href="{% url 'imovel:imovel_create' %}" class="btn btn-primary mb-3">Add Imovel</a>
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>image</th>
-                        <th>username</th>
-                        <th>price</th>
-                        <th>square_footage</th>
-                        <th>view</th>
-                        <th>edit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for imovel in imoveis %}
-                    <tr>
-                        <td>
-                            <img class="rounded-circle article-svg" src="#">
-                        </td>
-                        <td>
-                            {{ imovel.name }}
-                        </td>
-                        <td>
-                            {{ imovel.price }}
-                        </td>
-                        <td>
-                            {{ imovel.square_footage }}
-                        </td>
-                        <td>
-                            <a href="{% url 'imovel:imovel_detail' imovel.id %}" hx-get="{% url 'imovel:imovel_detail' imovel.id %}" hx-target="#imovel-list"
-                                hx-swap="outerHTML">VIEW</a>
-                        </td>
-                        <!-- <td>
-                            <a href="#" hx-get="#" hx-target="#imovel-list" hx-swap="outerHTML">VIEW</a>
-                        </td> -->
-                        <td>
-                            <a href="{% url 'imovel:imovel_update' imovel.id %}">EDIT </a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3">No files uploaded yet.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+
+<span style="display: flex; "><h2 class="listtitle">Client List</h2><a href="{% url 'imovel:imovel_create' %}" class="btn btn-primary mb-3">Add Imovel</a> 
+    <button class="btn btn-primary mb-3">Filters</button>
+    <button class="btn btn-primary mb-3">Order By</button></span>
+
+
+    <div id="cimovel-list" class="viewlist">
+    
+        
+        <!--<a href="{% url 'crm:client_create_view' %}" hx-get="{% url 'crm:client_create_view' %}" hx-target="#cliente-list"
+            hx-swap="outerHTML" class="btn btn-primary mb-3">Add Client</a>-->
+        
+       
+        {% for imovel in imoveis %}
+            <div class="card">
+                <div class="cardcontent">
+                  <a href="{% url 'imovel:imovel_detail' imovel.id %}"><h4><b>{{ imovel.name }}</b></h4></a>
+                    <div class="cardtable">
+                        <p>{{ imovel.price }}</p>
+                        <p>{{ imovel.square_footage }}</p>
+                        <a href="{% url 'imovel:imovel_update' imovel.id %}">EDIT </a>
+    
+
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+
+
+
+
+
+        
     </div>
 
     <!-- Pagination -->

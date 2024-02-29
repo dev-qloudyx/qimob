@@ -27,23 +27,23 @@ class ClientCreateView(CreateView):
     model = Client
     form_class = ClientForm
     template_name = 'client/client_create.html'
-    success_url = reverse_lazy('crm:client_create_view')  
+    success_url = 'crm:client_create_view'
     
-    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
-        return super().post(request, *args, **kwargs)
 
-    def form_valid(self, form):
-        super().form_valid(form)
-        messages.success(self.request, 'Client created successfully!')
-        pk = self.object.pk
-        return HttpResponse(json.dumps( pk, ensure_ascii=False), content_type="application/json")
+    def get_success_url(self):
+        # Get the previous URL from the session
+        previous_url = self.request.session.get('previous_url')
+        
+        # If previous_url exists, return it as success URL
+        if previous_url:
+            return previous_url
+        
+        # Default to the success URL defined in the class
+        return reverse_lazy('crm:client_create_view')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.htmx:
-            base_template = "partial_base.html"
-        else:
-            base_template = "base.html"
+        base_template = "base.html"
         context['base_template'] = base_template
         
         return context

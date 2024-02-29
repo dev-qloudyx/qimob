@@ -4,6 +4,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import gettext_lazy as _
 
 
+
 class BaseModelManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(deleted=False)
@@ -63,6 +64,12 @@ class Client(models.Model):
     email_address = models.EmailField(_("email address"), max_length=254, null=True, unique=True)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
+    nif = models.CharField(_("NIF"), max_length=9, null=True, unique=True)
+    ident_doc = models.CharField(_("identity doc"), max_length=15, null=True, unique=True)
+    url = models.CharField(_("social link"),null=True, unique=True)
+    #created_by = models.CharField(_("created by"),null=True, unique=True)
+    #license = models.ForeignKey(Client, on_delete=models.CASCADE)
+    #client_type = models.CharField(_("created by"),null=True, unique=True)
 
     def __str__(self):
         return self.name
