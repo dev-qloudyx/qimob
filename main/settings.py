@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'qdocs',
     'qmessages',
     'django_filters',
-    'django_htmx',
     'crispy_bootstrap5',
     'bootstrap5',
     'widget_tweaks',
@@ -72,7 +71,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'django_htmx.middleware.HtmxMiddleware',
     'qajax_middleware.middleware.AjaxMiddleware',
 ]
 
