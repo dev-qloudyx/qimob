@@ -65,10 +65,7 @@ class ClientUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.htmx:
-            context['base_template'] = "partial_base.html"
-        else:
-            context['base_template'] = "base.html"
+        context['base_template'] = "base.html"
         return context
     
     def get_success_url(self):
@@ -92,10 +89,7 @@ class ClientUpdateViewJson(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.htmx:
-            context['base_template'] = "partial_base.html"
-        else:
-            context['base_template'] = "base.html"
+        context['base_template'] = "base.html"
         return context
     
     def get_success_url(self):
@@ -156,10 +150,7 @@ class ClientDetailView(DetailView):
         else:
             context['address_data'] = None
 
-        if self.request.htmx:
-            context['base_template'] = "partial_base.html"
-        else:
-            context['base_template'] = "base.html"
+        context['base_template'] = "base.html"
 
         return context
 
@@ -190,10 +181,8 @@ class ClientListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         base_url = self.request.build_absolute_uri(reverse('crm:client_list_view'))
-        if self.request.htmx:
-            base_template = "partial_base.html"
-        else:
-            base_template = "base.html"
+        
+        base_template = "base.html"
  
         context.update({
             'base_url': base_url,
@@ -317,10 +306,7 @@ class ClientDocsListView(FileListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         base_url = self.request.build_absolute_uri(reverse('crm:client_docs_list_view', kwargs={'pk': self.kwargs['pk']}))
-        if self.request.htmx:
-            base_template = "partial_base.html"
-        else:
-            base_template = "base.html"
+        base_template = "base.html"
         
         client =  get_object_or_404(Client, pk=self.kwargs.get('pk'))
         clientdocs = ClientDoc.objects.filter(client=self.kwargs.get('pk')).order_by('id')
@@ -352,10 +338,7 @@ class ClientDocsUploadView(FileUploadView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.htmx:
-            context['base_template'] = "partial_base.html"
-        else:
-            context['base_template'] = self.base_template
+        context['base_template'] = self.base_template
         return context
     
     def get(self, request, *args, **kwargs):
@@ -389,10 +372,7 @@ class ClientDocsUploadViewJson(FileUploadView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.htmx:
-            context['base_template'] = "partial_base.html"
-        else:
-            context['base_template'] = self.base_template
+        context['base_template'] = self.base_template
         return context
     
     def get(self, request, *args, **kwargs):
@@ -425,10 +405,7 @@ class ClientDocsView(FileView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.htmx:
-            context['base_template'] = "partial_base.html"
-        else:
-            context['base_template'] = self.base_template
+        context['base_template'] = self.base_template
         return context
 
 class ClientDocsDeleteView(FileDeleteView):
@@ -436,10 +413,7 @@ class ClientDocsDeleteView(FileDeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.htmx:
-            context['base_template'] = "partial_base.html"
-        else:
-            context['base_template'] = self.base_template
+        context['base_template'] = self.base_template
         return context
     
     def post(self, request, *args, **kwargs):
@@ -473,10 +447,7 @@ class ClientAddressCreateView(AddressView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.htmx:
-            context['base_template'] = "partial_base.html"
-        else:
-            context['base_template'] = self.base_template
+        context['base_template'] = self.base_template
         return context
     
     def get(self, request, *args, **kwargs):

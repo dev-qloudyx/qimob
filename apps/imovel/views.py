@@ -51,10 +51,7 @@ class ImovelDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.htmx:
-            context['base_template'] = "partial_base.html"
-        else:
-            context['base_template'] = "base.html"
+        context['base_template'] = "base.html"
         return context
     
 

@@ -13,7 +13,6 @@ crispy-bootstrap5 = "*"
 django-tables2 = "*"
 django-allauth = "*"
 pillow = "*"
-django-htmx = "*"
 QAddress = {file = "packages/QAddress-0.0.1.tar.gz"}
 QDocs = {file = "packages/QDocs-0.0.1.tar.gz"}
 QMessages = {file = "packages/QMessages-0.0.1.tar.gz"}

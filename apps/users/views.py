@@ -57,10 +57,7 @@ class CustomPasswordChangeView(PasswordChangeView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.htmx:
-            base_template = "partial_base.html"
-        else:
-            base_template = "base.html"
+        base_template = "base.html"
         context['base_template'] = base_template
 
         return context
@@ -87,10 +84,7 @@ class ProfileView(View):
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user.profile)
         
-        if request.htmx:
-            base_template = "partial_base.html"
-        else:
-            base_template = "base.html"
+        base_template = "base.html"
 
         context = {
             'u_form': u_form,
@@ -125,10 +119,7 @@ class ProfileView(View):
             'u_form': u_form,
             'p_form': p_form
         }
-        if request.htmx:
-            base_template = "partial_base.html"
-        else:
-            base_template = "base.html"
+        base_template = "base.html"
 
         context = {
             'u_form': u_form,
