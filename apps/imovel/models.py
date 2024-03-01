@@ -32,13 +32,12 @@ class Imovel(models.Model):
 
 
 class ImovelLead(models.Model):
-    imovel = models.ForeignKey(Imovel, on_delete=models.CASCADE)
-    lead = models.ForeignKey(Lead, on_delete=models.CASCADE)
-
+    imovel = models.ForeignKey("Imovel", on_delete=models.CASCADE)
+    lead = models.ForeignKey("crm.Lead", on_delete=models.CASCADE)
 
 class ImovelDoc(models.Model):
     token =  models.CharField(_("token"), max_length=255)
-    imovel = models.ForeignKey(Imovel, on_delete=models.CASCADE)
+    imovel = models.ForeignKey('Imovel', on_delete=models.CASCADE)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
     deleted = models.BooleanField(default=False)

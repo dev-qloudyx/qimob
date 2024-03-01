@@ -38,5 +38,7 @@ urlpatterns = [
     path('client/messages/list/<int:pk>/', views.ClientMessageListView.as_view(), name='client_messages_list_view'),
 
     # Lead
+
+    path('lead/create/', views.LeadCreateView.as_view(), name='lead.create_view'),
     # Consultant
 ]

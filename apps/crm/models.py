@@ -12,7 +12,18 @@ class BaseModelManager(models.Manager):
 class Lead(models.Model):
     name = models.CharField(_("name"), max_length=100)
     email = models.EmailField(_("email"), max_length=100, unique=True)
+    owner = models.ForeignKey(User, related_name='lead_owner', on_delete=models.SET_NULL, blank=True, null=True)
+    client = models.ForeignKey('Client', verbose_name=_('lead client'), on_delete=models.CASCADE)
+    imovel = models.ForeignKey('imovel.Imovel', verbose_name=_('lead imovel'), on_delete=models.CASCADE)
+    short_name = models.CharField(_('short name'), max_length=20)
+    short_desc = models.CharField(_('short description'), max_length=50)
+    desc = models.CharField(_('description'), max_length=500)
+    district = models.CharField(_('district'), max_length=30)
+    county = models.CharField(_('county'), max_length=30)
+    locality = models.CharField(_('locality'), max_length=30)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    created_by = models.ForeignKey(User, related_name='created_by', on_delete=models.CASCADE)
+    com_tip = models.CharField(_('comunication tips'), max_length=100)
     
     def __str__(self):
         return self.name
@@ -65,8 +76,8 @@ class Client(models.Model):
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
     nif = models.CharField(_("NIF"), max_length=9, null=True, unique=True)
-    ident_doc = models.CharField(_("identity doc"), max_length=15, null=True, unique=True)
-    url = models.CharField(_("social link"), max_length=254, null=True, unique=True)
+    nif = models.CharField(_("NIF"), max_length=9, null=True, unique=True, blank=True)
+    ident_doc = models.CharField(_("identity document"), max_length=15, null=True, unique=True, blank=True)
     #created_by = models.CharField(_("created by"),null=True, unique=True)
     #license = models.ForeignKey(Client, on_delete=models.CASCADE)
     #client_type = models.CharField(_("created by"),null=True, unique=True)
