@@ -66,7 +66,7 @@ class Client(models.Model):
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
     nif = models.CharField(_("NIF"), max_length=9, null=True, unique=True)
     ident_doc = models.CharField(_("identity doc"), max_length=15, null=True, unique=True)
-    url = models.CharField(_("social link"),null=True, unique=True)
+    url = models.CharField(_("social link"), max_length=254, null=True, unique=True)
     #created_by = models.CharField(_("created by"),null=True, unique=True)
     #license = models.ForeignKey(Client, on_delete=models.CASCADE)
     #client_type = models.CharField(_("created by"),null=True, unique=True)
