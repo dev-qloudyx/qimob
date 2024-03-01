@@ -210,6 +210,18 @@ class ClientListView(ListView):
         else:
             context['address_data'] = None
 
+        base_url = self.request.build_absolute_uri(reverse('crm:client_list_view'))
+        if self.request.htmx:
+            base_template = "partial_base.html"
+        else:
+            base_template = "base.html"
+ 
+        context.update({
+            'base_url': base_url,
+            'clients': context['object_list'],
+            'base_template': base_template, 
+        })
+
         return context
 
 # Document Integration Below.
