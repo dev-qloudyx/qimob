@@ -1,7 +1,7 @@
 import json
 import os
-from apps.crm.forms import ClientForm
-from apps.crm.models import Client, ClientAddress, ClientDoc, ClientDocStatus, ClientDocStatusDesc, ClientMessage
+from apps.crm.forms import ClientForm, LeadCreateForm
+from apps.crm.models import Client, ClientAddress, ClientDoc, ClientDocStatus, ClientDocStatusDesc, ClientMessage, Lead
 from apps.crm.utils import handle_not_found, is_image
 from qaddress.views import AddressView, retrieveAddressDataByToken, updateAddressDataByToken
 from qdocs.views import FileDeleteView, FileListView, FileUploadView, FileView
@@ -29,7 +29,7 @@ class ClientCreateView(CreateView):
     model = Client
     form_class = ClientForm
     template_name = 'client/client_create.html'
-    success_url = 'crm:client_create_view'
+   
     
 
     def get_success_url(self):
@@ -41,7 +41,7 @@ class ClientCreateView(CreateView):
             return previous_url
         
         # Default to the success URL defined in the class
-        return reverse_lazy('crm:client_create_view')
+        return reverse_lazy('crm:client_list_view')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -175,20 +175,41 @@ class ClientDetailViewJson(View):
 class ClientListView(ListView):
     model = Client
     paginate_by = 5
+    paginate_by = 10
     template_name = 'client/client_list.html'
     ordering = 'id'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        base_url = self.request.build_absolute_uri(reverse('crm:client_list_view'))
-        
-        base_template = "base.html"
- 
-        context.update({
-            'base_url': base_url,
-            'clients': context['object_list'],
-            'base_template': base_template, 
-        })
+
+        clients = self.get_queryset()  # Get the queryset of clients
+        client_address = clients.first().clientaddress_set.first()
+
+        if client_address:
+            address_token = client_address.token
+            print(address_token)
+            if address_token:
+                # Query the Address model based on the token
+                address = get_object_or_404(Address, token=address_token)
+                print(address.postal_code)
+
+                # Create a dictionary to store address data
+                address_data = {
+                    'district': address.district,
+                    'county': address.county,
+                    'locality': address.locality,
+                    'postal_code': address.postal_code,
+                    'street': address.street,
+                    'number': address.number,
+                    'more_info': address.more_info,
+                    # Add more fields as needed
+                }
+                context['address_data'] = address_data
+            else:
+                context['address_data'] = None
+        else:
+            context['address_data'] = None
+
         return context
 
 # Document Integration Below.
@@ -334,7 +355,10 @@ class ClientDocsListView(FileListView):
 class ClientDocsUploadView(FileUploadView):
     base_template = "base.html"
     template_name = 'client/client_upload.html'
-    #success_url = reverse_lazy('crm:client_detail_view', kwargs={'pk': self.object.pk})
+
+
+    def get_success_url(self):
+        return reverse_lazy('crm:client_detail_view', kwargs={'pk': self.object.pk})
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -523,9 +547,18 @@ class ClientMessageListView(MessageListView):
         kwargs['tokens'] = client_tokens
         return super().get(request, *args, **kwargs)
 
-    
-        
+class LeadCreateView(CreateView):
+    model = Lead
+    form_class = LeadCreateForm
+    template_name = 'client/client_create.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.htmx:
+            context['base_template'] = "partial_base.html"
+        else:
+            context['base_template'] = "base.html"
+        return context
         
         
             
