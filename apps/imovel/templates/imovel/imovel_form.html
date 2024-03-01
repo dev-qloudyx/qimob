@@ -2,6 +2,7 @@
 {% load crispy_forms_tags %}
 {% load i18n %}
 {% load allauth %}
+
 {% block content %}
 <form method="post">
     {% csrf_token %}
@@ -11,5 +12,8 @@
     {% endif %}
     <button class="btn btn-primary" type="submit">{% trans "Submit" %}</button>
     <a class="btn btn-secondary" href="#" onclick="history.back(); return false;">{% trans "Cancel" %}</a>
+    {% if update_template %}
+        <a class="btn btn-secondary" href="{% url 'imovel:imovel_docs_upload_view' pk=imovel.pk %}">{% trans "Upload photos" %}</a>
+    {% endif %}
 </form>
 {% endblock content %}

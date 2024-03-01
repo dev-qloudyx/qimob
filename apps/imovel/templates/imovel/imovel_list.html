@@ -1,9 +1,27 @@
 {% extends base_template %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% load allauth %}
 {% block content %}
 
 <span style="display: flex; "><h2 class="listtitle">Imovel List</h2><a href="{% url 'imovel:imovel_create' %}" class="btn btn-primary mb-3">Add Imovel</a> 
     <button class="btn btn-primary mb-3">Filters</button>
     <button class="btn btn-primary mb-3">Order By</button></span>
+
+    <form action="" method="get" class="form">
+        <div class="row">
+            <div class="col-12" style="line-height: 0">
+                {{ filter.form.search|as_crispy_field  }}
+            </div>
+            <div class="col-12 col-md-6">
+                
+            </div>
+            <div class="col-12 col-md-6">
+                
+            </div>
+        </div>   
+        <button class='btn btn-size btn-sm mt-1 mb-1' type="submit">Pesquisar</button>
+    </form>
 
 
     <div id="cimovel-list" class="viewlist">

@@ -1,0 +1,25 @@
+{% extends base_template %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% load allauth %}
+{% block content %}
+<div id="upload-docs" class="col-md-6">
+    {% include '_alert.html' %}
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">Upload File</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data"
+                hx-target="#upload-docs" hx-swap="outerHTML">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                    <a class="btn btn-secondary" href="#" onclick="history.back(); return false;">{% trans "Cancel" %}</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
