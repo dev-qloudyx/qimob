@@ -360,11 +360,8 @@ class ClientDocsUploadView(FileUploadView):
             client_doc = ClientDoc.objects.create(token=token, client=client)
             client_doc_status_desc = ClientDocStatusDesc.objects.get(desc="New")
             client_doc_status = ClientDocStatus.objects.create(client_doc=client_doc, doc_desc=client_doc_status_desc)
-            #client_doc_status.next_status()
-        
-        data = [{"size":454536,"name":"test.png","type":"f"}]
-        
-        return redirect('crm:client_docs_list_view', pk=kwargs['pk'])
+
+        return redirect('crm:client_detail_view', pk=kwargs['pk'])
 
 class ClientDocsUploadViewJson(FileUploadView):
     base_template = "base.html"
