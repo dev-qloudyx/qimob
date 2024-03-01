@@ -1,4 +1,4 @@
-from apps.users.models import Profile, User, UserRole
+from apps.users.models import Profile, TeamLeader, User, UserRole
 from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
 
@@ -16,3 +16,4 @@ class UserAdmin(auth_admin.UserAdmin):
 admin.site.register(User, UserAdmin)
 admin.site.register(UserRole)
 admin.site.register(Profile)
+admin.site.register(TeamLeader)

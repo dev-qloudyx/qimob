@@ -14,32 +14,37 @@ class UserRole(models.Model):
 
 class UserManager(BaseUserManager):
     
-    def create_user(self, email, username, password=None):
+    def create_user(self, email, username, password=None, role = None):
         if not email:
             raise ValueError(_('Users must have an email address.'))
         if not username:
             raise ValueError(_('Users must have a username.'))
+        if role is None:
+            raise ValueError(_('Users must have a role.'))
         user = self.model(
             email=self.normalize_email(email),
-            username=username
+            username=username,
+            role=role
+          
         )
         user.set_password(password)
-        user.save()
+        user.save(using=self._db)
         return user
 
     def create_superuser(self, email, username, password=None):
         user = self.create_user(
             email=email,
             username=username,
-            password=password
+            password=password,
+            role=UserRole.objects.get(role_name="admin")
         )
-        user.role = UserRole.objects.get(role_name="admin")
+        
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
-        user.save()
+        user.save(using=self._db)
         return user
-    
+        
 class User(AbstractBaseUser):
     email = models.EmailField(max_length=255, unique=True)
     username = models.CharField(max_length=30, unique=True)
@@ -48,10 +53,11 @@ class User(AbstractBaseUser):
     last_login = models.DateTimeField(verbose_name='last login', auto_now=True)
     is_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    # last_active = models.DateTimeField(verbose_name='Data Última Activação', auto_now_add=True)
-    # last_inactive = models.DateTimeField(verbose_name='Data Última Activação', auto_now_add=True)
+    last_active = models.DateTimeField(verbose_name='Data Última Activação', blank=True, null=True)
+    last_inactive = models.DateTimeField(verbose_name='Data Última Inactivação', blank=True, null=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    # team_leader_relation = models.ForeignKey('TeamLeader', on_delete=models.SET_NULL, blank=True, null=True)
     
     USERNAME_FIELD = 'email' 
     REQUIRED_FIELDS = ['username']
@@ -71,6 +77,7 @@ class User(AbstractBaseUser):
         return self.role == UserRole.objects.get(role_name="admin")
     
 
+    
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     full_name = models.CharField(
@@ -91,3 +98,6 @@ class Profile(models.Model):
                 output_size = (300, 300)
                 img.thumbnail(output_size)
                 img.save(self.image.path)
+
+class TeamLeader(models.Model):
+    team_leader = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)

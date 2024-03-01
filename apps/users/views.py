@@ -1,14 +1,14 @@
-
+from django.utils import timezone
 from django.http import JsonResponse
 from apps.users.allauth_utils import custom_form_valid
-from apps.users.models import Profile, User
+from apps.users.models import Profile, User, TeamLeader
 from .forms import CustomSignupForm, UserUpdateForm, ProfileUpdateForm
 from apps.users.roles import roles_required
 from allauth.account.views import  SignupView, PasswordChangeView
 from allauth.account.views import RedirectAuthenticatedUserMixin
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.views.generic.list import ListView
 from django.utils.decorators import method_decorator
@@ -65,15 +65,20 @@ class CustomPasswordChangeView(PasswordChangeView):
 
         return context
     
-@method_decorator(roles_required(['admin']), name='dispatch')
+# @method_decorator(roles_required(['admin']), name='dispatch')
 class CustomSignupView(CustomRedirectMixin, SignupView):
-    template_name = "account/signup.html"
-    form_class = CustomSignupForm
-    
-    def form_valid(self, form):
+   template_name = "account/signup.html"
+
+   def form_valid(self, form):
         custom_form_valid(self, form)
         PasswordResetView.as_view()(self.request)
         return redirect('users:users_list')
+
+#         user = form.save(self.request)
+#         role = form.cleaned_data['role']
+#         user.save() 
+#         return super().form_valid(form)
+
 
 @method_decorator(login_required, name='dispatch')
 class ProfileView(View):
@@ -100,6 +105,16 @@ class ProfileView(View):
         p_form = ProfileUpdateForm(
             request.POST, request.FILES, instance=request.user.profile)
         if u_form.is_valid() and p_form.is_valid():
+
+            this_instance = u_form.save(commit=False)
+            original_instance = get_object_or_404(User, pk=this_instance.pk)
+            if this_instance.is_active != original_instance.is_active:
+                if this_instance.is_active:
+                    this_instance.last_active = timezone.now()
+                else:
+                    this_instance.last_inactive = timezone.now()
+            
+            this_instance.save()
             u_form.save()
             p_form.save()
             messages.success(request, 'A sua conta foi atualizada!')
