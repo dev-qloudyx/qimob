@@ -2,6 +2,7 @@ from django.db import models
 from apps.users.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import gettext_lazy as _
+from qaddress.models import Address, DistrictData, CountyData, CPData
 
 
 
@@ -10,23 +11,28 @@ class BaseModelManager(models.Manager):
         return super().get_queryset().filter(deleted=False)
     
 class Lead(models.Model):
-    name = models.CharField(_("name"), max_length=100)
-    email = models.EmailField(_("email"), max_length=100, unique=True)
+    leadtype = models.ForeignKey('LeadType',related_name='lead_type' , on_delete=models.CASCADE, default = 1)
     owner = models.ForeignKey(User, related_name='lead_owner', on_delete=models.SET_NULL, blank=True, null=True)
     client = models.ForeignKey('Client', verbose_name=_('lead client'), on_delete=models.CASCADE)
     imovel = models.ForeignKey('imovel.Imovel', verbose_name=_('lead imovel'), on_delete=models.CASCADE)
     short_name = models.CharField(_('short name'), max_length=20)
-    short_desc = models.CharField(_('short description'), max_length=50)
-    desc = models.CharField(_('description'), max_length=500)
-    district = models.CharField(_('district'), max_length=30)
-    county = models.CharField(_('county'), max_length=30)
-    locality = models.CharField(_('locality'), max_length=30)
+    short_desc = models.CharField(_('short description'), max_length=50, null=True, blank=True)
+    desc = models.CharField(_('description'), max_length=500, null=True, blank=True)
+    district = models.ForeignKey(DistrictData,on_delete=models.CASCADE , verbose_name=_('district'))
+    county = models.ForeignKey(CountyData, on_delete=models.CASCADE , verbose_name=_('county'))
+    locality = models.ForeignKey(CPData,on_delete=models.CASCADE, verbose_name=_('locality'))
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
-    created_by = models.ForeignKey(User, related_name='created_by', on_delete=models.CASCADE)
-    com_tip = models.CharField(_('comunication tips'), max_length=100)
+    created_by = models.ForeignKey(User, related_name='created_by', on_delete=models.CASCADE, default=1)
+    com_tip = models.CharField(_('comunication tips'), max_length=100, null=True, blank=True)
     
     def __str__(self):
-        return self.name
+        return self.short_name
+    
+class LeadType(models.Model):
+    type = models.CharField( _('lead type'), max_length=20)
+
+    def __str__(self):
+        return self.type
 
 class LeadScore(models.Model):
     lead = models.ForeignKey(Lead, verbose_name=_("lead"), on_delete=models.CASCADE)
@@ -34,7 +40,7 @@ class LeadScore(models.Model):
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
     def __str__(self):
-        return f'{self.lead.name} - {self.score}%'
+        return f'{self.lead.short_name} - {self.score}%'
 
 class LeadStatusDesc(models.Model):
     desc = models.CharField(_("desc"), max_length=255)

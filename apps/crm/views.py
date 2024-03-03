@@ -21,7 +21,7 @@ from django.utils.decorators import method_decorator
 from typing import Any
 from urllib.parse import urljoin
 
-from qaddress.models import Address
+from qaddress.models import Address, CountyData, DistrictData, CPData
 from qdocs.models import File
 # Create your views here.
 
@@ -563,6 +563,7 @@ class LeadCreateView(CreateView):
     model = Lead
     form_class = LeadCreateForm
     template_name = 'client/client_create.html'
+    success_url = reverse_lazy('crm:lead_list_view')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -571,7 +572,71 @@ class LeadCreateView(CreateView):
         else:
             context['base_template'] = "base.html"
         return context
+    
+class LeadListView(ListView):
+    model = Lead
+    template_name = 'client/lead_list.html'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        # Filtering
+        type = self.request.GET.get('type')
+        if type:
+            queryset = queryset.filter(leadtype=type)
+
+        # Ordering
+        order_by = self.request.GET.get('order_by', '-created_at')
+        if order_by:
+            queryset = queryset.order_by(order_by)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        leadslist = self.get_queryset() 
+        context['leadslist']=leadslist
+       
+        context['base_template'] = "base.html"
+        return context
+    
+
+
+
+
         
+
+
+def get_counties(request):
+    if request.method == 'GET' and 'district_id' in request.GET:
+        district_id = request.GET.get('district_id')
+        try:
+            # Assuming you have a ForeignKey relationship from CountyData to DistrictData
+            counties = CountyData.objects.filter(DD_id=district_id)
+            county_data = {county.id: county.DESIG for county in counties}
+            return JsonResponse(county_data)
+        except CountyData.DoesNotExist:
+            # Handle the case where no counties are found for the given district
+            return JsonResponse({'error': 'No counties found for the selected district.'}, status=404)
+    else:
+        # Handle the case where the request method is not GET or 'district_id' is missing
+        return JsonResponse({'error': 'Invalid request.'}, status=400)
         
+
+def get_locality(request):
+    if request.method == 'GET' and 'county_id' in request.GET:
+        county_id = request.GET.get('county_id')
+        try:
+            # Assuming you have a ForeignKey relationship from CountyData to DistrictData
+            localities = CPData.objects.filter(CC_id=county_id).distinct('LOCALIDADE')
+            locality_data = {locality.id: locality.LOCALIDADE for locality in localities}
+            return JsonResponse(locality_data)
+        except CountyData.DoesNotExist:
+            # Handle the case where no counties are found for the given district
+            return JsonResponse({'error': 'No localities found for the selected county.'}, status=404)
+    else:
+        # Handle the case where the request method is not GET or 'district_id' is missing
+        return JsonResponse({'error': 'Invalid request.'}, status=400)
             
         

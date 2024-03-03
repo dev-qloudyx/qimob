@@ -20,5 +20,48 @@
 
 <!-- <form id="addressForm"></form> -->
 
+<script>
+  $(document).ready(function(){
+    $('#id_district').change(function(){
+        var districtId = $(this).val();
+        if(districtId){
+            $.ajax({
+                url: '/crm/get_counties/',  
+                type: 'GET',
+                data: {'district_id': districtId},
+                success: function(data){
+                    $('#id_county').empty();
+                    $.each(data, function(key, value){
+                        $('#id_county').append('<option value="'+key+'">'+value+'</option>');
+                    });
+                }
+            });
+        }else{
+            $('#id_county').empty();
+        }
+    });
+});
+
+$(document).ready(function(){
+    $('#id_county').change(function(){  
+        var countyId = $(this).val();  
+        if(countyId){
+            $.ajax({
+                url: '/crm/get_localities/', 
+                type: 'GET',
+                data: {'county_id': countyId}, 
+                success: function(data){
+                    $('#id_locality').empty();
+                    $.each(data, function(key, value){
+                        $('#id_locality').append('<option value="'+key+'">'+value+'</option>');
+                    });
+                }
+            });
+        }else{
+            $('#id_locality').empty();
+        }
+    });
+});
+// </script>
 
 {% endblock %}

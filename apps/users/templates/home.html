@@ -71,7 +71,7 @@
         <img src="{% static 'images/plus-color.png' %}" alt=""> Adicionar
       </h1>
       <div class="addmenu">
-        <div class="boxfilter"><h3>Lead</h3> </div>
+        <a href="{% url 'crm:lead_create_view' %}"><div class="boxfilter"><h3>Lead</h3> </div></a>
         <div class="boxfilter"><h3>Ação</h3> </div>
         <a href="{% url 'crm:client_create_view' %}"><div class="boxfilter"><h3>Cliente</h3> </div></a>
         <a href="{% url 'imovel:imovel_create' %}"><div class="boxfilter"><h3>Imóvel</h3> </div></a>

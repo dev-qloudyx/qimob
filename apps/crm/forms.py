@@ -15,4 +15,4 @@ class ClientForm(forms.ModelForm):
 class LeadCreateForm(forms.ModelForm):
     class Meta:
         model=Lead
-        fields = ['short_name', 'district']
+        fields = ['leadtype','short_name', 'district','county' , 'locality', 'owner', 'client','imovel']
