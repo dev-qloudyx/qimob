@@ -1,36 +1,26 @@
 {% extends base_template %}
 {% load crispy_forms_tags %}
+{# stuff #}
 {% load i18n %}
 {% load allauth %}
 {% block content %}
 
-<span style="display: flex; "><h2 class="listtitle">Imovel List</h2><a href="{% url 'imovel:imovel_create' %}" class="btn btn-primary mb-3">Add Imovel</a> 
-    <button class="btn btn-primary mb-3">Filters</button>
-    <button class="btn btn-primary mb-3">Order By</button></span>
+<div>
+    <span style="display: flex; ">
+    
+        <h2 class="listtitle">Imovel List</h2>
+        <a href="{% url 'imovel:imovel_create' %}" class="btn btn-primary mb-3">Add Imovel</a> 
+        <button class="btn btn-primary mb-3">Filters</button>
+        <button class="btn btn-primary mb-3">Order By</button>
+    </span>
 
-    <form action="" method="get" class="form">
-        <div class="row">
-            <div class="col-12" style="line-height: 0">
-                
-            </div>
-            <div class="col-12 col-md-6">
-                
-            </div>
-            <div class="col-12 col-md-6">
-                
-            </div>
-        </div>   
-        <button class='btn btn-size btn-sm mt-1 mb-1' type="submit">Pesquisar</button>
+    <form action="{% url 'imovel:imovel_list' %}" method="get">
+        {{ form.as_p }}
+        <input type="submit" value="Submit" class="btn btn-primary">
     </form>
 
-
     <div id="cimovel-list" class="viewlist">
-    
-        
-        <!--<a href="{% url 'crm:client_create_view' %}" hx-get="{% url 'crm:client_create_view' %}" hx-target="#cliente-list"
-            hx-swap="outerHTML" class="btn btn-primary mb-3">Add Client</a>-->
-        
-       
+           
         {% for imovel in imoveis %}
             <div class="card">
                 <div class="cardcontent">
@@ -45,13 +35,7 @@
                 </div>
             </div>
         {% endfor %}
-
-
-
-
-
-
-        
+ 
     </div>
 
     <!-- Pagination -->

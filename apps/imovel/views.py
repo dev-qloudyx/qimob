@@ -1,3 +1,4 @@
+from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -18,20 +19,25 @@ class ImovelCreateView(CreateView):
     template_name = 'imovel/imovel_form.html'
     success_url = reverse_lazy('imovel:imovel_list')
 
-
+    
 @method_decorator([login_required], name='dispatch')
-class ImovelListView(FilterView, ListView):
+class ImovelListView(ListView):
+    model = Imovel
     queryset = Imovel.objects.all()
-    filterset_class = ImovelFilter
-    ordering = ['-created_at']
     template_name = 'imovel/imovel_list.html'
-    paginate_by = 25
-
+    context_object_name = 'imoveis'
+    paginate_by = 12
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        self.filterset = ImovelFilter(self.request.GET, queryset=queryset)
+        return self.filterset.qs
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         base_template = "base.html"
- 
         context = {
+            'form': self.filterset.form,
             'imoveis': context['object_list'],
             'base_template': base_template, 
         }
@@ -74,10 +80,7 @@ class ImovelDocsUploadView(FileUploadView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.htmx:
-            context['base_template'] = "partial_base.html"
-        else:
-            context['base_template'] = self.base_template
+        context['base_template'] = self.base_template
         return context
     
     def get(self, request, *args, **kwargs):

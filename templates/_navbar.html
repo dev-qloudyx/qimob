@@ -21,8 +21,8 @@
       <div class="dropdown">
 
         <button class="dropbtn">
-          {% if user.profile.image %}
-                    <img class="rounded-circle" style="width: 48px; height: 48px;" src="{{ user.profile.image.url }}">
+          {% if request.user.profile.image %}
+                    <img class="rounded-circle" style="width: 48px; height: 48px;" src="{{ request.user.profile.image.url }}">
                 {% else %}
                     <img class="rounded-circle" style="width: 48px; height: 48px;"  src="">
                 {% endif %}
