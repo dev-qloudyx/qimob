@@ -1,6 +1,9 @@
+from typing import Any
+from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.http import JsonResponse
 from apps.users.allauth_utils import custom_form_valid
+from apps.users.filters import UserFilter
 from apps.users.models import Profile, User, TeamLeader
 from .forms import CustomSignupForm, UserUpdateForm, ProfileUpdateForm
 from apps.users.roles import roles_required
@@ -13,6 +16,7 @@ from django.views import View
 from django.views.generic.list import ListView
 from django.utils.decorators import method_decorator
 from allauth.account.views import PasswordResetView
+from django_filters.views import FilterView
 
 # Create your views here.
 
@@ -36,21 +40,29 @@ class UserListViewJson(View):
         return JsonResponse(list(users), safe=False)
 
 
-# @method_decorator([login_required, roles_required(['admin'])], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class ListUsersView(ListView):
+    model = Profile
     queryset = Profile.objects.all()
     template_name = 'users/user_list.html'
-    paginate_by = 25
+    context_object_name = 'users'
+    paginate_by = 12
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        self.filterset = UserFilter(self.request.GET, queryset=queryset)
+        return self.filterset.qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         base_template = "base.html"
- 
         context = {
+            'form': self.filterset.form,
             'users': context['object_list'],
             'base_template': base_template, 
         }
         return context
+    
 
 class CustomPasswordChangeView(PasswordChangeView):
     template_name = "account/password_change.html"
@@ -115,13 +127,69 @@ class ProfileView(View):
         else:
             messages.error(request,
                 'Problemas em atualizar a sua conta, veja erros em baixo...')
-        context = {
-            'u_form': u_form,
-            'p_form': p_form
-        }
+        # context = {
+        #     'u_form': u_form,
+        #     'p_form': p_form
+        # }
         base_template = "base.html"
 
         context = {
+            'u_form': u_form,
+            'p_form': p_form,
+            'base_template': base_template,
+        }
+
+        return render(request, "profile/profile.html", context)
+    
+@method_decorator(login_required, name='dispatch')
+class ProfileUpdate(View):
+
+    def get(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        u_form = UserUpdateForm(instance=user)
+        p_form = ProfileUpdateForm(instance=user.profile)
+        
+        base_template = "base.html"
+
+        context = {
+            'user': user,
+            'u_form': u_form,
+            'p_form': p_form,
+            'base_template': base_template,
+        }
+
+        return render(request, "profile/profile.html", context)
+
+    def post(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        u_form = UserUpdateForm(request.POST, instance=user)
+        p_form = ProfileUpdateForm(
+            request.POST, request.FILES, instance=user.profile)
+        if u_form.is_valid() and p_form.is_valid():
+
+            this_instance = u_form.save(commit=False)
+            original_instance = get_object_or_404(User, pk=this_instance.pk)
+            if this_instance.is_active != original_instance.is_active:
+                if this_instance.is_active:
+                    this_instance.last_active = timezone.now()
+                else:
+                    this_instance.last_inactive = timezone.now()
+            
+            this_instance.save()
+            u_form.save()
+            p_form.save()
+            messages.success(request, 'A sua conta foi atualizada!')
+        else:
+            messages.error(request,
+                'Problemas em atualizar a sua conta, veja erros em baixo...')
+        # context = {
+        #     'u_form': u_form,
+        #     'p_form': p_form
+        # }
+        base_template = "base.html"
+
+        context = {
+            'user': user,
             'u_form': u_form,
             'p_form': p_form,
             'base_template': base_template,
