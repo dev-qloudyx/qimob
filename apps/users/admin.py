@@ -13,8 +13,12 @@ class UserAdmin(auth_admin.UserAdmin):
     list_filter = ()
     fieldsets = ()
 
+
+class UserRoleAdmin(admin.ModelAdmin):        
+    list_display = ('id','role_name')
+
 admin.site.register(User, UserAdmin)
-admin.site.register(UserRole)
+admin.site.register(UserRole, UserRoleAdmin)
 admin.site.register(Profile)
 admin.site.register(TeamLeader)
 admin.site.register(MasterConfig)
