@@ -1,10 +1,26 @@
 {% extends base_template %}
 {% block content %}
 
-<span style="display: flex; "><h2 class="listtitle">Lead List</h2><a href="{% url 'crm:lead_create_view' %}" class="btn btn-primary mb-3">Add Lead</a> 
+<span style=" display: inline;"><h2 class="listtitle">Lead List</h2><a href="{% url 'crm:lead_create_view' %}" class="btn btn-primary mb-3">Add Lead</a> 
     <button class="btn btn-primary mb-3">Filters</button>
-    <button class="btn btn-primary mb-3">Order By</button></span>
+    <button class="btn btn-primary mb-3">Order By</button>
+
+    
+</span>
+
+<div style=" display: block;">
+    <h2 class="listtitle">Lead List</h2> 
+    <a href="{% url 'crm:lead_create_view' %}" class="btn btn-primary mb-3">Add Lead</a>
+    <form method="GET">
+        <label for="q">Search:</label>
+        <input type="text" name="q" id="q" value="{{ request.GET.q }}">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+</div>
+
     <a href="{% url 'crm:lead_list_view' %}?order_by=created_at">Order by Created At</a>
+    
     <form method="GET">
         <label for="type">Type:</label>
         <select name="type" id="type">
@@ -15,6 +31,8 @@
         </select>
         <button type="submit">Filter</button>
     </form>
+    
+    
 
 <div id="cliente-list" class="viewlist">
     

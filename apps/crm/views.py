@@ -23,6 +23,8 @@ from urllib.parse import urljoin
 
 from qaddress.models import Address, CountyData, DistrictData, CPData
 from qdocs.models import File
+
+from django.db.models import Q
 # Create your views here.
 
 class ClientCreateView(CreateView):
@@ -211,10 +213,8 @@ class ClientListView(ListView):
             context['address_data'] = None
 
         base_url = self.request.build_absolute_uri(reverse('crm:client_list_view'))
-        if self.request.htmx:
-            base_template = "partial_base.html"
-        else:
-            base_template = "base.html"
+        
+        base_template = "base.html"
  
         context.update({
             'base_url': base_url,
@@ -567,10 +567,8 @@ class LeadCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.htmx:
-            context['base_template'] = "partial_base.html"
-        else:
-            context['base_template'] = "base.html"
+        
+        context['base_template'] = "base.html"
         return context
     
 class LeadListView(ListView):
@@ -579,6 +577,14 @@ class LeadListView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+
+        search_query = self.request.GET.get('q')
+        if search_query:
+            queryset = queryset.filter(
+                Q(short_desc__icontains=search_query) |
+                Q(short_name__icontains=search_query) |
+                Q(client__name__icontains=search_query)
+            )
 
         # Filtering
         type = self.request.GET.get('type')
