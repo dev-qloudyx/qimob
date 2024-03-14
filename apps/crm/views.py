@@ -1,5 +1,8 @@
 import json
 import os
+import uuid
+
+from django.forms import BaseModelForm
 from apps.crm.forms import ClientForm, LeadCreateForm
 from apps.crm.models import Client, ClientAddress, ClientDoc, ClientDocStatus, ClientDocStatusDesc, ClientMessage, Lead
 from apps.crm.utils import handle_not_found, is_image
@@ -25,6 +28,7 @@ from qaddress.models import Address, CountyData, DistrictData, CPData
 from qdocs.models import File
 
 from django.db.models import Q
+from datetime import datetime
 # Create your views here.
 
 class ClientCreateView(CreateView):
@@ -32,17 +36,48 @@ class ClientCreateView(CreateView):
     form_class = ClientForm
     template_name = 'client/client_create.html'
    
+    def form_valid(self, form):
+        # Generate a token for the client
+        token = uuid.uuid4()
+        
+        client_instance = form.save(commit=False)
+        client_instance.save()
+
+        # Create ClientAddress instance and save token
+        ClientAddress.objects.create(
+            client=client_instance,
+            token=token
+        )
+
+        Address.objects.create(
+            token=token,
+            project = "QIMOB",
+            app = 'crm',
+            model = 'client',
+            cp4 = 2970,
+            cp3 = 868,
+            postal_code = '2970-868',
+            district = '2970-868',
+            county = '2970-868',
+            locality = '2970-868',
+            street = '2970-868',
+            number = '2970-868',
+            created_at = datetime.now,
+            updated_at = datetime.now
+
+        )
+
+        print(token)
+
+        return super().form_valid(form)
     
 
     def get_success_url(self):
-        # Get the previous URL from the session
         previous_url = self.request.session.get('previous_url')
-        
-        # If previous_url exists, return it as success URL
+
         if previous_url:
             return previous_url
         
-        # Default to the success URL defined in the class
         return reverse_lazy('crm:client_list_view')
     
     def get_context_data(self, **kwargs):
@@ -177,7 +212,6 @@ class ClientDetailViewJson(View):
 class ClientListView(ListView):
     model = Client
     paginate_by = 5
-    paginate_by = 10
     template_name = 'client/client_list.html'
     ordering = 'id'
 
@@ -186,6 +220,7 @@ class ClientListView(ListView):
 
         clients = self.get_queryset()  # Get the queryset of clients
         client_address = clients.first().clientaddress_set.first()
+        print('hello')
 
         if client_address:
             address_token = client_address.token
@@ -193,7 +228,8 @@ class ClientListView(ListView):
             if address_token:
                 # Query the Address model based on the token
                 address = get_object_or_404(Address, token=address_token)
-                print(address.postal_code)
+                print(address)
+                print('hello')
 
                 # Create a dictionary to store address data
                 address_data = {
@@ -207,6 +243,7 @@ class ClientListView(ListView):
                     # Add more fields as needed
                 }
                 context['address_data'] = address_data
+                print(address_data)
             else:
                 context['address_data'] = None
         else:
@@ -618,15 +655,15 @@ def get_counties(request):
     if request.method == 'GET' and 'district_id' in request.GET:
         district_id = request.GET.get('district_id')
         try:
-            # Assuming you have a ForeignKey relationship from CountyData to DistrictData
+            
             counties = CountyData.objects.filter(DD_id=district_id)
             county_data = {county.id: county.DESIG for county in counties}
             return JsonResponse(county_data)
         except CountyData.DoesNotExist:
-            # Handle the case where no counties are found for the given district
+
             return JsonResponse({'error': 'No counties found for the selected district.'}, status=404)
     else:
-        # Handle the case where the request method is not GET or 'district_id' is missing
+        
         return JsonResponse({'error': 'Invalid request.'}, status=400)
         
 
@@ -634,15 +671,30 @@ def get_locality(request):
     if request.method == 'GET' and 'county_id' in request.GET:
         county_id = request.GET.get('county_id')
         try:
-            # Assuming you have a ForeignKey relationship from CountyData to DistrictData
+           
             localities = CPData.objects.filter(CC_id=county_id).distinct('LOCALIDADE')
             locality_data = {locality.id: locality.LOCALIDADE for locality in localities}
             return JsonResponse(locality_data)
         except CountyData.DoesNotExist:
-            # Handle the case where no counties are found for the given district
+           
             return JsonResponse({'error': 'No localities found for the selected county.'}, status=404)
     else:
-        # Handle the case where the request method is not GET or 'district_id' is missing
+        
         return JsonResponse({'error': 'Invalid request.'}, status=400)
             
-        
+def get_address_info(request):
+    if request.method == 'GET' and 'postal_code' in request.GET:
+        postal_code = request.GET.get('postal_code')
+        try:
+            address_info = CPData.objects.get(CP4=postal_code)  # Assuming CPData has a field for postal code
+            data = {
+                'district': address_info.county.district.name,  # Assuming CountyData has a foreign key to DistrictData
+                'county': address_info.county.DESIG,
+                'locality': address_info.LOCALIDADE,
+                'street': address_info.STREET_FIELD_NAME  # Replace STREET_FIELD_NAME with actual field name for street
+            }
+            return JsonResponse(data)
+        except CPData.DoesNotExist:
+            return JsonResponse({'error': 'No address information found for the entered postal code.'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request.'}, status=400)        
