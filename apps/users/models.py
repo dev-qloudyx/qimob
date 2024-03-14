@@ -104,6 +104,9 @@ class Profile(models.Model):
 class TeamLeader(models.Model):
     team_leader = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f'{self.team_leader.username}'
+
 
 class MasterConfig(models.Model):
     is_active = models.BooleanField(default=True)

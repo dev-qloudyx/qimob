@@ -10,7 +10,8 @@ User = get_user_model()
 class CustomSignupForm(SignupForm):
     email = forms.EmailField(label='E-mail')
     role = forms.ModelChoiceField(queryset=UserRole.objects.all(), label='Role')
-    #team_leader_relation = forms.ModelChoiceField(queryset=TeamLeader.objects.all(), label='Team leader') 
+    team_leader = forms.ModelChoiceField(TeamLeader.objects.all(), label='Lider Equipa', required=False)
+
     class Meta:
         model = User 
         fields = ['email', 'username', 'role', 'is_active']
@@ -29,7 +30,7 @@ class CustomSignupForm(SignupForm):
         self.fields['password2'].label = ''
         self.fields['password1'].help_text = ''
         self.fields['password2'].help_text = ''
-        # self.fields['team_leader_relation'].required = False
+        # self.fields['team_leader'].widget = forms.HiddenInput()
 
     def signup(self, request, user):  # Override signup method
         user.role = self.cleaned_data['role']

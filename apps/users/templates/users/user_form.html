@@ -3,6 +3,24 @@
 {% load i18n %}
 {% load allauth %}
 {% block content %}
+<script>
+    $(document).ready(function() {
+        $('#div_id_team_leader').hide(); // Oculta o campo team_leader inicialmente
+        console.log('hello')
+    
+        $('#id_role').change(function(){
+            var valueSelected = $('#id_role').val(); // Obtém o valor selecionado do campo role
+    
+            if (valueSelected === '3') { // Verifica se o valor selecionado é 'consultor'
+                console.log('goodbye')
+                $('#div_id_team_leader').show(); // Mostra o campo team_leader se o role for 'consultor'
+            } else {
+                console.log('fu')
+                $('#div_id_team_leader').hide(); // Oculta o campo team_leader para outros roles
+            }
+        });
+    });
+</script>
 <form method="post">
     {% csrf_token %}
     {{ form|crispy }}
