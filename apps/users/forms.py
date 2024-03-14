@@ -30,7 +30,6 @@ class CustomSignupForm(SignupForm):
         self.fields['password2'].label = ''
         self.fields['password1'].help_text = ''
         self.fields['password2'].help_text = ''
-        # self.fields['team_leader'].widget = forms.HiddenInput()
 
     def signup(self, request, user):  # Override signup method
         user.role = self.cleaned_data['role']
@@ -39,14 +38,9 @@ class CustomSignupForm(SignupForm):
 
     def save(self, request):
         user = super().save(request)
-        #role = self.cleaned_data['role']
-        # if role.role_name == 'consultor':  # Adjust this condition according to your role model
-        #     team_leader_id = request.POST.get('team_leader_relation')  # Assuming related_user field is submitted in the form
-        #     if team_leader_id:
-        #         team_leader = User.objects.get(pk=team_leader_id)
-        #         user.team_leader = team_leader
         user.save()
         return user
+
 
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField()

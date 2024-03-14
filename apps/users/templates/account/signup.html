@@ -26,20 +26,16 @@
 </div>
 
 <script>
-
     $(document).ready(function() {
-        $('#div_id_team_leader').hide(); // Oculta o campo team_leader inicialmente
-        console.log('hello')
+        $('#div_id_team_leader').hide();
     
         $('#id_role').change(function(){
-            var valueSelected = $('#id_role').val(); // Obtém o valor selecionado do campo role
+            var valueSelected = $('#id_role').val();
     
-            if (valueSelected === '2') { // Verifica se o valor selecionado é 'consultor'
-                console.log('goodbye')
-                $('#div_id_team_leader').show(); // Mostra o campo team_leader se o role for 'consultor'
+            if (valueSelected === '3') { 
+                $('#div_id_team_leader').show();
             } else {
-                console.log('fu')
-                $('#div_id_team_leader').hide(); // Oculta o campo team_leader para outros roles
+                $('#div_id_team_leader').hide();
             }
         });
     });
