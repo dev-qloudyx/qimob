@@ -20,7 +20,9 @@
                         <p>{{ client.phone_number }}</p>
                         <p>{{ client.email_address }}</p>
                         <p>{{ client.nif }}</p>
-                        <p> {{ address_data.postal_code}} {{ address_data.locality}}</p>
+                        {% if address_data %}
+                            <p>{{ address_data.postal_code }}</p>
+                        {% endif %}
 
                     </div>
                 </div>

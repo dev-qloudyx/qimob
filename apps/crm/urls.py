@@ -1,7 +1,7 @@
 
 from . import views
 from django.urls import path
-from .views import get_counties, get_locality
+from .views import get_counties, get_locality, get_address_info
 
 app_name ="crm"
 
@@ -42,9 +42,11 @@ urlpatterns = [
 
     path('lead/create/', views.LeadCreateView.as_view(), name='lead_create_view'),
     path('lead/list/', views.LeadListView.as_view(), name='lead_list_view'),
+    path('lead/detail/<int:pk>/', views.LeadDetailView.as_view(), name='lead_detail_view'),
     # Consultant
 
 
     path('get_counties/', get_counties, name='get_counties'),
     path('get_localities/', get_locality, name='get_locality'),
+    path('get_address_info/', get_address_info, name='get_address_info'),
 ]

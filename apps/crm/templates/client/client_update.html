@@ -14,10 +14,39 @@
        
             <button type="submit" class="btn btn-primary" id="btn">Submit</button>
             <a class="btn btn-secondary"  href="#" onclick="history.back(); return false;">{% trans "Cancel" %}</a>
+            <button class="btn btn-primary" type="button" id="validate">{% trans "Validate" %}</button> <!-- Added ID "validate" to the button -->
   
         </form>
      
     </div>
 
+<script>  
+$(document).ready(function(){
+    // Function to fetch district, county, locality based on postal code
+    $('#validate').click(function(){
+        var postalCodePart1 = $('#id_postal_code1').val();
+        var postalCodePart2 = $('#id_postal_code2').val();
+        var postalCode = postalCodePart1 + postalCodePart2; // Concatenate the two parts
+        if(postalCode){
+            $.ajax({
+                url: '/crm/get_address_info/',  
+                type: 'GET',
+                data: {
+                    'postal_code': postalCode,
+                    'code1': postalCodePart1,
+                    'code2': postalCodePart2
+                },
+                success: function(data){
+                    // Assuming data contains district, county, locality, and street information
+                    $('#id_district').val(data.district);
+                    $('#id_county').val(data.county);
+                    $('#id_locality').val(data.locality);
+                    $('#id_street').val(data.street);
+                }
+            });
+        }
+    });
+});
+</script>
 
 {% endblock %}

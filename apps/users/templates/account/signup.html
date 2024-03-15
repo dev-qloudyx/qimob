@@ -24,4 +24,20 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function() {
+        $('#div_id_team_leader').hide();
+    
+        $('#id_role').change(function(){
+            var valueSelected = $('#id_role').val();
+    
+            if (valueSelected === '3') { 
+                $('#div_id_team_leader').show();
+            } else {
+                $('#div_id_team_leader').hide();
+            }
+        });
+    });
+</script>
 {% endblock content %}

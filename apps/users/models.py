@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from apps.users.validators import only_char, only_int, validate_file
 from PIL import Image
-from django.utils.translation import gettext as _
+# from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
 
@@ -9,7 +11,7 @@ class UserRole(models.Model):
     role_name = models.CharField(max_length=50)
 
     def __str__(self):
-        return self.role_name
+        return f'{self.id} - {self.role_name}'
     
 
 class UserManager(BaseUserManager):
@@ -57,7 +59,6 @@ class User(AbstractBaseUser):
     last_inactive = models.DateTimeField(verbose_name='Data Última Inactivação', blank=True, null=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    # team_leader_relation = models.ForeignKey('TeamLeader', on_delete=models.SET_NULL, blank=True, null=True)
     
     USERNAME_FIELD = 'email' 
     REQUIRED_FIELDS = ['username']
@@ -99,5 +100,68 @@ class Profile(models.Model):
                 img.thumbnail(output_size)
                 img.save(self.image.path)
 
+
 class TeamLeader(models.Model):
-    team_leader = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    team_leader = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.team_leader.username}'
+
+
+class MasterConfig(models.Model):
+    is_active = models.BooleanField(default=True)
+    short_desc = models.CharField(max_length=100, verbose_name=_('short description'))
+    long_desc = models.CharField(max_length=254, verbose_name=_('long description'), blank=True, null=True)
+
+
+class License(models.Model):
+    customer_name = models.CharField(max_length=100, verbose_name=_('Client'))
+    nif = models.CharField(max_length=9, verbose_name='NIF', validators=[only_int])
+    # address_token = 
+    email = models.EmailField(max_length=254, unique=True, verbose_name='E-Mail')
+    phone = models.CharField(max_length=15, verbose_name=_('Phone Number'), validators=[only_int])
+    is_active = models.BooleanField(default=True, verbose_name=_('Is Active'))
+    limit_date = models.DateField(verbose_name=_('Limit Date'))
+    config_ID = models.ForeignKey(MasterConfig, on_delete=models.CASCADE, verbose_name=_('configuration id'))
+    logo = models.ImageField(verbose_name=_('Logo'), upload_to='license_logos')
+
+
+class StatusCode(models.Model):
+    code = models.CharField(primary_key=True, unique=True, max_length=2, verbose_name='Código Status', validators=[only_int])
+    name = models.CharField(max_length=50)
+
+
+class StatusConfig(models.Model):
+    LEAD = 'LEAD'
+    PROSPECT = 'PROSPECT'
+    TYPE_CHOICES = [
+        (LEAD, 'Lead'),
+        (PROSPECT, 'Prospect'),
+    ]
+    config_ID = models.ForeignKey(MasterConfig, on_delete=models.CASCADE)
+    status_type = models.CharField(verbose_name='Tipo Status', max_length=20, choices=TYPE_CHOICES)
+    status_code = models.ForeignKey(StatusCode, on_delete=models.CASCADE)
+    label = models.CharField(max_length=50)
+    color = models.CharField(max_length=7, blank=True, null=True)
+    icon = models.ImageField(upload_to='status_icons', blank=True, null=True)
+    tooltip = models.CharField(max_length=150, blank=True, null=True)
+    notes = models.TextField(verbose_name='Notas', blank=True, null=True)
+
+
+class WorkflowConfig(models.Model):
+    LEAD_VENDA = 'LEAD-VENDA'
+    LEAD_COMPRA = 'LEAD-COMPRA'
+    PROSPECT_VENDA = 'PROSPECT-VENDA'
+    PROSPECT_COMPRA = 'PROSPECT-COMPRA'
+    TYPE_CHOICES = [
+        (LEAD_VENDA, 'Lead - Venda'),
+        (LEAD_COMPRA, 'Lead - Compra'),
+        (PROSPECT_VENDA, 'Prospect - Venda'),
+        (PROSPECT_COMPRA, 'Prospect - Compra'),
+    ]
+    config_ID = models.ForeignKey(MasterConfig, on_delete=models.CASCADE)
+    workflow_type = models.CharField(verbose_name='Tipo Workflow', max_length=20, choices=TYPE_CHOICES)
+    is_active = models.BooleanField(default=True, verbose_name=_('Is Active'))
+    start_status = models.ForeignKey(StatusCode, on_delete=models.CASCADE, related_name='start_status', verbose_name='Estado Inicial')
+    end_status = models.ForeignKey(StatusCode, on_delete=models.CASCADE, related_name='end_status', verbose_name='Estado Final')
+    available_if = models.ForeignKey(StatusCode, on_delete=models.CASCADE, related_name='available_if', verbose_name='Disponível se', blank=True, null=True)

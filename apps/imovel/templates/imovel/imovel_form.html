@@ -6,7 +6,37 @@
 {% block content %}
 <form method="post">
     {% csrf_token %}
-    {{ form|crispy }}
+    <div class="row form-group">
+        <div class="col-md-6">
+            {{ form.name|as_crispy_field }}
+        </div>
+        <div class="col-md-3">
+            {{ form.imovel_type|as_crispy_field }}
+        </div>
+        <div class="col-md-3">
+            {{ form.image|as_crispy_field }}
+        </div>
+        <div class="col-md-12">
+            {{ form.address|as_crispy_field }}
+        </div>
+        <div class="col-md-12">
+            {{ form.description|as_crispy_field }}
+        </div>
+        <div class="col-md-3">
+            {{ form.bedrooms|as_crispy_field }}
+        </div>
+        <div class="col-md-3">
+            {{ form.bathrooms|as_crispy_field }}
+        </div>
+        <div class="col-md-3">
+            {{ form.square_footage|as_crispy_field }}
+        </div>
+        <div class="col-md-3">
+            {{ form.price|as_crispy_field }}
+        </div>
+    </div>
+
+    
     {% if redirect_field_value %}
         <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
     {% endif %}

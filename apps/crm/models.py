@@ -81,7 +81,6 @@ class Client(models.Model):
     email_address = models.EmailField(_("email address"), max_length=254, null=True, unique=True)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
-    nif = models.CharField(_("NIF"), max_length=9, null=True, unique=True)
     nif = models.CharField(_("NIF"), max_length=9, null=True, unique=True, blank=True)
     ident_doc = models.CharField(_("identity document"), max_length=15, null=True, unique=True, blank=True)
     #created_by = models.CharField(_("created by"),null=True, unique=True)

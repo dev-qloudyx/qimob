@@ -1,4 +1,4 @@
-from apps.users.models import Profile, TeamLeader, User, UserRole
+from apps.users.models import License, MasterConfig, Profile, StatusCode, StatusConfig, TeamLeader, User, UserRole, WorkflowConfig
 from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
 
@@ -13,7 +13,16 @@ class UserAdmin(auth_admin.UserAdmin):
     list_filter = ()
     fieldsets = ()
 
+
+class UserRoleAdmin(admin.ModelAdmin):        
+    list_display = ('id','role_name')
+
 admin.site.register(User, UserAdmin)
-admin.site.register(UserRole)
+admin.site.register(UserRole, UserRoleAdmin)
 admin.site.register(Profile)
 admin.site.register(TeamLeader)
+admin.site.register(MasterConfig)
+admin.site.register(License)
+admin.site.register(StatusCode)
+admin.site.register(StatusConfig)
+admin.site.register(WorkflowConfig)
