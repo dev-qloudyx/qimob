@@ -3,7 +3,8 @@ import os
 import uuid
 
 from django.forms import BaseModelForm
-from apps.crm.forms import ClientForm, LeadCreateForm
+import pandas as pd
+from apps.crm.forms import ClientForm, LeadCreateForm, ClientUpdateForm
 from apps.crm.models import Client, ClientAddress, ClientDoc, ClientDocStatus, ClientDocStatusDesc, ClientMessage, Lead
 from apps.crm.utils import handle_not_found, is_image
 from qaddress.views import AddressView, retrieveAddressDataByToken, updateAddressDataByToken
@@ -38,36 +39,44 @@ class ClientCreateView(CreateView):
    
     def form_valid(self, form):
         # Generate a token for the client
-        token = uuid.uuid4()
+        
         
         client_instance = form.save(commit=False)
         client_instance.save()
 
-        # Create ClientAddress instance and save token
-        ClientAddress.objects.create(
-            client=client_instance,
-            token=token
-        )
+        filled_fields = ['postal_code1', 'postal_code2', 'locality', 'county', 'district']
+        if any(form.cleaned_data.get(field) for field in filled_fields):
 
-        Address.objects.create(
-            token=token,
-            project = "QIMOB",
-            app = 'crm',
-            model = 'client',
-            cp4 = 2970,
-            cp3 = 868,
-            postal_code = '2970-868',
-            district = '2970-868',
-            county = '2970-868',
-            locality = '2970-868',
-            street = '2970-868',
-            number = '2970-868',
-            created_at = datetime.now,
-            updated_at = datetime.now
+            token = uuid.uuid4()
 
-        )
+            ClientAddress.objects.create(
+                client=client_instance,
+                token=token
+            )
+            
 
-        print(token)
+            cp4 = form.cleaned_data.get('postal_code1')
+            cp3 = form.cleaned_data.get('postal_code2')
+            
+            Address.objects.create(
+                token=token,
+                project = "QIMOB",
+                app = 'crm',
+                model = 'client',
+                cp4 = cp4,
+                cp3 = cp3,
+                postal_code = f"{cp4}-{cp3}",
+                district = form.cleaned_data.get('district'),
+                county = form.cleaned_data.get('county'),
+                locality = form.cleaned_data.get('locality'),
+                street = form.cleaned_data.get('street'),
+                number = form.cleaned_data.get('moreinfo'),
+                created_at = datetime.now,
+                updated_at = datetime.now
+
+            )
+
+            print(token)
 
         return super().form_valid(form)
     
@@ -89,7 +98,7 @@ class ClientCreateView(CreateView):
 
 class ClientUpdateView(UpdateView):
     model = Client
-    form_class = ClientForm
+    form_class = ClientUpdateForm
     template_name = 'client/client_update.html'
     
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
@@ -222,32 +231,32 @@ class ClientListView(ListView):
         client_address = clients.first().clientaddress_set.first()
         print('hello')
 
-        if client_address:
-            address_token = client_address.token
-            print(address_token)
-            if address_token:
-                # Query the Address model based on the token
-                address = get_object_or_404(Address, token=address_token)
-                print(address)
-                print('hello')
+        # if client_address:
+        #     address_token = client_address.token
+        #     print(address_token)
+        #     if address_token:
+        #         # Query the Address model based on the token
+        #         address = get_object_or_404(Address, token=address_token)
+        #         print(address)
+        #         print('hello')
 
-                # Create a dictionary to store address data
-                address_data = {
-                    'district': address.district,
-                    'county': address.county,
-                    'locality': address.locality,
-                    'postal_code': address.postal_code,
-                    'street': address.street,
-                    'number': address.number,
-                    'more_info': address.more_info,
-                    # Add more fields as needed
-                }
-                context['address_data'] = address_data
-                print(address_data)
-            else:
-                context['address_data'] = None
-        else:
-            context['address_data'] = None
+        #         # Create a dictionary to store address data
+        #         address_data = {
+        #             'district': address.district,
+        #             'county': address.county,
+        #             'locality': address.locality,
+        #             'postal_code': address.postal_code,
+        #             'street': address.street,
+        #             'number': address.number,
+        #             'more_info': address.more_info,
+        #             # Add more fields as needed
+        #         }
+        #         context['address_data'] = address_data
+        #         print(address_data)
+        #     else:
+        #         context['address_data'] = None
+        # else:
+        #     context['address_data'] = None
 
         base_url = self.request.build_absolute_uri(reverse('crm:client_list_view'))
         
@@ -646,6 +655,25 @@ class LeadListView(ListView):
     
 
 
+class LeadDetailView(DetailView):
+    model = Lead
+    template_name = 'client/lead_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        lead = self.get_object()
+
+        clientdata = get_object_or_404(Client, id=lead.client_id)  # Assuming client_id is the foreign key field in Lead model
+        context['clientdata'] = clientdata 
+
+          
+        context['base_template'] = "base.html"
+        return context
+
+
+
+
 
 
         
@@ -685,16 +713,38 @@ def get_locality(request):
 def get_address_info(request):
     if request.method == 'GET' and 'postal_code' in request.GET:
         postal_code = request.GET.get('postal_code')
+        code1 = request.GET.get('code1')
+        code2 = request.GET.get('code2')
+        print(postal_code)
+        print(code1)
+        print(code2)
         try:
-            address_info = CPData.objects.get(CP4=postal_code)  # Assuming CPData has a field for postal code
-            data = {
-                'district': address_info.county.district.name,  # Assuming CountyData has a foreign key to DistrictData
-                'county': address_info.county.DESIG,
-                'locality': address_info.LOCALIDADE,
-                'street': address_info.STREET_FIELD_NAME  # Replace STREET_FIELD_NAME with actual field name for street
-            }
-            return JsonResponse(data)
+            address_info_list = CPData.objects.filter(CP4=code1)
+            # for record in address_info_list:
+            #         print(record.CP4)
+            #         print(record.CP3) 
+            address_info = address_info_list.filter(CP3=code2).first()
+            print(address_info.CP4 + address_info.CP3)
+
+            if address_info:
+
+                street = f'{address_info.ART_TIPO + " " if not (pd.isnull(address_info.ART_TIPO) or address_info.ART_TIPO == "nan") else ""}' \
+                        f'{address_info.PRI_PREP + " " if not (pd.isnull(address_info.PRI_PREP) or address_info.PRI_PREP == "nan") else ""}' \
+                        f'{address_info.ART_TITULO + " " if not (pd.isnull(address_info.ART_TITULO) or address_info.ART_TITULO == "nan") else ""}' \
+                        f'{address_info.SEG_PREP + " " if not (pd.isnull(address_info.SEG_PREP) or address_info.SEG_PREP == "nan") else ""}' \
+                        f'{address_info.ART_DESIG + " " if not (pd.isnull(address_info.ART_DESIG) or address_info.ART_DESIG == "nan") else ""}' \
+                        f'{address_info.ART_LOCAL if not (pd.isnull(address_info.ART_LOCAL) or address_info.ART_LOCAL == "nan") else ""}'
+                
+                data = {
+                    'district': address_info.DD.DESIG,  
+                    'county': address_info.CC.DESIG,
+                    'locality': address_info.LOCALIDADE,
+                    'street': street
+                }
+                return JsonResponse(data)
+            else:
+                return JsonResponse({'error': 'No address information found for the entered postal codes.'}, status=404)
         except CPData.DoesNotExist:
-            return JsonResponse({'error': 'No address information found for the entered postal code.'}, status=404)
+            return JsonResponse({'error': 'No address information found for the entered postal codes.'}, status=404)
     else:
-        return JsonResponse({'error': 'Invalid request.'}, status=400)        
+        return JsonResponse({'error': 'Invalid request.'}, status=400)

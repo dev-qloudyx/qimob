@@ -40,7 +40,7 @@
     {% for lead in leadslist %}
     <div class="card">
         <div class="cardcontent">
-          <a href="#"><h4><b>{{ lead.short_name }}</b> - <b>{{ lead.leadtype }}</b></h4></a>
+          <a href="{% url 'crm:lead_detail_view' lead.id %}"><h4><b>{{ lead.short_name }}</b> - <b>{{ lead.leadtype }}</b></h4></a>
             <div class="cardtable">
                 <p>{{ lead.district.DESIG }}</p>
                 <p>{{ lead.county.DESIG }}</p>
