@@ -5,8 +5,7 @@ from django.db import migrations
 def create_role(apps, schema_editor):
     UserRole = apps.get_model('users', 'UserRole')
     UserRole.objects.create(role_name='chefe_equipa')
-    UserRole.save()
-
+    
 class Migration(migrations.Migration):
 
     dependencies = [
