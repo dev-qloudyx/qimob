@@ -1,3 +1,4 @@
+from typing import Any
 from django.db import models
 from apps.users.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -10,9 +11,23 @@ class BaseModelManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(deleted=False)
     
+
+class License(models.Model):
+    name = models.CharField(_('company name'), max_length = 100)
+    phone = models.CharField(_("phone number"), max_length=16)
+    logo = models.ImageField(_("company logo"),upload_to='media/logos')
+
+    def __str__(self):
+        return self.name
+
+
+
+
+
 class Lead(models.Model):
+    license = models.ForeignKey(License,related_name='lead_license' , on_delete=models.CASCADE, default = 1, null=True, blank= True)
     leadtype = models.ForeignKey('LeadType',related_name='lead_type' , on_delete=models.CASCADE, default = 1)
-    owner = models.ForeignKey(User, related_name='lead_owner', on_delete=models.SET_NULL, blank=True, null=True)
+    owner = models.ForeignKey(User, related_name='lead_owner', on_delete=models.CASCADE)
     client = models.ForeignKey('Client', verbose_name=_('lead client'), on_delete=models.CASCADE)
     imovel = models.ForeignKey('imovel.Imovel', verbose_name=_('lead imovel'), on_delete=models.CASCADE)
     short_name = models.CharField(_('short name'), max_length=20)
@@ -20,10 +35,11 @@ class Lead(models.Model):
     desc = models.CharField(_('description'), max_length=500, null=True, blank=True)
     district = models.ForeignKey(DistrictData,on_delete=models.CASCADE , verbose_name=_('district'))
     county = models.ForeignKey(CountyData, on_delete=models.CASCADE , verbose_name=_('county'))
-    locality = models.ForeignKey(CPData,on_delete=models.CASCADE, verbose_name=_('locality'))
+    # locality = models.ForeignKey(CPData,on_delete=models.CASCADE, verbose_name=_('locality'))
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     created_by = models.ForeignKey(User, related_name='created_by', on_delete=models.CASCADE, default=1)
     com_tip = models.CharField(_('comunication tips'), max_length=100, null=True, blank=True)
+    is_active = models.BooleanField(_('is active'), default=True)
     
     def __str__(self):
         return self.short_name
@@ -61,7 +77,26 @@ class LeadStatus(models.Model):
 
 class LeadDoc(models.Model):
     token =  models.CharField(_("token"), max_length=255)
-    lead = models.ForeignKey(Lead, on_delete=models.CASCADE, blank=True)
+    lead = models.ForeignKey(Lead, on_delete=models.CASCADE)
+
+
+class LeadComment(models.Model):
+    lead = models.ForeignKey(Lead, on_delete=models.CASCADE)
+    comment = models.CharField(_('comment'), max_length=500)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    posted_at = models.DateTimeField(_('posted_at'), auto_now_add=True)
+
+    def __str__(self):
+        return self.comment
+
+class Prospects(models.Model):
+    lead = models.ForeignKey(Lead, on_delete=models.CASCADE)
+    short_desc = models.CharField(_('short description'), max_length=100)
+    partyname = models.CharField(_('third party name'), max_length=100)
+    partyphone = models.BigIntegerField(
+        validators=[MinValueValidator(900000000), MaxValueValidator(999999999)]
+    )
+    partyemail = models.EmailField(_('third party email'))
 
 class Contact(models.Model):
     lead = models.ForeignKey(Lead, on_delete=models.CASCADE, related_name='contact')
@@ -76,6 +111,7 @@ class Contact(models.Model):
 
 
 class Client(models.Model):
+    license = models.ForeignKey(License,related_name='client_license' , on_delete=models.CASCADE, default = 1,null=True, blank= True)
     name = models.CharField(_("name"), max_length=255)
     phone_number = models.CharField(_("phone number"), max_length=16)
     email_address = models.EmailField(_("email address"), max_length=254, null=True, unique=True)

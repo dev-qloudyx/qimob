@@ -6,6 +6,8 @@
 
   {% include '_alert.html' %}
   <h1>Client Update</h5>
+
+    <div class="formview">
     <div class="createforms">
      
         <form method="post">
@@ -14,10 +16,11 @@
        
             <button type="submit" class="btn btn-primary" id="btn">Submit</button>
             <a class="btn btn-secondary"  href="#" onclick="history.back(); return false;">{% trans "Cancel" %}</a>
-            <button class="btn btn-primary" type="button" id="validate">{% trans "Validate" %}</button> <!-- Added ID "validate" to the button -->
+            <button class="btn btn-primary" type="button" id="validate">{% trans "Validate" %}</button> 
   
         </form>
      
+    </div>
     </div>
 
 <script>  

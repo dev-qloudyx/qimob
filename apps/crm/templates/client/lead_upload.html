@@ -8,7 +8,7 @@
             <h5 class="card-title">Upload File</h5>
         </div>
         <div class="card-body">
-            <form method="post" enctype="multipart/form-data" hx-post="{% url 'crm:client_docs_upload_view' pk=client.pk %}">
+            <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 {{ form|crispy }}
                 <div class="d-grid gap-2">

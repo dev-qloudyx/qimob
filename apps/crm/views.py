@@ -5,7 +5,7 @@ import uuid
 from django.forms import BaseModelForm
 import pandas as pd
 from apps.crm.forms import ClientForm, LeadCreateForm, ClientUpdateForm
-from apps.crm.models import Client, ClientAddress, ClientDoc, ClientDocStatus, ClientDocStatusDesc, ClientMessage, Lead
+from apps.crm.models import Client, ClientAddress, ClientDoc, ClientDocStatus, ClientDocStatusDesc, ClientMessage, Lead, LeadDoc, LeadComment
 from apps.crm.utils import handle_not_found, is_image
 from qaddress.views import AddressView, retrieveAddressDataByToken, updateAddressDataByToken
 from qdocs.views import FileDeleteView, FileListView, FileUploadView, FileView
@@ -13,7 +13,7 @@ from qmessages.views import MessageCreateView, MessageListView
 
 from django.conf import settings
 from django.contrib import messages
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.views import View
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
@@ -30,6 +30,8 @@ from qdocs.models import File
 
 from django.db.models import Q
 from datetime import datetime
+
+from apps.imovel.models import Imovel
 # Create your views here.
 
 class ClientCreateView(CreateView):
@@ -608,8 +610,13 @@ class ClientMessageListView(MessageListView):
 class LeadCreateView(CreateView):
     model = Lead
     form_class = LeadCreateForm
-    template_name = 'client/client_create.html'
+    template_name = 'client/lead_update.html'
     success_url = reverse_lazy('crm:lead_list_view')
+
+    def form_valid(self, form):
+
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -659,24 +666,110 @@ class LeadDetailView(DetailView):
     model = Lead
     template_name = 'client/lead_detail.html'
 
+    def post(self, request, *args, **kwargs):
+        if 'cancel' in request.POST:
+            lead = self.get_object()
+            lead.is_active = not lead.is_active
+            lead.save()
+            return HttpResponseRedirect(self.request.path_info)  # Redirect to the same page after processing the POST request
+        return super().post(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         lead = self.get_object()
 
-        clientdata = get_object_or_404(Client, id=lead.client_id)  # Assuming client_id is the foreign key field in Lead model
+        if lead.owner.role == 'admin' or lead.owner == self.request.user:
+            if lead.is_active:
+                context['buttontext'] = 'Cancelar'
+            else:
+                context['buttontext'] = 'Reabrir'
+        else:
+            context['buttontext'] = None
+
+
+        lead_tokens = self.object.leaddoc_set.values_list('token', flat=True)
+        doc_files = []
+        if lead_tokens:
+            for token in lead_tokens:
+                print(token)
+                doc = get_object_or_404(File, token=token)
+                print(doc.upload)
+                doc_files.append(doc)
+            context['doc_files'] = doc_files
+
+        else:
+            context['doc_files'] = None
+
+
+        lead_comments = LeadComment.objects.filter(lead=self.object)
+        comment_list = []
+        for comment in lead_comments:
+            comment_list.append(comment)
+        context['comments'] = comment_list
+
+
+        clientdata = get_object_or_404(Client, id=lead.client_id)  
         context['clientdata'] = clientdata 
 
+        imoveldata = get_object_or_404(Imovel, id=lead.imovel_id) 
+        context['imoveldata'] = imoveldata 
+
           
+        context['base_template'] = "base.html"
+        return context
+    
+    
+
+class LeadUpdateView(UpdateView):
+    model = Lead
+    fields = ['owner', 'client', 'imovel', 'short_name', 'short_desc','desc', 'district', 'county', 'com_tip']
+    template_name = 'client/lead_create.html'
+
+    def get_success_url(self):
+        return reverse_lazy('crm:lead_detail_view', kwargs={'pk': self.object.pk})
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+ 
         context['base_template'] = "base.html"
         return context
 
 
 
+class LeadDocsUploadView(FileUploadView):
+    base_template = "base.html"
+    template_name = 'client/lead_upload.html'
 
 
+    def get_success_url(self):
+        return reverse_lazy('crm:lead_detail_view', kwargs={'pk': self.object.pk})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['base_template'] = self.base_template
+        return context
+    
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        form = super().get_form()
+        lead = get_object_or_404(Lead, pk=kwargs['pk'])
+        context['lead'] = lead
+        context['form'] = form
+        return render(request, self.template_name, context)
+    
+    
+    def post(self, request, *args, **kwargs):
+        kwargs['project'] = 'qimob'
+        kwargs['app'] = 'crm'
+        kwargs['model'] = 'Lead'
+        tokens = super().post(request, *args, **kwargs)
+        lead = get_object_or_404(Lead, pk=kwargs['pk'])
+        for token in tokens:
+            LeadDoc.objects.create(token=token, lead=lead)
 
-        
+        return redirect('crm:lead_detail_view', pk=kwargs['pk'])
 
 
 def get_counties(request):

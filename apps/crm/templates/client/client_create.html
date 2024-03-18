@@ -3,66 +3,31 @@
 {% load crispy_forms_tags %}
 {% load i18n %}
 
-<div class="createforms">
-    <form method="post">
-        {% csrf_token %}
-        
-      
-          {{ form|crispy }}
-        
-        <button class="btn btn-primary" type="submit" value="">{% trans "Create" %}</button>
-        <a class="btn btn-secondary"  href="#" onclick="history.back(); return false;">{% trans "Cancel" %}</a>
-        <button class="btn btn-primary" type="button" id="validate">{% trans "Validate" %}</button> <!-- Added ID "validate" to the button -->
-        
-    </form>
+<div class="formview">
+
+    <div class="createforms">
+        <form method="post">
+            {% csrf_token %}
+            
+          
+              {{ form|crispy }}
+            
+            <button class="btn btn-primary" type="submit" value="">{% trans "Create" %}</button>
+            <a class="btn btn-secondary"  href="#" onclick="history.back(); return false;">{% trans "Cancel" %}</a>
+            <button class="btn btn-primary" type="button" id="validate">{% trans "Validate" %}</button>
+            
+        </form>
+    
+    
+    </div>
 
 
 </div>
 
+
 <!-- <form id="addressForm"></form> -->
 
 <script>
-  $(document).ready(function(){
-    $('#id_district').change(function(){
-        var districtId = $(this).val();
-        if(districtId){
-            $.ajax({
-                url: '/crm/get_counties/',  
-                type: 'GET',
-                data: {'district_id': districtId},
-                success: function(data){
-                    $('#id_county').empty();
-                    $.each(data, function(key, value){
-                        $('#id_county').append('<option value="'+key+'">'+value+'</option>');
-                    });
-                }
-            });
-        }else{
-            $('#id_county').empty();
-        }
-    });
-});
-
-$(document).ready(function(){
-    $('#id_county').change(function(){  
-        var countyId = $(this).val();  
-        if(countyId){
-            $.ajax({
-                url: '/crm/get_localities/', 
-                type: 'GET',
-                data: {'county_id': countyId}, 
-                success: function(data){
-                    $('#id_locality').empty();
-                    $.each(data, function(key, value){
-                        $('#id_locality').append('<option value="'+key+'">'+value+'</option>');
-                    });
-                }
-            });
-        }else{
-            $('#id_locality').empty();
-        }
-    });
-});
 
 $(document).ready(function(){
     // Function to fetch district, county, locality based on postal code

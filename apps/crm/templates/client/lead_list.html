@@ -6,19 +6,14 @@
     
     <button class="btn btn-primary mb-3">Filters</button>
     <button class="btn btn-primary mb-3">Order By</button>
-
+    <div style=" display: block;">
+        <form method="GET">
+            <label for="q">Search:</label>
+            <input type="text" name="q" id="q" value="{{ request.GET.q }}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
     
-</span>
-
-<div style=" display: block;">
-    <form method="GET">
-        <label for="q">Search:</label>
-        <input type="text" name="q" id="q" value="{{ request.GET.q }}">
-        <button type="submit" class="btn btn-primary">Search</button>
-    </form>
-
-</div>
-
+    </div>
     <a href="{% url 'crm:lead_list_view' %}?order_by=created_at">Order by Created At</a>
     
     <form method="GET">
@@ -31,6 +26,13 @@
         </select>
         <button type="submit">Filter</button>
     </form>
+
+    
+</span>
+
+
+
+   
     
     
 

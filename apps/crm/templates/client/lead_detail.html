@@ -1,50 +1,104 @@
 {% extends base_template %}
+{% load i18n %}
 {% block content %}
 
-<span id="notification"></span>
 
-<span style="display: flex; margin-right: 20px;"><h2 class="listtitle">{{ object.short_name}}</h2><a href="#" class="btn btn-primary mb-3">Update</a> 
-  <button class="btn btn-primary mb-3">Delete</button>
-  </span>
+<span id="notification"></span>
+<h2 class="listtitle">{{ object.short_name}}</h2>
+<span style="display: flex; margin-right: 20px;">
+  
+  <form method="post" style='padding:0px'>
+    {% csrf_token %}
+    <a href="{% url 'crm:lead_update_view' lead.id %}" class="btn btn-primary mb-3">Update</a>
+    <a href="#" class="btn btn-primary mb-3">{% trans "Logs" %}</a>
+    <button class="btn btn-primary mb-3">Checklist</button> 
+    {% if buttontext %}
+    <button type="submit" class="btn btn-primary mb-3" name="cancel">{{ buttontext }}</button> 
+    {% endif %}
+ 
+  </form>
+</span>
 
 <div class="detailsview">
-  <button class="collapsible"><h3>Client Data</h3></button>
-<div class="content">
+    
+    
+    <button class="collapsible"><h3>{% trans "Lead Data" %}</h3></button>
+    <div class="content">
+      <p><b class="title">License:</b> {{ object.license.name}}</p>
+      <p><b class="title">Owner:</b> {{ object.owner.username}}</p>
+      <p><b class="title">Type:</b> {{ object.leadtype }}</p>
+      <p><b class="title">Short description:</b> {{ object.short_desc }}</p>
+      <p><b class="title">Description:</b> {{ object.desc }}</p>
+      <p><b class="title">Created at:</b> {{ object.created_at }}</p>
+    </div>
 
-  <p><b class="title">Name:</b> {{ clientdata.name }}</p>
-  <p><b class="title">Phone Number:</b> {{ clientdata.phone_number }}</p>
-  <p><b class="title">Email:</b> {{ clientdata.email_address }}</p>
-  <p><b class="title">NIF:</b> {{ clientdata.nif }}</p>
-  <p><b class="title">Identity Document:</b> {{ clientdata.ident_doc }}</p>
-  <p><b class="title">Link:</b> {{ clientdata.url}}</p>
+
+    <button class="collapsible"><h3>{% trans "Client Data" %}</h3></button>
+    <div class="content">
+      <p><b class="title">Name:</b> {{ clientdata.name }}</p>
+      <p><b class="title">Phone Number:</b> {{ clientdata.phone_number }}</p>
+      <p><b class="title">Email:</b> {{ clientdata.email_address }}</p>
+      <p><b class="title">NIF:</b> {{ clientdata.nif }}</p>
+      <p><b class="title">Identity Document:</b> {{ clientdata.ident_doc }}</p>
+      <p><b class="title">Link:</b> {{ clientdata.url}}</p>
+    </div>
+
+    <button class="collapsible"><h3>{% trans "House Data" %}</h3></button>
+    <div class="content">
+      <p><b class="title">{% trans "Name" %}:</b> {{ imoveldata.name }}</p>
+      <p><b class="title">{% trans "House Type" %}:</b> {{ imoveldata.imovel_type }}</p>
+      <p><b class="title">{% trans "Address" %}:</b> {{ imoveldata.address }}</p>
+      <p><b class="title">{% trans "Price" %}:</b> {{ imoveldata.price }} €</p>
+      <p><b class="title">{% trans "Square Footage" %}:</b> {{ imoveldata.square_footage }} M<sup>2</sup></p>
+      <p><b class="title">{% trans "Number of Bedrooms" %}:</b> {{ imoveldata.bedrooms }}</p>
+      <p><b class="title">{% trans "Number of Bathrooms" %}:</b> {{ imoveldata.bathrooms }}</p>
+      <p><b class="title">{% trans "Description" %}:</b> {{ imoveldata.description}}</p>
+    </div>
+
+
+    <button class="collapsible"><h3>Documents</h3> </button>
+    <div class="content">
+      <a href="{% url 'crm:lead_docs_upload_view' lead.pk %}" class="btn btn-primary mb-3">Add Document</a>
+    
+      {% if doc_files %}
+        {% for doc in doc_files %}
+        <p>Download File: <a href="{{ MEDIA_URL }}{{ doc.upload }}" target="_blank">{{ MEDIA_URL }}{{ doc.upload }}</a></p>
+        {% endfor %}
+      {% else %}
+        <p>No document found</p>
+      {% endif %}
+    </div>
+
+    <button class="collapsible"><h3>Prospects</h3> </button>
+    <div class="content">
+      <a href="#" class="btn btn-primary mb-3">Add Prospect</a>
+    
+    
+    </div>
+
+    <button class="collapsible"><h3>Actions</h3> </button>
+    <div class="content">
+      <a href="#" class="btn btn-primary mb-3">Add Action</a>
+    
+    
+    </div>
+
+
+    <button class="collapsible"><h3>Comments</h3></button>
+    <div class="content">
+      <a href="#" class="btn btn-primary mb-3">Add Comment</a> 
+      {% if comments %}
+        {% for doc in comments %}
+        <p>{{ doc.comment }} - {{doc.user.username}}</a></p>
+        {% endfor %}
+      {% else %}
+        <p>No comments found</p>
+      {% endif %}
+    </div>
+
 </div>
-<button class="collapsible"><h3>Lead Data</h3></button>
-<div class="content">
-  
-      <div class="address">
-        <p><b class="title">Owner:</b> {{ object.owner}}</p>
-        <p><b class="title">Type:</b> {{ object.type }}</p>
-        <p><b class="title">Short description:</b> {{ object.short_desc }}</p>
-        <p><b class="title">Description:</b> {{ object.desc }}</p>
-        <p><b class="title">Created at:</b> {{ object.created_at }}</p>
-
-      </div>
-</div>
-<button class="collapsible"><h3>Documents</h3></button>
-<div class="content">
- 
-  
-</div>
 
 
-
-
-  <!-- {% if doc_file %}
-  <p>Download File: <a href="{{ MEDIA_URL }}/{{ doc_file.upload }}" target="_blank">{{ MEDIA_URL }}/{{ doc_file.upload }}</a></p>
-  {% else %}
-  <p>No document found.</p>
-  {% endif %} -->
-</div>
 
 
 

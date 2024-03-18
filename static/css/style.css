@@ -37,12 +37,12 @@ body {
 
 
 .containermain {
-  width: 85%;
+  width: 80%;
   height: 80%;
   position: fixed;
   top: 15%;
   left: 10%;
-  overflow-y: auto;
+  overflow-y:hidden;
   padding: 20px;
  
 
@@ -54,6 +54,7 @@ body {
 .createforms{
   display: flex;
   justify-content: center;
+ 
 }
 
 .containermain .btn-primary{
@@ -233,6 +234,7 @@ h1 img{
 }
 
 .viewlist{
+  height: 60%;
   width: 85%;
   display: flex;
   flex-direction: column;
@@ -240,6 +242,8 @@ h1 img{
   margin-left: auto;
   margin-right: auto;
   padding: 20px;
+  overflow-y: scroll;
+
 
 }
 
@@ -268,6 +272,18 @@ h1 img{
   margin-right: auto;
   
 }
+
+
+/* FormView */
+.formview{
+
+  border-radius: 20px;
+  padding: 20px;
+  height: 90%;
+  overflow-y: auto;
+
+}
+
 
 
 /* DetailViews */

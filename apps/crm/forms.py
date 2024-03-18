@@ -49,4 +49,4 @@ class ClientUpdateForm(forms.ModelForm):
 class LeadCreateForm(forms.ModelForm):
     class Meta:
         model=Lead
-        fields = ['leadtype','short_name', 'district','county' , 'locality', 'owner', 'client','imovel']
+        fields = ['leadtype','short_name', 'district','county', 'client','imovel']

@@ -43,6 +43,8 @@ urlpatterns = [
     path('lead/create/', views.LeadCreateView.as_view(), name='lead_create_view'),
     path('lead/list/', views.LeadListView.as_view(), name='lead_list_view'),
     path('lead/detail/<int:pk>/', views.LeadDetailView.as_view(), name='lead_detail_view'),
+    path('lead/detail/<int:pk>/update/', views.LeadUpdateView.as_view(), name='lead_update_view'),
+    path('lead/docs/upload/<int:pk>/', views.LeadDocsUploadView.as_view(), name='lead_docs_upload_view'),
     # Consultant
 
 
