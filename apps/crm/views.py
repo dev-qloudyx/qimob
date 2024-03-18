@@ -42,12 +42,26 @@ class ClientCreateView(CreateView):
     def form_valid(self, form):
         # Generate a token for the client
         
-        
+        cp4 = self.request.POST.get('postal_code1')
+        cp3 = self.request.POST.get('postal_code2')
+        district = self.request.POST.get('district')
+        county = self.request.POST.get('county')
+        locality = self.request.POST.get('locality')
+        street = self.request.POST.get('street')
+        moreinfo = self.request.POST.get('moreinfo')
+        if moreinfo is None:
+            moreinfo = ' '
+
+
+        print(district)
+        print(locality)
+        print(moreinfo)
+             
         client_instance = form.save(commit=False)
         client_instance.save()
 
-        filled_fields = ['postal_code1', 'postal_code2', 'locality', 'county', 'district']
-        if any(form.cleaned_data.get(field) for field in filled_fields):
+
+        if any(value for value in [cp4, cp3, locality, county, district]):
 
             token = uuid.uuid4()
 
@@ -57,25 +71,21 @@ class ClientCreateView(CreateView):
             )
             
 
-            cp4 = form.cleaned_data.get('postal_code1')
-            cp3 = form.cleaned_data.get('postal_code2')
-            
             Address.objects.create(
                 token=token,
-                project = "QIMOB",
-                app = 'crm',
-                model = 'client',
-                cp4 = cp4,
-                cp3 = cp3,
-                postal_code = f"{cp4}-{cp3}",
-                district = form.cleaned_data.get('district'),
-                county = form.cleaned_data.get('county'),
-                locality = form.cleaned_data.get('locality'),
-                street = form.cleaned_data.get('street'),
-                number = form.cleaned_data.get('moreinfo'),
-                created_at = datetime.now,
-                updated_at = datetime.now
-
+                project="QIMOB",
+                app='crm',
+                model='client',
+                cp4=cp4,
+                cp3=cp3,
+                postal_code=f"{cp4}-{cp3}",
+                district=district,
+                county=county,
+                locality=locality,
+                street=street,
+                number=moreinfo,
+                created_at=datetime.now(),
+                updated_at=datetime.now()
             )
 
             print(token)
@@ -180,6 +190,7 @@ class ClientDetailView(DetailView):
                 # Query the Address model based on the token
                 address = get_object_or_404(Address, token=address_token)
                 print(address.postal_code)
+                
 
                 # Create a dictionary to store address data
                 address_data = {
@@ -811,29 +822,43 @@ def get_address_info(request):
         print(postal_code)
         print(code1)
         print(code2)
+        
         try:
-            address_info_list = CPData.objects.filter(CP4=code1)
+            address_info_list = CPData.objects.filter(CP4=code1, CP3=code2)
             # for record in address_info_list:
             #         print(record.CP4)
             #         print(record.CP3) 
-            address_info = address_info_list.filter(CP3=code2).first()
-            print(address_info.CP4 + address_info.CP3)
+            
+            # print(address_info.CP4 + address_info.CP3)
+            print(address_info_list)
 
-            if address_info:
+            if address_info_list.exists():
+                streets = []
+                localitys = []
+                for address_info in address_info_list:
+                    street = f'{address_info.ART_TIPO + " " if not (pd.isnull(address_info.ART_TIPO) or address_info.ART_TIPO == "nan") else ""}' \
+                             f'{address_info.PRI_PREP + " " if not (pd.isnull(address_info.PRI_PREP) or address_info.PRI_PREP == "nan") else ""}' \
+                             f'{address_info.ART_TITULO + " " if not (pd.isnull(address_info.ART_TITULO) or address_info.ART_TITULO == "nan") else ""}' \
+                             f'{address_info.SEG_PREP + " " if not (pd.isnull(address_info.SEG_PREP) or address_info.SEG_PREP == "nan") else ""}' \
+                             f'{address_info.ART_DESIG + " " if not (pd.isnull(address_info.ART_DESIG) or address_info.ART_DESIG == "nan") else ""}' \
+                             f'{address_info.ART_LOCAL if not (pd.isnull(address_info.ART_LOCAL) or address_info.ART_LOCAL == "nan") else ""}'
+                    
+                    streets.append({
+                        'street': street,
+                        
+                    })
+                    print(street)
+                    localitys.append({
+                        'locality' : address_info.LOCALIDADE
+                        })
 
-                street = f'{address_info.ART_TIPO + " " if not (pd.isnull(address_info.ART_TIPO) or address_info.ART_TIPO == "nan") else ""}' \
-                        f'{address_info.PRI_PREP + " " if not (pd.isnull(address_info.PRI_PREP) or address_info.PRI_PREP == "nan") else ""}' \
-                        f'{address_info.ART_TITULO + " " if not (pd.isnull(address_info.ART_TITULO) or address_info.ART_TITULO == "nan") else ""}' \
-                        f'{address_info.SEG_PREP + " " if not (pd.isnull(address_info.SEG_PREP) or address_info.SEG_PREP == "nan") else ""}' \
-                        f'{address_info.ART_DESIG + " " if not (pd.isnull(address_info.ART_DESIG) or address_info.ART_DESIG == "nan") else ""}' \
-                        f'{address_info.ART_LOCAL if not (pd.isnull(address_info.ART_LOCAL) or address_info.ART_LOCAL == "nan") else ""}'
-                
                 data = {
                     'district': address_info.DD.DESIG,  
                     'county': address_info.CC.DESIG,
-                    'locality': address_info.LOCALIDADE,
-                    'street': street
+                    'localitys': localitys,
+                    'streets': streets
                 }
+                print(data)
                 return JsonResponse(data)
             else:
                 return JsonResponse({'error': 'No address information found for the entered postal codes.'}, status=404)

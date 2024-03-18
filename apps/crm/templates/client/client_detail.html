@@ -22,11 +22,14 @@
       <div class="address">
         <p><b class="title">District</b> {{ address_data.district }}</p>
         <p><b class="title">County:</b> {{ address_data.county }}</p>
-        <p><b class="title">Locality:</b> {{ address_data.locality }}</p>
-        <p><b class="title">Postal Code:</b> {{ address_data.postal_code }}</p>
-        <p><b class="title">Street:</b> {{ address_data.street }}</p>
-        <p><b class="title">Number:</b> {{ address_data.number }}</p>
-        <p><b class="title">Floor:</b> {{ address_data.more_info }}</p>
+        <p><b class="title">Postal Code:</b> {{ address_data.postal_code }} {{ address_data.locality }}</p>
+
+        <p><b class="title">Address:</b> {{ address_data.street }} {{ address_data.number }} 
+        {% if address_data.more_info %}  
+          {{ address_data.more_info }}
+        {% endif %}
+        </p>
+ 
       </div>
 </div>
 <button class="collapsible"><h3>Documents</h3></button>
