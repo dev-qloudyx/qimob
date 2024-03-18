@@ -107,11 +107,21 @@ class TeamLeader(models.Model):
     def __str__(self):
         return f'{self.team_leader.username}'
 
+class Teams(models.Model):
+    team_leader = models.ForeignKey(TeamLeader, on_delete=models.CASCADE)
+    team_member = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.team_leader.team_leader.username} - {self.team_member.username}'
+
 
 class MasterConfig(models.Model):
     is_active = models.BooleanField(default=True)
     short_desc = models.CharField(max_length=100, verbose_name=_('short description'))
     long_desc = models.CharField(max_length=254, verbose_name=_('long description'), blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.short_desc}'
 
 
 class License(models.Model):
@@ -122,13 +132,19 @@ class License(models.Model):
     phone = models.CharField(max_length=15, verbose_name=_('Phone Number'), validators=[only_int])
     is_active = models.BooleanField(default=True, verbose_name=_('Is Active'))
     limit_date = models.DateField(verbose_name=_('Limit Date'))
-    config_ID = models.ForeignKey(MasterConfig, on_delete=models.CASCADE, verbose_name=_('configuration id'))
+    config = models.ForeignKey(MasterConfig, on_delete=models.CASCADE, verbose_name=_('configuration id'))
     logo = models.ImageField(verbose_name=_('Logo'), upload_to='license_logos')
+
+    def __str__(self):
+        return self.customer_name
 
 
 class StatusCode(models.Model):
     code = models.CharField(primary_key=True, unique=True, max_length=2, verbose_name='Código Status', validators=[only_int])
     name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.code
 
 
 class StatusConfig(models.Model):
@@ -138,7 +154,7 @@ class StatusConfig(models.Model):
         (LEAD, 'Lead'),
         (PROSPECT, 'Prospect'),
     ]
-    config_ID = models.ForeignKey(MasterConfig, on_delete=models.CASCADE)
+    config = models.ForeignKey(MasterConfig, on_delete=models.CASCADE)
     status_type = models.CharField(verbose_name='Tipo Status', max_length=20, choices=TYPE_CHOICES)
     status_code = models.ForeignKey(StatusCode, on_delete=models.CASCADE)
     label = models.CharField(max_length=50)
@@ -159,7 +175,7 @@ class WorkflowConfig(models.Model):
         (PROSPECT_VENDA, 'Prospect - Venda'),
         (PROSPECT_COMPRA, 'Prospect - Compra'),
     ]
-    config_ID = models.ForeignKey(MasterConfig, on_delete=models.CASCADE)
+    config = models.ForeignKey(MasterConfig, on_delete=models.CASCADE)
     workflow_type = models.CharField(verbose_name='Tipo Workflow', max_length=20, choices=TYPE_CHOICES)
     is_active = models.BooleanField(default=True, verbose_name=_('Is Active'))
     start_status = models.ForeignKey(StatusCode, on_delete=models.CASCADE, related_name='start_status', verbose_name='Estado Inicial')
