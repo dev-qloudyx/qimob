@@ -5,13 +5,14 @@
 
 <div class="topnav">
     <img src="{% static 'images/qimob_logo2.png' %}" alt="" width="100px" onclick="openNav()">
-    <a  href="{% url 'users:home' %}">{% trans "Home" %}</a>
+    <a  href="{% url 'users:home' %}"><img src="{% static 'images/logoQloudyx.png' %}" style="height: 40px;" alt=""></a>
+    <!-- <a  href="{% url 'users:home' %}">{% trans "Home" %}</a> -->
 
     <div class="topmenu"> 
 
       <form >
         {% csrf_token %}
-        <input type="text" class="searchbar" placeholder="Search..">
+        <input type="text" class="searchbar" placeholder="Procurar...">
         <input type="submit" class="btn btn-primary">
       </form>
 

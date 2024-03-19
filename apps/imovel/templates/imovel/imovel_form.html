@@ -4,6 +4,9 @@
 {% load allauth %}
 
 {% block content %}
+
+<h3>Criar/Atualizar Imóvel</h3> 
+<div class="formview">
 <form method="post">
     {% csrf_token %}
     <div class="row form-group">
@@ -46,4 +49,5 @@
         <a class="btn btn-secondary" href="{% url 'imovel:imovel_docs_upload_view' pk=imovel.pk %}">{% trans "Upload photos" %}</a>
     {% endif %}
 </form>
+</div>
 {% endblock content %}

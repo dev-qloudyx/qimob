@@ -72,6 +72,9 @@ margin-top: 100%;
 
 .footer{
 position: fixed;
+left: -200px;
 bottom: 0px;
+transition: 0.5s;
+
 }
 

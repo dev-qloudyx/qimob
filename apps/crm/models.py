@@ -69,12 +69,21 @@ class LeadComment(models.Model):
     def __str__(self):
         return self.comment
 
+class LeadShare(models.Model):
+    lead = models.ForeignKey(Lead, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    can_read = models.BooleanField(_('can read'), default=True)
+    can_write = models.BooleanField(_('can write'), default=False)
+
+    def __str__(self):
+        return self.lead.short_name
+
 class Prospects(models.Model):
     lead = models.ForeignKey(Lead, on_delete=models.CASCADE)
     short_desc = models.CharField(_('short description'), max_length=100)
     partyname = models.CharField(_('third party name'), max_length=100)
     partyphone = models.BigIntegerField(
-        validators=[MinValueValidator(900000000), MaxValueValidator(999999999)]
+        validators=[MinValueValidator(200000000), MaxValueValidator(999999999)]
     )
     partyemail = models.EmailField(_('third party email'))
 

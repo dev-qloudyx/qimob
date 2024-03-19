@@ -4,7 +4,7 @@ import uuid
 
 from django.forms import BaseModelForm
 import pandas as pd
-from apps.crm.forms import ClientForm, LeadCreateForm, ClientUpdateForm
+from apps.crm.forms import ClientForm, LeadCreateForm, ClientUpdateForm, LeadShareForm
 from apps.crm.models import Client, ClientAddress, ClientDoc, ClientDocStatus, ClientDocStatusDesc, ClientMessage, Lead, LeadDoc, LeadComment, LeadStatus
 from apps.crm.utils import handle_not_found, is_image
 from qaddress.views import AddressView, retrieveAddressDataByToken, updateAddressDataByToken
@@ -672,7 +672,7 @@ class ClientMessageListView(MessageListView):
 class LeadCreateView(CreateView):
     model = Lead
     form_class = LeadCreateForm
-    template_name = 'client/lead_update.html'
+    template_name = 'client/lead_create.html'
     success_url = reverse_lazy('crm:lead_list_view')
     
     def form_valid(self, form):
@@ -731,6 +731,19 @@ class LeadDetailView(DetailView):
     template_name = 'client/lead_detail.html'
 
     def post(self, request, *args, **kwargs):
+        lead = self.get_object()
+
+
+        share_form = LeadShareForm(request.POST)
+        if share_form.is_valid():
+                
+            share_instance = share_form.save(commit=False)
+            share_instance.lead = lead  
+            share_instance.save()
+            return HttpResponseRedirect(self.request.path_info)
+            
+
+
         if 'cancel' in request.POST:
             lead = self.get_object()
             lead.is_active = not lead.is_active
@@ -779,6 +792,8 @@ class LeadDetailView(DetailView):
         imoveldata = get_object_or_404(Imovel, id=lead.imovel_id) 
         context['imoveldata'] = imoveldata 
 
+        context['shareform'] = LeadShareForm()
+
           
         context['base_template'] = "base.html"
         return context
@@ -788,7 +803,7 @@ class LeadDetailView(DetailView):
 class LeadUpdateView(UpdateView):
     model = Lead
     fields = ['owner', 'client', 'imovel', 'short_name', 'short_desc','desc', 'district', 'county', 'com_tip']
-    template_name = 'client/lead_create.html'
+    template_name = 'client/lead_update.html'
 
     def get_success_url(self):
         return reverse_lazy('crm:lead_detail_view', kwargs={'pk': self.object.pk})

@@ -14,6 +14,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="icon" href="#" type="image/png" sizes="16x16">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <style>
         #div_id_password {
             position: relative;
@@ -35,8 +36,8 @@
             <div class="w-100" style="max-width: 500px;">
                 <form method="POST" class="bg-white shadow rounded px-5 py-4 mb-4">
                     <div class="text-center">
-                        <img style="padding-bottom: 10px;" src="{% static 'img/logo-hpdrones-cor.webp' %}" alt="HPDrones" width="200px"></img>
-                        {% trans "LiveStreaming" %}
+                        <img style="padding-bottom: 10px;" src="{% static 'images/qimob_logo2.png' %}" alt="Qimob" width="200px"></img>
+
                     </div>
                     {% csrf_token %}
                     <fieldset>
@@ -45,7 +46,7 @@
                     </fieldset>
                     <div class="mt-4">
                         <!-- Use the Bootstrap button classes -->
-                        <button class="btn btn-danger btn-block py-2" type="submit">{% trans "Sign In" %}</button>
+                        <button class="btn btn-primary" type="submit">{% trans "Sign In" %}</button>
                     </div>
                 </form>
             </div>
