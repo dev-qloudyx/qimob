@@ -241,7 +241,7 @@ class ClientListView(ListView):
         context = super().get_context_data(**kwargs)
 
         clients = self.get_queryset()  # Get the queryset of clients
-        client_address = clients.first().clientaddress_set.first()
+        # client_address = clients.first().clientaddress_set.first()
         print('hello')
 
         # if client_address:

@@ -1,6 +1,6 @@
 from typing import Any
 from django.db import models
-from apps.users.models import User
+from apps.users.models import License, StatusCode, User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import gettext_lazy as _
 from qaddress.models import Address, DistrictData, CountyData, CPData
@@ -11,17 +11,6 @@ class BaseModelManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(deleted=False)
     
-
-class License(models.Model):
-    name = models.CharField(_('company name'), max_length = 100)
-    phone = models.CharField(_("phone number"), max_length=16)
-    logo = models.ImageField(_("company logo"),upload_to='media/logos')
-
-    def __str__(self):
-        return self.name
-
-
-
 
 
 class Lead(models.Model):
@@ -58,22 +47,13 @@ class LeadScore(models.Model):
     def __str__(self):
         return f'{self.lead.short_name} - {self.score}%'
 
-class LeadStatusDesc(models.Model):
-    desc = models.CharField(_("desc"), max_length=255)
-    created_on = models.DateTimeField(_("created on"), auto_now_add=True)
-    updated_on = models.DateTimeField(_("updated on"), auto_now=True)
-
-    def __str__(self):
-        return 'Desc: {}'.format(self.desc)
-
 class LeadStatus(models.Model): 
-    lead_desc = models.ForeignKey(LeadStatusDesc,related_name="leadstatus_leadstatusdesc", verbose_name=_("lead desc"), on_delete=models.CASCADE)
+    status = models.ForeignKey(StatusCode,related_name="status_code", verbose_name=_("status"), on_delete=models.CASCADE)
     lead = models.ForeignKey(Lead, related_name="lead_status", verbose_name=_("lead"), on_delete=models.CASCADE)
     created_on = models.DateTimeField(_("created on"), auto_now_add=True)
-    updated_on = models.DateTimeField(_("updated on"), auto_now=True)
 
     def __str__(self):
-        return 'Lead Status: {} - Status Date: {} - Updated On: {}'.format(self.lead_desc.desc, self.created_on, self.updated_on)
+        return self.lead
 
 class LeadDoc(models.Model):
     token =  models.CharField(_("token"), max_length=255)
