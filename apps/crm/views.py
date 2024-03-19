@@ -5,7 +5,7 @@ import uuid
 from django.forms import BaseModelForm
 import pandas as pd
 from apps.crm.forms import ClientForm, LeadCreateForm, ClientUpdateForm
-from apps.crm.models import Client, ClientAddress, ClientDoc, ClientDocStatus, ClientDocStatusDesc, ClientMessage, Lead, LeadDoc, LeadComment
+from apps.crm.models import Client, ClientAddress, ClientDoc, ClientDocStatus, ClientDocStatusDesc, ClientMessage, Lead, LeadDoc, LeadComment, LeadStatus
 from apps.crm.utils import handle_not_found, is_image
 from qaddress.views import AddressView, retrieveAddressDataByToken, updateAddressDataByToken
 from qdocs.views import FileDeleteView, FileListView, FileUploadView, FileView
@@ -32,6 +32,8 @@ from django.db.models import Q
 from datetime import datetime
 
 from apps.imovel.models import Imovel
+from apps.users.status import leads_last_statuses
+# from apps.users.status import Status
 # Create your views here.
 
 class ClientCreateView(CreateView):
@@ -623,11 +625,12 @@ class LeadCreateView(CreateView):
     form_class = LeadCreateForm
     template_name = 'client/lead_update.html'
     success_url = reverse_lazy('crm:lead_list_view')
-
+    
     def form_valid(self, form):
-
         form.instance.owner = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        LeadStatus.objects.create(lead=self.object)
+        return response
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -641,32 +644,33 @@ class LeadListView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        queryset = leads_last_statuses() # TAYLORSWIFT - QUERYSET DOS ULTIMOS ESTADOS DAS LEADS ()
 
-        search_query = self.request.GET.get('q')
-        if search_query:
-            queryset = queryset.filter(
-                Q(short_desc__icontains=search_query) |
-                Q(short_name__icontains=search_query) |
-                Q(client__name__icontains=search_query)
-            )
+        # search_query = self.request.GET.get('q')  - AQUI NÃO SEI SE JÁ MEXESTE NOS FILTROS...
+        # if search_query:
+        #     queryset = queryset.filter(
+        #         Q(short_desc__icontains=search_query) |
+        #         Q(short_name__icontains=search_query) |
+        #         Q(client__name__icontains=search_query)
+        #     )
 
-        # Filtering
-        type = self.request.GET.get('type')
-        if type:
-            queryset = queryset.filter(leadtype=type)
+        # # Filtering
+        # type = self.request.GET.get('type')
+        # if type:
+        #     queryset = queryset.filter(leadtype=type)
 
-        # Ordering
-        order_by = self.request.GET.get('order_by', '-created_at')
-        if order_by:
-            queryset = queryset.order_by(order_by)
+        # # Ordering
+        # order_by = self.request.GET.get('order_by', '-created_at')
+        # if order_by:
+        #     queryset = queryset.order_by(order_by)
 
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        leadslist = self.get_queryset() 
-        context['leadslist']=leadslist
+        lead_status = leads_last_statuses()
+        leadslist = self.get_queryset()
+        context['leadslist']=lead_status
        
         context['base_template'] = "base.html"
         return context

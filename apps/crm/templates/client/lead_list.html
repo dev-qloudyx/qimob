@@ -38,18 +38,18 @@
 
 <div id="cliente-list" class="viewlist">
     
-        
+    <!-- TAYLORSWIFT - AQUI DEIXEI ASSIM SÓ PARA DESENRASCAR... NÃO SEI SE QUERES POR MAIS BONITO -->
     {% for lead in leadslist %}
     <div class="card">
         <div class="cardcontent">
-          <a href="{% url 'crm:lead_detail_view' lead.id %}"><h4><b>{{ lead.short_name }}</b> - <b>{{ lead.leadtype }}</b></h4></a>
+          <a href="{% url 'crm:lead_detail_view' lead.id %}"><h4><b>{{ lead.lead.short_name }}</b> - <b>{{ lead.lead.leadtype }}</b></h4></a>
             <div class="cardtable">
-                <p>{{ lead.district.DESIG }}</p>
-                <p>{{ lead.county.DESIG }}</p>
-                <p>{{ lead.locality.LOCALIDADE}}</p>
-                <p>{{ lead.client }}</p>
-                <p>{{ lead.owner }}</p>
-                <p>{{ lead.created_at }}</p>
+                <p>{{ lead.lead.district.DESIG }}</p>
+                <p>{{ lead.lead.county.DESIG }}</p>
+                <p>{{ lead.lead.locality.LOCALIDADE}}</p>
+                <p>{{ lead.lead.client }}</p>
+                <p>{{ lead.lead.owner }}</p>
+                <p>{{ lead.lead.created_at }}</p>
 
             </div>
         </div>

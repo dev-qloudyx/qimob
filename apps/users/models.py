@@ -143,8 +143,17 @@ class StatusCode(models.Model):
     code = models.CharField(primary_key=True, unique=True, max_length=2, verbose_name='Código Status', validators=[only_int])
     name = models.CharField(max_length=50)
 
+    @staticmethod
+    def get_default():
+        default_code = '10'
+        default_name = 'Aberto'
+        default_status = StatusCode.objects.filter(code=default_code, name=default_name).first()
+        if not default_status:
+            default_status = StatusCode.objects.create(code=default_code, name=default_name)
+        return default_status.code
+
     def __str__(self):
-        return self.code
+        return f'{self.code} - {self.name}'
 
 
 class StatusConfig(models.Model):
@@ -162,6 +171,9 @@ class StatusConfig(models.Model):
     icon = models.ImageField(upload_to='status_icons', blank=True, null=True)
     tooltip = models.CharField(max_length=150, blank=True, null=True)
     notes = models.TextField(verbose_name='Notas', blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.status_code}/{self.status_type} - Config: {self.config.short_desc}'
 
 
 class WorkflowConfig(models.Model):

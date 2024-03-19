@@ -48,12 +48,12 @@ class LeadScore(models.Model):
         return f'{self.lead.short_name} - {self.score}%'
 
 class LeadStatus(models.Model): 
-    status = models.ForeignKey(StatusCode,related_name="status_code", verbose_name=_("status"), on_delete=models.CASCADE)
+    status = models.ForeignKey(StatusCode,related_name="status_code", verbose_name=_("status"), default=StatusCode.get_default, on_delete=models.CASCADE)
     lead = models.ForeignKey(Lead, related_name="lead_status", verbose_name=_("lead"), on_delete=models.CASCADE)
     created_on = models.DateTimeField(_("created on"), auto_now_add=True)
 
     def __str__(self):
-        return self.lead
+        return f'{self.lead.short_name} - {self.status}'
 
 class LeadDoc(models.Model):
     token =  models.CharField(_("token"), max_length=255)
