@@ -108,7 +108,7 @@ class Client(models.Model):
 
 class ClientAddress(models.Model):
     token =  models.CharField(_("token"), max_length=255)
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_address')
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
     deleted = models.BooleanField(default=False)

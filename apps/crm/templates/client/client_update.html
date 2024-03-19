@@ -25,11 +25,11 @@
 
 <script>  
 $(document).ready(function(){
-    // Function to fetch district, county, locality based on postal code
+    
     $('#validate').click(function(){
         var postalCodePart1 = $('#id_postal_code1').val();
         var postalCodePart2 = $('#id_postal_code2').val();
-        var postalCode = postalCodePart1 + postalCodePart2; // Concatenate the two parts
+        var postalCode = postalCodePart1 + postalCodePart2; 
         if(postalCode){
             $.ajax({
                 url: '/crm/get_address_info/',  
@@ -40,11 +40,21 @@ $(document).ready(function(){
                     'code2': postalCodePart2
                 },
                 success: function(data){
-                    // Assuming data contains district, county, locality, and street information
+
                     $('#id_district').val(data.district);
                     $('#id_county').val(data.county);
-                    $('#id_locality').val(data.locality);
-                    $('#id_street').val(data.street);
+
+                    $('#id_locality').empty();
+                    for (var i = 0; i < data.localitys.length; i++) {
+                        var locality = data.localitys[i].locality;
+                        $('#id_locality').append('<option value="' + locality + '">' + locality + '</option>');
+                    }
+
+                    $('#id_street').empty();
+                    for (var i = 0; i < data.streets.length; i++) {
+                        var street = data.streets[i].street;
+                        $('#id_street').append('<option value="' + street + '">' + street + '</option>');
+                    }
                 }
             });
         }

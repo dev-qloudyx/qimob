@@ -41,37 +41,30 @@ class ClientCreateView(CreateView):
     form_class = ClientForm
     template_name = 'client/client_create.html'
    
-    def form_valid(self, form):
-        # Generate a token for the client
-        
+    def form_valid(self, form): 
+         
+        client_instance = form.save(commit=False)
+        client_instance.save()
+
+        token = uuid.uuid4()
+
+        ClientAddress.objects.create(
+                client=client_instance,
+                token=token
+            ) 
+
         cp4 = self.request.POST.get('postal_code1')
         cp3 = self.request.POST.get('postal_code2')
         district = self.request.POST.get('district')
         county = self.request.POST.get('county')
         locality = self.request.POST.get('locality')
         street = self.request.POST.get('street')
+        number = self.request.POST.get('number')
         moreinfo = self.request.POST.get('moreinfo')
         if moreinfo is None:
             moreinfo = ' '
 
-
-        print(district)
-        print(locality)
-        print(moreinfo)
-             
-        client_instance = form.save(commit=False)
-        client_instance.save()
-
-
         if any(value for value in [cp4, cp3, locality, county, district]):
-
-            token = uuid.uuid4()
-
-            ClientAddress.objects.create(
-                client=client_instance,
-                token=token
-            )
-            
 
             Address.objects.create(
                 token=token,
@@ -85,12 +78,12 @@ class ClientCreateView(CreateView):
                 county=county,
                 locality=locality,
                 street=street,
-                number=moreinfo,
+                number=number,
+                more_info=moreinfo,
                 created_at=datetime.now(),
                 updated_at=datetime.now()
             )
-
-            print(token)
+  
 
         return super().form_valid(form)
     
@@ -114,12 +107,90 @@ class ClientUpdateView(UpdateView):
     model = Client
     form_class = ClientUpdateForm
     template_name = 'client/client_update.html'
+
+
+    def get_initial(self):
+        initial = super().get_initial()
+        
+        try:
+            get_token = get_object_or_404(ClientAddress, client=self.object)
+            print(get_token.token , get_token )
+            get_clientaddress = get_object_or_404(Address, token=get_token.token )
+            print(get_clientaddress.street , get_clientaddress, get_clientaddress.token)
+
+            initial['postal_code1'] = get_clientaddress.cp4
+            initial['postal_code2'] = get_clientaddress.cp3
+            initial['locality'] = get_clientaddress.locality
+            initial['county'] = get_clientaddress.county
+            initial['district'] = get_clientaddress.district
+            initial['street'] = get_clientaddress.street
+            initial['number'] = get_clientaddress.number
+            initial['moreinfo'] = get_clientaddress.more_info
+        except :
+        
+            pass
+    
+        return initial
     
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         response = super().form_valid(form)
+
+        cp4 = self.request.POST.get('postal_code1')
+        cp3 = self.request.POST.get('postal_code2')
+        district = self.request.POST.get('district')
+        county = self.request.POST.get('county')
+        locality = self.request.POST.get('locality')
+        street = self.request.POST.get('street')
+        number = self.request.POST.get('number')
+        moreinfo = self.request.POST.get('moreinfo')
+        if moreinfo is None:
+            moreinfo = ' '
+
+        client_instance = form.save(commit=False)
+
+        get_token = get_object_or_404(ClientAddress, client=self.object)
+
+        try:
+            get_clientaddress = get_object_or_404(Address, token=get_token.token )
+        
+            get_clientaddress.cp4=cp4
+            get_clientaddress.cp3=cp3
+            get_clientaddress.postal_code=f"{cp4}-{cp3}"
+            get_clientaddress.district=district
+            get_clientaddress.county=county
+            get_clientaddress.locality=locality
+            get_clientaddress.street=street
+            get_clientaddress.number=number
+            get_clientaddress.more_info=moreinfo
+            get_clientaddress.updated_at=datetime.now()
+
+            get_clientaddress.save()
+
+        except:
+
+            Address.objects.create(
+                token=get_token.token,
+                project="QIMOB",
+                app='crm',
+                model='client',
+                cp4=cp4,
+                cp3=cp3,
+                postal_code=f"{cp4}-{cp3}",
+                district=district,
+                county=county,
+                locality=locality,
+                street=street,
+                number=number,
+                more_info=moreinfo,
+                created_at=datetime.now(),
+                updated_at=datetime.now()
+            )
+
+        
+        client_instance.save()
         messages.success(self.request, 'Client updated successfully!')
         return response
 
@@ -130,6 +201,7 @@ class ClientUpdateView(UpdateView):
     
     def get_success_url(self):
         return reverse_lazy('crm:client_detail_view', kwargs={'pk': self.object.pk})
+    
 
 class ClientUpdateViewJson(UpdateView):
     model = Client
@@ -159,6 +231,11 @@ class ClientDetailView(DetailView):
     model = Client
     template_name = 'client/client_detail.html'
 
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        messages.get_messages(request)  
+        return response
+
     def get_object(self, queryset=None):
         client_id = self.request.GET.get('client_id') or self.kwargs.get('pk')
         return get_object_or_404(Client, pk=client_id)
@@ -173,39 +250,38 @@ class ClientDetailView(DetailView):
                 print(token)
                 doc = get_object_or_404(File, token=token)
                 print(doc.upload)
-                doc_files.append(doc)
-            #print(doc_token)
-            #doc = get_object_or_404(File, token = doc_token)
-            #print(doc.upload)
-            #context['doc_file'] = doc
+                doc_files.append(doc)  
 
             context['doc_files'] = doc_files
         else:
             context['doc_files'] = None
     
-
-        client_address = self.object.clientaddress_set.first() 
+        
+        client_address = self.object.client_address.first() 
         if client_address:
             address_token = client_address.token
             print(address_token)
             if address_token:
                 # Query the Address model based on the token
-                address = get_object_or_404(Address, token=address_token)
-                print(address.postal_code)
+                try:
+                    address = get_object_or_404(Address, token=address_token)
+                    print(address.postal_code)
                 
 
-                # Create a dictionary to store address data
-                address_data = {
-                    'district': address.district,
-                    'county': address.county,
-                    'locality': address.locality,
-                    'postal_code': address.postal_code,
-                    'street': address.street,
-                    'number': address.number,
-                    'more_info': address.more_info,
-                    # Add more fields as needed
-                }
-                context['address_data'] = address_data
+                    address_data = {
+                        'district': address.district,
+                        'county': address.county,
+                        'locality': address.locality,
+                        'postal_code': address.postal_code,
+                        'street': address.street,
+                        'number': address.number,
+                        'more_info': address.more_info,
+                        # Add more fields as needed
+                    }
+                    context['address_data'] = address_data
+                except:
+                    context['address_data'] = None
+
             else:
                 context['address_data'] = None
         else:
@@ -245,33 +321,6 @@ class ClientListView(ListView):
         clients = self.get_queryset()  # Get the queryset of clients
         # client_address = clients.first().clientaddress_set.first()
         print('hello')
-
-        # if client_address:
-        #     address_token = client_address.token
-        #     print(address_token)
-        #     if address_token:
-        #         # Query the Address model based on the token
-        #         address = get_object_or_404(Address, token=address_token)
-        #         print(address)
-        #         print('hello')
-
-        #         # Create a dictionary to store address data
-        #         address_data = {
-        #             'district': address.district,
-        #             'county': address.county,
-        #             'locality': address.locality,
-        #             'postal_code': address.postal_code,
-        #             'street': address.street,
-        #             'number': address.number,
-        #             'more_info': address.more_info,
-        #             # Add more fields as needed
-        #         }
-        #         context['address_data'] = address_data
-        #         print(address_data)
-        #     else:
-        #         context['address_data'] = None
-        # else:
-        #     context['address_data'] = None
 
         base_url = self.request.build_absolute_uri(reverse('crm:client_list_view'))
         
