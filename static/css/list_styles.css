@@ -1,0 +1,82 @@
+:root {
+  --primary: #ffffff;
+  --secondary: #FF8647;
+  --terciary:#FF7C00;
+  --backcolor:#e6e6e6;
+  --maintextcolor:#3f3f3f;
+  --bodytext:#000000;
+}
+
+/* Lists  */
+
+
+.listtitle{
+  padding-right: 20px;
+  color: var(--maintextcolor);
+}
+
+.viewlist{
+  height: 80%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+  overflow-y: scroll;
+
+
+}
+
+
+.card{
+
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 20px !important;
+
+}
+
+
+.cardcontent{
+  padding: 20px;
+  width: 100%;
+
+}
+
+.cardtable{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  
+}
+
+
+.button_tab form {
+  display: inline-block; /* Display forms in a single line */
+  vertical-align: top; /* Align forms vertically with other elements */
+}
+
+.button_tab form input{
+  height: 38px; /* Align forms vertically with other elements */
+  border-color: var(--secondary);
+  vertical-align: bottom;
+}
+
+.filterform{
+  display: none;
+
+
+}
+@media (min-width: 600px) {
+  
+
+}
+@media (min-width: 1000px) {
+  
+
+}

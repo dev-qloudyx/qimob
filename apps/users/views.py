@@ -1,3 +1,4 @@
+import os
 from typing import Any
 from django.db.models.query import QuerySet
 from django.utils import timezone
@@ -5,6 +6,7 @@ from django.http import JsonResponse
 from apps.users.allauth_utils import custom_form_valid
 from apps.users.filters import UserFilter
 from apps.users.models import Profile, Teams, User, TeamLeader, UserRole
+from main import settings
 from .forms import CustomSignupForm, UserUpdateForm, ProfileUpdateForm
 from apps.users.roles import roles_required
 from allauth.account.views import  SignupView, PasswordChangeView
@@ -17,6 +19,7 @@ from django.views.generic.list import ListView
 from django.utils.decorators import method_decorator
 from allauth.account.views import PasswordResetView
 from django_filters.views import FilterView
+from django.core.files.base import ContentFile
 
 # Create your views here.
 
@@ -46,7 +49,7 @@ class ListUsersView(ListView):
     queryset = Profile.objects.all()
     template_name = 'users/user_list.html'
     context_object_name = 'users'
-    paginate_by = 12
+    paginate_by = 5
 
     def get_queryset(self):
         user = self.request.user
@@ -69,10 +72,18 @@ class ListUsersView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        print(context['object_list'])
+        users_with_pics = []
+        for profile in context['object_list']:
+            user = profile.user  # Access the User instance associated with the Profile
+            profile_pic = profile.image.url if profile.image else None  # Access the profile picture URL
+            users_with_pics.append({'user': user, 'profile_pic': profile_pic})
+        print(users_with_pics)
         base_template = "base.html"
         context = {
             'form': self.filterset.form,
-            'users': context['object_list'],
+            'users': users_with_pics,
             'base_template': base_template, 
         }
         return context
@@ -104,6 +115,17 @@ class CustomSignupView(CustomRedirectMixin, SignupView):
             leader_id = self.request.POST.get('team_leader')
             leader = TeamLeader.objects.get(id=leader_id)
             Teams.objects.create(team_leader=leader, team_member=user)
+
+
+        if not user.profile.image:
+            # Set default image for user profile
+            default_image_path = os.path.join(settings.STATIC_ROOT, 'images', 'default.png')  # Path to your default image
+            with open(default_image_path, 'rb') as f:
+                # Read the default image file
+                default_image_content = f.read()
+                # Save the default image to the user profile
+                user.profile.image.save('client.png', ContentFile(default_image_content), save=True)
+
 
         return redirect('users:users_list')
 

@@ -1,37 +1,44 @@
 {% extends base_template %}
 {% block content %}
 
-<span style="display: flex; "><h2 class="listtitle">Client List</h2><a href="{% url 'crm:client_create_view' %}" class="btn btn-primary mb-3">Add Client</a> 
-    <button class="btn btn-primary mb-3">Filters</button>
-    <button class="btn btn-primary mb-3">Order By</button></span>
+
+<h2 class="listtitle">Lista Clientes</h2>
+<div><a href="{% url 'crm:client_create_view' %}" class="btn btn-primary mb-3">Adicionar Cliente</a> 
+    <button class="btn btn-primary mb-3">Filtros</button>
+    <button class="btn btn-primary mb-3">Ordenar</button>
+</div>
 
 <div id="cliente-list" class="viewlist">
-    
-        
-        <!--<a href="{% url 'crm:client_create_view' %}" hx-get="{% url 'crm:client_create_view' %}" hx-target="#cliente-list"
-            hx-swap="outerHTML" class="btn btn-primary mb-3">Add Client</a>-->
-        
-       
-        {% for client in clients %}
-            <div class="card">
-                <div class="cardcontent">
-                  <a href="{% url 'crm:client_detail_view' client.id %}"><h4><b>{{ client.name }}</b></h4></a>
-                    <div class="cardtable">
-                        <p>{{ client.phone_number }}</p>
-                        <p>{{ client.email_address }}</p>
-                        <p>{{ client.nif }}</p>
-                        {% if address_data %}
-                            <p>{{ address_data.postal_code }}</p>
-                        {% endif %}
+         
+            {% for token in tokens %}
+                {% for client in clients %}
+                    {% if client == token.1 %}
+                        <div class="card">
+                            <div class="cardcontent">
+                                <a href="{% url 'crm:client_detail_view' client.id %}">
+                                    <h4><b>{{ client.name }}</b></h4>
+                                </a>
+                                <div class="cardtable">
+                                    <p>{{ client.phone_number }}</p>
+                                    <p>{{ client.email_address }}</p>
+                                    <p>{{ client.nif }}</p>
+                                    {% for client_address in addresses %}
+                                        {% if client_address.2 == token.0 %}
+                                            <p>{{ client_address.0 }} {{ client_address.1 }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
 
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
     
 
     <!-- Pagination -->
     
 </div>
 {% include '_pagination.html' %}
+
 {% endblock %}

@@ -5,19 +5,24 @@
 {% load allauth %}
 {% block content %}
 
+<h2 class="listtitle">Lista Imóveis</h2>
 
-    <span style="display: flex; ">
-    
-        <h2 class="listtitle">Imovel List</h2>
-        <a href="{% url 'imovel:imovel_create' %}" class="btn btn-primary mb-3">Add Imovel</a> 
-        <button class="btn btn-primary mb-3">Filters</button>
-        <button class="btn btn-primary mb-3">Order By</button>
-    </span>
+<div class="button_tab">
 
-    <form action="{% url 'imovel:imovel_list' %}" method="get">
-        {{ form.as_p }}
-        <input type="submit" value="Submit" class="btn btn-primary">
-    </form>
+    <a href="{% url 'imovel:imovel_create' %}" class="btn btn-primary mb-3">Adicionar Imóvel</a> 
+    <button class="btn btn-primary mb-3">Filtros</button>
+    <button class="btn btn-primary mb-3">Ordenar</button>
+
+    <div class="filterform">
+        <form action="{% url 'imovel:imovel_list' %}" method="get" >
+            {{ form.as_p }}
+            <input type="submit" value="Submit" class="btn btn-primary">
+        </form>
+
+    </div>
+
+</div>
+  
 
     <div id="cimovel-list" class="viewlist">
            
@@ -30,7 +35,6 @@
                         <p>{{ imovel.square_footage }}</p>
                         <a href="{% url 'imovel:imovel_update' imovel.id %}">EDIT </a>
     
-
                     </div>
                 </div>
             </div>

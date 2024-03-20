@@ -51,4 +51,5 @@ urlpatterns = [
     path('get_counties/', get_counties, name='get_counties'),
     path('get_localities/', get_locality, name='get_locality'),
     path('get_address_info/', get_address_info, name='get_address_info'),
+   
 ]

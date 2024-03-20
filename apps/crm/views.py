@@ -4,6 +4,7 @@ import uuid
 
 from django.forms import BaseModelForm
 import pandas as pd
+from apps.crm.filters import LeadTypeFilter
 from apps.crm.forms import ClientForm, LeadCreateForm, ClientUpdateForm, LeadShareForm
 from apps.crm.models import Client, ClientAddress, ClientDoc, ClientDocStatus, ClientDocStatusDesc, ClientMessage, Lead, LeadDoc, LeadComment, LeadStatus
 from apps.crm.utils import handle_not_found, is_image
@@ -311,7 +312,7 @@ class ClientDetailViewJson(View):
         
 class ClientListView(ListView):
     model = Client
-    paginate_by = 5
+    paginate_by = 10
     template_name = 'client/client_list.html'
     ordering = 'id'
 
@@ -319,9 +320,20 @@ class ClientListView(ListView):
         context = super().get_context_data(**kwargs)
 
         clients = self.get_queryset()  # Get the queryset of clients
-        # client_address = clients.first().clientaddress_set.first()
-        print('hello')
+        client_tokens = []
+        client_addresses = []
 
+        for client in clients:
+            try:
+                get_token = get_object_or_404(ClientAddress, client=client.id)
+                get_clientaddress = get_object_or_404(Address, token=get_token.token )
+
+                client_tokens.append((get_token.token, get_token.client))
+                client_addresses.append((get_clientaddress.postal_code, get_clientaddress.locality , str(get_clientaddress.token)))
+            except:
+                client_addresses.append(None)
+                client_tokens.append(None)
+        
         base_url = self.request.build_absolute_uri(reverse('crm:client_list_view'))
         
         base_template = "base.html"
@@ -329,6 +341,9 @@ class ClientListView(ListView):
         context.update({
             'base_url': base_url,
             'clients': context['object_list'],
+            'clients_with_addresses': zip(context['object_list'], client_addresses), 
+            'addresses': client_addresses,
+            'tokens': client_tokens,
             'base_template': base_template, 
         })
 
@@ -690,37 +705,16 @@ class LeadCreateView(CreateView):
 class LeadListView(ListView):
     model = Lead
     template_name = 'client/lead_list.html'
+    context_object_name = 'leads'
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = leads_last_statuses() # TAYLORSWIFT - QUERYSET DOS ULTIMOS ESTADOS DAS LEADS ()
-
-        # search_query = self.request.GET.get('q')  - AQUI NÃO SEI SE JÁ MEXESTE NOS FILTROS...
-        # if search_query:
-        #     queryset = queryset.filter(
-        #         Q(short_desc__icontains=search_query) |
-        #         Q(short_name__icontains=search_query) |
-        #         Q(client__name__icontains=search_query)
-        #     )
-
-        # # Filtering
-        # type = self.request.GET.get('type')
-        # if type:
-        #     queryset = queryset.filter(leadtype=type)
-
-        # # Ordering
-        # order_by = self.request.GET.get('order_by', '-created_at')
-        # if order_by:
-        #     queryset = queryset.order_by(order_by)
-
-        return queryset
+        return leads_last_statuses()  # Applying filtering directly
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        lead_status = leads_last_statuses()
-        leadslist = self.get_queryset()
-        context['leadslist']=lead_status
-       
+        lead_filter = LeadTypeFilter(self.request.GET, queryset=self.get_queryset())
+        context['lead_filter'] = lead_filter
         context['base_template'] = "base.html"
         return context
     
@@ -934,3 +928,4 @@ def get_address_info(request):
             return JsonResponse({'error': 'No address information found for the entered postal codes.'}, status=404)
     else:
         return JsonResponse({'error': 'Invalid request.'}, status=400)
+

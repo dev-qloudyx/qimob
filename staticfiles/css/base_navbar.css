@@ -1,0 +1,135 @@
+/* Top menu */
+.topnav {
+  background-color: var(--primary);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 5px 22px;
+  height: 75px;
+}
+
+
+
+.topnav img {
+float: left;
+display: block;
+
+}
+
+.topnav a{
+float: left;
+display: block;
+font-size: 20px;
+text-align: center;
+padding: 14px 15px;
+text-decoration: none;
+color: var(--textcolor);
+transition: 0.3s;
+}
+.topnav a:hover{
+
+text-decoration: none;
+color: var(--secondary);
+}
+
+.topnav img:hover {
+transition: 0.3s;
+transform: scale(1.1); /* Increase size on hover */
+
+}
+
+.topmenu{
+float: right;
+display: flex;
+
+}
+.topmenu form{
+padding: 14px 16px;
+display: flex;
+flex-direction: row;
+}
+
+.topmenu a {
+float: left;
+display: block;
+text-align: center;
+padding: 14px 16px;
+text-decoration: none;
+
+}
+.topmenu img {
+width: 40px;
+
+}
+
+
+/* The dropdown container */
+.dropdown {
+float: right;
+
+}
+
+/* Dropdown button */
+.dropdown .dropbtn {
+padding-top: 14px;
+border: none;
+outline: none;
+background-color: inherit;
+font-family: inherit; /* Important for vertical align on mobile phones */
+margin: 0; /* Important for vertical align on mobile phones */
+}
+.dropbtn:hover{
+color: var(--secondary);
+}
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+display: none;
+position: absolute;
+right: 0px;
+background-color: var(--primary);
+min-width: 160px;
+box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+z-index: 9999;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+float: none;
+color: var(--textcolor);
+padding: 12px 16px;
+text-decoration: none;
+display: block;
+text-align: left;
+}
+
+/* Add a grey background color to dropdown links on hover */
+.dropdown-content a:hover {
+background-color: var(--secondary);
+color: var(--primary);
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+display: block;
+}
+
+.topnav .btn-primary{
+background-color: var(--secondary) ;
+border-color: var(--terciary);
+border-radius: 50px;
+}
+
+.topnav .btn-primary:hover{
+background-color: var(--primary) ;
+border-color: var(--terciary);
+color: var(--secondary) ;
+}
+
+.topnav .searchbar{
+padding: 5px ;
+margin-right:12px ;
+border-radius: 50px;
+border-color: var(--secondary);
+}

@@ -1,0 +1,118 @@
+@import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
+
+:root {
+  --base-color: #1a202c;
+}
+
+/* ---------------------------------------------------
+  SIDEBAR
+----------------------------------------------------- */
+
+
+/* ---------------------------------------------------
+  CONTENT STYLE
+----------------------------------------------------- */
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+#content {
+  display: flex;
+  flex-direction: column;
+  padding: 0px;
+  flex: 1; 
+  margin-left: 20px; 
+  transition: all 0.3s;
+}
+
+.content-section {
+  background: #ffffff;
+  padding: 10px 20px;
+  border: 1px solid #dddddd;
+  border-bottom-left-radius: 3px; 
+  border-bottom-right-radius: 3px;
+  flex: 1;
+}
+
+#tabstrip {
+  flex-grow: 1;
+  flex: 1;
+}
+
+footer {
+  margin-top: auto;
+}
+
+
+/* ---------------------------------------------------
+  MEDIAQUERIES
+----------------------------------------------------- */
+@media (max-width: 768px) {
+  #sidebar {
+      transition: all 0.3s;
+      min-width: 100%;
+      max-width: 100%;
+      text-align: center;
+  }
+  #content {
+    margin-left: 0px !important; 
+  }
+  .dropdown-toggle::after {
+      top: auto;
+      bottom: 10px;
+      right: 50%;
+      -webkit-transform: translateX(50%);
+      -ms-transform: translateX(50%);
+      transform: translateX(50%);
+  }
+  #sidebar.active {
+      margin-left: 0 !important;
+  }
+  #sidebar .sidebar-header h3,
+  #sidebar .CTAs {
+      display: none;
+  }
+  #sidebar .sidebar-header strong {
+      display: block;
+  }
+  #sidebar ul li a {
+      padding: 20px 10px;
+  }
+  #sidebar ul li a span {
+      font-size: 0.85em;
+  }
+  #sidebar.active ul li a i {
+      margin-right: auto;
+      margin-left: auto;
+      font-size: 1.3em;
+  }
+  #sidebar ul li a i {
+      font-size: 1.3em;
+      display: block;
+      width: auto;
+  }
+  #sidebar ul ul a {
+      padding: 10px !important;
+  }
+  #sidebar {
+      margin-left: 0;
+  }
+  #sidebarCollapse span {
+      display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .w-56 {
+    width: 4.5rem; /* 56 * 0.25rem = 14rem */
+  }
+  .w-16 {
+    width: 220px; /* 16 * 0.25rem = 4rem */
+  }
+  .w-0 {
+    width: 0px; /* 16 * 0.25rem = 4rem */
+  }
+}

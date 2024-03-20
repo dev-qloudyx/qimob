@@ -1,0 +1,91 @@
+
+
+
+
+.sidenav {
+  height: 100dvh;
+  width: 200px;
+  position: fixed;
+  top: 0;
+  left: -125px;
+  background-color: var(--secondary);
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 100px;
+  z-index: 999;
+}
+
+.sideover{
+z-index: 999;
+}
+
+.sidenav a {
+  padding: 10px 8px 10px 16px;
+  text-decoration: none;
+  font-size: 22px;
+  color: var(--primary);
+  display: block;
+  transition: 0.3s;
+}
+
+
+
+
+.sidenavgrid{
+display: grid;
+grid-template-columns: 1fr 1fr;
+grid-column-gap: 20px;
+}
+
+
+.icons{
+fill: var(--primary);
+transition: 0.3s;
+
+}
+.link a{
+width: 93%;
+display: flex;
+justify-content: space-between;
+}
+
+.link:hover a{
+
+color: #000000;
+}
+
+.icon {
+filter: invert(100%); /* Rotate the hue by 180 degrees, changing the color */
+width: 36px;
+transition: 0.3s;
+}
+
+.icon_spin {
+  filter: invert(100%); /* Rotate the hue by 180 degrees, changing the color */
+  width: 36px;
+  transition: 0.3s;
+  }
+
+.link:hover .icon{
+filter: invert(0%);
+
+
+}
+
+.link:hover .icon_spin{
+  filter: invert(0%);
+
+}
+
+.options{
+margin-top: 100%;
+}
+
+.footer{
+position: fixed;
+left: -200px;
+bottom: 0px;
+transition: 0.5s;
+
+}
+

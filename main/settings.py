@@ -228,6 +228,8 @@ ACCOUNT_LOGOUT_REDIRECT_URL ="/accounts/login"
 ACCOUNT_FORMS = {'signup':'apps.users.forms.CustomSignupForm'}
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
+LOGIN_REDIRECT_URL = '/home/'
+
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'locale'),
 )

@@ -3,7 +3,10 @@
 {% load i18n %}
 
 {% block content%}
-    <div class="container-fluid">
+    <div class="detailsview">
+
+    
+    <div class="container-fluid" style="overflow-y: auto;">
         {% include '_alert.html' %}
         <form method="POST" enctype="multipart/form-data" class="space-y-6">
             {% csrf_token %}
@@ -35,6 +38,12 @@
             </div>
         </form>
     </div>
+</div>
+
+
+
+
+
     <script>
         setTimeout(function() {
             const alerts = document.querySelectorAll('.alert');

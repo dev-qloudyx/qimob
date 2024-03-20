@@ -14,7 +14,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="icon" href="#" type="image/png" sizes="16x16">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base_login.css' %}">
     <style>
         #div_id_password {
             position: relative;
@@ -30,7 +30,32 @@
     </style>
 </head>
 <body>
-    <div> 
+
+    {% include '_alert.html' %}
+    <div class="login" >
+        <div class="box">
+        <form method="POST" class="bg-white shadow rounded px-5 py-4 mb-4 ">
+            <div class="text-center">
+                <img style="padding-bottom: 10px;" src="{% static 'images/qimob_logo2.png' %}" alt="Qimob" width="200px"></img>
+
+            </div>
+            {% csrf_token %}
+            <fieldset>
+                {{ form|crispy }}
+                
+            </fieldset>
+            <div>
+                
+                <button class="btn btn-primary" type="submit">{% trans "Sign In" %}</button>
+            </div>
+        </form>
+        </div>
+
+    </div>
+
+    {% include '_footer.html' %}
+
+    <!-- <div> 
         {% include '_alert.html' %}
         <div class="d-flex align-items-center justify-content-center min-vh-100 bg-light">
             <div class="w-100" style="max-width: 500px;">
@@ -44,15 +69,18 @@
                         {{ form|crispy }}
                         
                     </fieldset>
-                    <div class="mt-4">
-                        <!-- Use the Bootstrap button classes -->
+                    <div>
+                        
                         <button class="btn btn-primary" type="submit">{% trans "Sign In" %}</button>
                     </div>
                 </form>
             </div>
         </div>
-    </div>
-    <script>
+    </div> -->
+
+
+
+<script>
         
         document.addEventListener('DOMContentLoaded', function () {
             var divPassword = document.getElementById('div_id_password');

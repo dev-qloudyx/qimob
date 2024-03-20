@@ -1,45 +1,36 @@
 {% extends base_template %}
 {% block content %}
 
-<span style=" display: inline;"><h2 class="listtitle">Lead List</h2><a href="{% url 'crm:lead_create_view' %}" class="btn btn-primary mb-3">Add Lead</a> 
-    
-    
-    <button class="btn btn-primary mb-3">Filters</button>
-    <button class="btn btn-primary mb-3">Order By</button>
-    <div style=" display: block;">
+<h2 class="listtitle">Lista Leads</h2>
+
+<div class="button_tab">
+    <a href="{% url 'crm:lead_create_view' %}" class="btn btn-primary ">Adicionar Lead</a> 
+        <button class="btn btn-primary ">Filtros</button>
+        <button class="btn btn-primary "><a href="{% url 'crm:lead_list_view' %}?order_by=created_at">Order by Created At</a></button>
+    <div class="filterform">
         <form method="GET">
-            <label for="q">Search:</label>
-            <input type="text" name="q" id="q" value="{{ request.GET.q }}">
+            <input type="text" name="q" id="q" class="searchbar" placeholder="Procurar.." value="{{ request.GET.q }}">
             <button type="submit" class="btn btn-primary">Search</button>
         </form>
-    
+
     </div>
-    <a href="{% url 'crm:lead_list_view' %}?order_by=created_at">Order by Created At</a>
     
-    <form method="GET">
-        <label for="type">Type:</label>
-        <select name="type" id="type">
-            <option value="">All</option>
-            <option value="1">Compra</option>
-            <option value="2">Venda</option>
-            <!-- Add other status options here -->
-        </select>
-        <button type="submit">Filter</button>
-    </form>
 
-    
-</span>
+    <div class="filterform">
+        <form method="get" >
+            {{ lead_filter.form.as_p }}
+            <button type="submit">Apply</button>
+        </form>
+
+    </div>
+      
+</div>
 
 
-
-   
-    
-    
 
 <div id="cliente-list" class="viewlist">
-    
-    <!-- TAYLORSWIFT - AQUI DEIXEI ASSIM SÓ PARA DESENRASCAR... NÃO SEI SE QUERES POR MAIS BONITO -->
-    {% for lead in leadslist %}
+
+{% for lead in leads %}
     <div class="card">
         <div class="cardcontent">
           <a href="{% url 'crm:lead_detail_view' lead.lead.id %}"><h4><b>{{ lead.lead.short_name }}</b> - <b>{{ lead.lead.leadtype }}</b></h4></a>
@@ -50,6 +41,7 @@
                 <p>{{ lead.lead.client }}</p>
                 <p>{{ lead.lead.owner }}</p>
                 <p>{{ lead.lead.created_at }}</p>
+                <b><p>{{ lead.status }}</p></b> 
 
             </div>
         </div>

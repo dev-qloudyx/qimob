@@ -1,32 +1,42 @@
 {% extends base_template %}
 {% load crispy_forms_tags %}
-
+{% load static %}
 {% block content %}
-<div id="user-list" class="py-5">
-    <div class="mt-5">
-        <h2 class="mb-3">User List</h2>
-        <a href="{% url 'users:account_signup' %}" class="btn btn-primary mb-3">Add User</a>
 
+<h2 class="mb-3">Equipa</h2>
+
+<div class="button_tab">
+    <a href="{% url 'users:account_signup' %}" class="btn btn-primary mb-3">Adicionar Utilizador</a>
+
+    <div class="filterform">
         <form action="{% url 'users:users_list' %}" method="get">
             {{ form.as_p }}
             <input type="submit" value="Submit" class="btn btn-primary">
         </form>
-        
-        
 
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>image</th>
-                        <th>username</th>
-                        <th>email</th>
-                        <th>role</th> 
-                        <th>edit user</th> 
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for u in users %}
+    </div>
+
+</div>
+ 
+<div id="cliente-list" class="viewlist">
+    
+{% for u in users %}
+    <div class="card">
+        <div class="cardcontent">
+          <a href="{% url 'users:profile-update' u.user.id %}"><h4><b>{{ u.user.username }} - {{ u.user.role }}</b></h4></a>
+            <div class="cardtable">
+                <img class="rounded-circle" style="height: 54px;" src="{{ u.profile_pic }}">
+                <p>{{ u.user.email }}</p>
+                <!-- {% if user.role_is_admin %}
+                <p><a href="{% url 'users:profile-update' u.user.id %}">EDIT </a></p>
+                {% endif %} -->
+
+
+            </div>
+        </div>
+    </div>
+{% endfor %}
+                    <!-- {% for u in users %}
                     <tr>
                         <td>
                             <img class="rounded-circle article-svg" src="">
@@ -50,11 +60,10 @@
                     <tr>
                         <td colspan="3">No files uploaded yet.</td>
                     </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+                    {% endfor %} -->
+
+
+      
 
     <!-- Pagination -->
     {% include '_pagination.html' %}
