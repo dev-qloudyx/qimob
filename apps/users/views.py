@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.http import JsonResponse
 from apps.users.allauth_utils import custom_form_valid
 from apps.users.filters import UserFilter
-from apps.users.models import Profile, User, TeamLeader
+from apps.users.models import Profile, Teams, User, TeamLeader, UserRole
 from .forms import CustomSignupForm, UserUpdateForm, ProfileUpdateForm
 from apps.users.roles import roles_required
 from allauth.account.views import  SignupView, PasswordChangeView
@@ -49,7 +49,21 @@ class ListUsersView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        user = self.request.user
+        leader = Teams.objects.filter(team_member=user.id).first()
+        members = Teams.objects.filter(team_leader=leader)
+
+        cons_role = UserRole.objects.get(role_name="consultor")
+        chief_role = UserRole.objects.get(role_name="chefe_equipa")
+        
+        if user.role == cons_role or user.role == chief_role:
+            if not members.exists():
+                queryset = Profile.objects.none()
+            else:
+                queryset = Profile.objects.filter(user_id__in=members)
+        else:
+            queryset = super().get_queryset()
+
         self.filterset = UserFilter(self.request.GET, queryset=queryset)
         return self.filterset.qs
 
@@ -81,12 +95,17 @@ class CustomSignupView(CustomRedirectMixin, SignupView):
    def form_valid(self, form):
         custom_form_valid(self, form)
         PasswordResetView.as_view()(self.request)
-        return redirect('users:users_list')
 
-#         user = form.save(self.request)
-#         role = form.cleaned_data['role']
-#         user.save() 
-#         return super().form_valid(form)
+        user = self.user
+        if user.role == UserRole.objects.get(role_name="chefe_equipa"):
+            TeamLeader.objects.create(team_leader=user)
+
+        if user.role == UserRole.objects.get(role_name="consultor"):
+            leader_id = self.request.POST.get('team_leader')
+            leader = TeamLeader.objects.get(id=leader_id)
+            Teams.objects.create(team_leader=leader, team_member=user)
+
+        return redirect('users:users_list')
 
 
 @method_decorator(login_required, name='dispatch')

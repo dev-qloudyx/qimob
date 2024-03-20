@@ -1,4 +1,4 @@
-from apps.users.models import License, MasterConfig, Profile, StatusCode, StatusConfig, TeamLeader, User, UserRole, WorkflowConfig
+from apps.users.models import License, MasterConfig, Profile, StatusCode, StatusConfig, TeamLeader, Teams, User, UserRole, WorkflowConfig
 from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
 
@@ -21,6 +21,7 @@ admin.site.register(User, UserAdmin)
 admin.site.register(UserRole, UserRoleAdmin)
 admin.site.register(Profile)
 admin.site.register(TeamLeader)
+admin.site.register(Teams)
 admin.site.register(MasterConfig)
 admin.site.register(License)
 admin.site.register(StatusCode)

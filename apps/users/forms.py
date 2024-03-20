@@ -14,7 +14,7 @@ class CustomSignupForm(SignupForm):
 
     class Meta:
         model = User 
-        fields = ['email', 'username', 'role', 'is_active']
+        fields = ['email', 'username', 'role', 'is_active', 'team_leader']
         help_texts = {
             'password1': '',
             'password2': ''
@@ -36,10 +36,10 @@ class CustomSignupForm(SignupForm):
         user.save()
         return user
 
-    def save(self, request):
-        user = super().save(request)
-        user.save()
-        return user
+    # def save(self, request):
+    #     user = super().save(request)
+    #     user.save()
+    #     return user
 
 
 class UserUpdateForm(forms.ModelForm):
