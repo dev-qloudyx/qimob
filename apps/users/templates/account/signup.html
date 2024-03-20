@@ -27,9 +27,9 @@
         $('#div_id_team_leader').hide();
     
         $('#id_role').change(function(){
-            var valueSelected = $('#id_role').val();
+            var valueSelected = $('#id_role  option:selected').text();
     
-            if (valueSelected === '3') { 
+            if (valueSelected === '4 - consultor') { 
                 $('#div_id_team_leader').show();
             } else {
                 $('#div_id_team_leader').hide();
