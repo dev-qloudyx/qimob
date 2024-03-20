@@ -5,14 +5,14 @@
 <div id="mySidenav" class="sidenav">
   <div class="sideover">
 
-    <div class="link">
+    <div class="link" onclick="openNav()">
       <a href="#" >
-        Menu
-        <img class="icon" src="{% static 'images/menu.png' %}" alt="Table Icon">
+        Fechar
+        <img class="icon_spin" id="arrow" src="{% static 'images/arrow.png' %}" alt="Table Icon">
       </a>
     </div>
     
-    <div class="link">
+    <div class="link" style="border-top: 1px white solid;">
       <a href="#" >
         Agenda 
         <img class="icon" src="{% static 'images/calendar.png' %}" alt="Table Icon">
@@ -43,13 +43,15 @@
         <img class="icon" src="{% static 'images/team.png' %}" alt="Table Icon">
       </a>
     </div>
-  </div>
-    <div class="options link">
+
+    <div class="link" style="border-top: 1px white solid;">
       <a href="#">Opções
         
         <img class="icon" src="{% static 'images/settings.png' %}" alt="Table Icon">
       </a>
     </div>
+  </div>
+    
 
 
     <div class=" footer" id="footer">

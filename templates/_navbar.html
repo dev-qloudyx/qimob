@@ -4,16 +4,16 @@
 
 
 <div class="topnav">
-    <img src="{% static 'images/qimob_logo2.png' %}" alt="" width="100px" onclick="openNav()">
-    <a  href="{% url 'users:home' %}"><img src="{% static 'images/logoQloudyx.png' %}" style="height: 40px;" alt=""></a>
+    
+    <a  href="{% url 'users:home' %}" style="padding: 0px;"><img src="{% static 'images/qimob_logo2.png' %}" alt="" width="100px" ></a>
     <!-- <a  href="{% url 'users:home' %}">{% trans "Home" %}</a> -->
 
     <div class="topmenu"> 
 
-      <form >
+      <form style="height: 40px; padding: 0%; margin-top: auto; margin-bottom: auto;">
         {% csrf_token %}
-        <input type="text" class="searchbar" placeholder="Procurar...">
-        <input type="submit" class="btn btn-primary">
+        <input type="text" class="searchbar" placeholder="Procurar..">
+        <button type="submit" class="btn btn_navbar " ><img src="{% static 'images/search.png' %}" alt="" style="height: 37px; width: auto; "></button>
       </form>
 
       <a href="#notif"><img src="{% static 'images/bell.png' %}" alt=""></a>

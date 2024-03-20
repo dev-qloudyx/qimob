@@ -48,19 +48,23 @@
     function openNav() {
     let sidebar = document.getElementById("mySidenav");
     let footer = document.getElementById("footer");
+    let arrow = document.getElementById("arrow")
     
     if (sidebar.style.left === "-125px") {
         sidebar.style.left = "0";
         footer.style.left = "0px";
+        arrow.style.rotate = "180deg";
         
     } 
     else if (sidebar.style.left === "0px") {
         sidebar.style.left = "-125px";
         footer.style.left = "-200px";
+        arrow.style.rotate = "0deg";
     }
     else {
         sidebar.style.left = "0";
         footer.style.left = "0px";
+        arrow.style.rotate = "180deg";
         
     }
 }
@@ -89,8 +93,7 @@ function close() {
     overlay.style.display = 'none';
     console.log('helloooo')
   }
-  
-    
+ 
 }
   
 
