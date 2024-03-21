@@ -77,8 +77,8 @@ class ListUsersView(ListView):
         # print(context['object_list'])
         users_with_pics = []
         for profile in context['object_list']:
-            user = profile.user  # Access the User instance associated with the Profile
-            profile_pic = profile.image.url if profile.image else None  # Access the profile picture URL
+            user = profile.user  
+            profile_pic = profile.image.url if profile.image else None 
             users_with_pics.append({'user': user, 'profile_pic': profile_pic})
         # print(users_with_pics)
         base_template = "base.html"
@@ -119,12 +119,10 @@ class CustomSignupView(CustomRedirectMixin, SignupView):
 
 
         if not user.profile.image:
-            # Set default image for user profile
+      
             default_image_path = os.path.join(settings.STATIC_ROOT, 'images', 'default.png')  # Path to your default image
-            with open(default_image_path, 'rb') as f:
-                # Read the default image file
+            with open(default_image_path, 'rb') as f:         
                 default_image_content = f.read()
-                # Save the default image to the user profile
                 user.profile.image.save('client.png', ContentFile(default_image_content), save=True)
 
 

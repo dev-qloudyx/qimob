@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from apps.crm.models import Lead
+from apps.users.models import License
 
 class BaseModelManager(models.Manager):
     def get_queryset(self):
@@ -16,6 +17,7 @@ class ImovelType(models.Model):
 
 
 class Imovel(models.Model):
+    license = models.ForeignKey(License,related_name='imovel_license' , on_delete=models.CASCADE, default = 1, null=True, blank= True)
     name = models.CharField(_("name"), max_length=200)
     imovel_type = models.ForeignKey(ImovelType, on_delete=models.SET_NULL, blank=True, null=True)
     image = models.ImageField(upload_to='imovel_pics', verbose_name=_('Photo') , blank=True)

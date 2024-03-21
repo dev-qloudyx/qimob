@@ -7,6 +7,32 @@ from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
 
+
+class MasterConfig(models.Model):
+    is_active = models.BooleanField(default=True)
+    short_desc = models.CharField(max_length=100, verbose_name=_('short description'))
+    long_desc = models.CharField(max_length=254, verbose_name=_('long description'), blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.short_desc}'
+
+class License(models.Model):
+    customer_name = models.CharField(max_length=100, verbose_name=_('Client'))
+    nif = models.CharField(max_length=9, verbose_name='NIF', validators=[only_int])
+    # address_token = 
+    email = models.EmailField(max_length=254, unique=True, verbose_name='E-Mail')
+    phone = models.CharField(max_length=15, verbose_name=_('Phone Number'), validators=[only_int])
+    is_active = models.BooleanField(default=True, verbose_name=_('Is Active'))
+    limit_date = models.DateField(verbose_name=_('Limit Date'))
+    config = models.ForeignKey(MasterConfig, on_delete=models.CASCADE, verbose_name=_('configuration id'))
+    logo = models.ImageField(verbose_name=_('Logo'), upload_to='license_logos')
+
+    def __str__(self):
+        return self.customer_name
+
+
+
+
 class UserRole(models.Model):
     role_name = models.CharField(max_length=50)
 
@@ -48,6 +74,7 @@ class UserManager(BaseUserManager):
         return user
         
 class User(AbstractBaseUser):
+    license = models.ForeignKey(License,related_name='user_related_license', on_delete=models.CASCADE, default = 1, null=True, blank= True)
     email = models.EmailField(max_length=255, unique=True)
     username = models.CharField(max_length=30, unique=True)
     date_joined = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
@@ -115,28 +142,9 @@ class Teams(models.Model):
         return f'{self.team_leader.team_leader.username} - {self.team_member.username}'
 
 
-class MasterConfig(models.Model):
-    is_active = models.BooleanField(default=True)
-    short_desc = models.CharField(max_length=100, verbose_name=_('short description'))
-    long_desc = models.CharField(max_length=254, verbose_name=_('long description'), blank=True, null=True)
-
-    def __str__(self):
-        return f'{self.short_desc}'
 
 
-class License(models.Model):
-    customer_name = models.CharField(max_length=100, verbose_name=_('Client'))
-    nif = models.CharField(max_length=9, verbose_name='NIF', validators=[only_int])
-    # address_token = 
-    email = models.EmailField(max_length=254, unique=True, verbose_name='E-Mail')
-    phone = models.CharField(max_length=15, verbose_name=_('Phone Number'), validators=[only_int])
-    is_active = models.BooleanField(default=True, verbose_name=_('Is Active'))
-    limit_date = models.DateField(verbose_name=_('Limit Date'))
-    config = models.ForeignKey(MasterConfig, on_delete=models.CASCADE, verbose_name=_('configuration id'))
-    logo = models.ImageField(verbose_name=_('Logo'), upload_to='license_logos')
 
-    def __str__(self):
-        return self.customer_name
 
 
 class StatusCode(models.Model):
