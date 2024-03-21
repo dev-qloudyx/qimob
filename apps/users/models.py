@@ -74,7 +74,7 @@ class UserManager(BaseUserManager):
         return user
         
 class User(AbstractBaseUser):
-    license = models.ForeignKey(License,related_name='user_related_license', on_delete=models.CASCADE, default = 1, null=True, blank= True)
+    # license = models.ForeignKey(License,related_name='user_related_license', on_delete=models.CASCADE, default = 1, null=True, blank= True)
     email = models.EmailField(max_length=255, unique=True)
     username = models.CharField(max_length=30, unique=True)
     date_joined = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
