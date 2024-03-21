@@ -8,11 +8,24 @@
 
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/base_login.css' %}">
+<div class="login">
+    <div class="box">
+        <div class="bg-white shadow rounded px-5 py-4 mb-4">
+            {% element h1 %}
+            {% trans "Account Inactive" %}
+            {% endelement %}
+            <p>{% trans "This account is inactive." %}</p>
+            <p><a href="{% url 'users:login' %}">Voltar ao login?</a></p>
+    
+        </div>
 
+    </div>
+    
 
-    {% element h1 %}
-        {% trans "Account Inactive" %}
-    {% endelement %}
-    <p>{% trans "This account is inactive." %}</p>
-    <p><a href="{% url 'users:login' %}">Voltar ao login?</a></p>
+</div>
+    
+    
+
+    {% include '_footer.html' %}
 {% endblock content %}

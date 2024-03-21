@@ -15,7 +15,11 @@
     --bodytext:#000000;
   }
 
-
+* .btn .btn-primary{
+  background-color: var(--secondary);
+  border-color: var(--terciary);
+  border-radius: 20px;
+}
 
   html, body {
     height: 100svh !important;
