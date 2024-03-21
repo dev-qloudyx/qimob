@@ -23,47 +23,15 @@
 {% for u in users %}
     <div class="card">
         <div class="cardcontent">
-          <a href="{% url 'users:profile-update' u.user.id %}"><h4><b>{{ u.user.username }} - {{ u.user.role }}</b></h4></a>
+          <a href="{% url 'users:profile_detail' u.user.id %}"><h4><b>{{ u.user.username }} - {{ u.user.role }}</b></h4></a>
             <div class="cardtable">
                 <img class="rounded-circle" style="height: 54px;" src="{{ u.profile_pic }}">
                 <p>{{ u.user.email }}</p>
-                <!-- {% if user.role_is_admin %}
-                <p><a href="{% url 'users:profile-update' u.user.id %}">EDIT </a></p>
-                {% endif %} -->
-
 
             </div>
         </div>
     </div>
 {% endfor %}
-                    <!-- {% for u in users %}
-                    <tr>
-                        <td>
-                            <img class="rounded-circle article-svg" src="">
-                        </td>
-                        <td>
-                            {{ u.user.username }}
-                        </td>
-                        <td>
-                            {{ u.user.email }}
-                        </td>
-                        <td>
-                            {{ u.user.role }}
-                        </td>
-                        {% if user.role_is_admin %}
-                        <td>
-                            <a href="{% url 'users:profile-update' u.user.id %}">EDIT </a>
-                        </td>
-                        {% endif %}
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3">No files uploaded yet.</td>
-                    </tr>
-                    {% endfor %} -->
-
-
-      
 
     <!-- Pagination -->
     {% include '_pagination.html' %}

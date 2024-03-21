@@ -50,6 +50,13 @@ class UserUpdateForm(forms.ModelForm):
         model = User
         fields = ['email', 'username', 'role', 'is_active']
 
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user_auth', None)  # Obtém o usuário autenticado
+        super().__init__(*args, **kwargs)
+        if user and not user.is_admin:  # Verifica se o usuário autenticado não é um administrador
+            self.fields['role'].widget = forms.HiddenInput()
+            self.fields['is_active'].widget = forms.HiddenInput()
+
 
 class ProfileUpdateForm(forms.ModelForm):
     image = forms.ImageField(widget=LoadPhotoWidget)

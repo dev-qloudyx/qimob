@@ -1,5 +1,5 @@
 from django.urls import path, reverse_lazy
-from apps.users.views import ProfileView, ProfileUpdate, CustomSignupView, HomeView, CustomPasswordChangeView, UserListViewJson, ListUsersView
+from apps.users.views import ProfileView, ProfileDetailView, ProfileUpdateView, CustomSignupView, HomeView, CustomPasswordChangeView, UserListViewJson, ListUsersView
 from django.views.generic.base import RedirectView
 
 app_name = "users" 
@@ -16,6 +16,6 @@ urlpatterns = [
     # Users
     path('get_users/', UserListViewJson.as_view(), name='get_users'),
     path('users/list/', ListUsersView.as_view(), name='users_list'),
-    path('users/update/<int:pk>/', ProfileUpdate.as_view(), name='profile-update'),
-
+    path('users/update/<int:pk>/', ProfileUpdateView.as_view(), name='profile_update'),
+    path('users/detail/<int:pk>/', ProfileDetailView.as_view(), name='profile_detail'),
 ]

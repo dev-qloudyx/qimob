@@ -15,7 +15,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
-from django.views.generic.list import ListView
+from django.views.generic import ListView, DetailView
 from django.utils.decorators import method_decorator
 from allauth.account.views import PasswordResetView
 from django_filters.views import FilterView
@@ -53,19 +53,20 @@ class ListUsersView(ListView):
 
     def get_queryset(self):
         user = self.request.user
-        leader = Teams.objects.filter(team_member=user.id).first()
-        members = Teams.objects.filter(team_leader=leader)
-
         cons_role = UserRole.objects.get(role_name="consultor")
         chief_role = UserRole.objects.get(role_name="chefe_equipa")
+        queryset = super().get_queryset()
         
         if user.role == cons_role or user.role == chief_role:
-            if not members.exists():
-                queryset = Profile.objects.none()
-            else:
-                queryset = Profile.objects.filter(user_id__in=members)
-        else:
-            queryset = super().get_queryset()
+            leader = Teams.objects.filter(team_member=user.id).first()
+            print(leader)
+            print(cons_role)
+            print(chief_role)
+            # if leader and Teams.objects.filter(team_leader=leader).exists():
+            #     members = Teams.objects.filter(team_leader=leader)
+            #     queryset = Profile.objects.filter(user_id__in=members)
+            # else:
+            #     queryset = Profile.objects.none()
 
         self.filterset = UserFilter(self.request.GET, queryset=queryset)
         return self.filterset.qs
@@ -73,13 +74,13 @@ class ListUsersView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        print(context['object_list'])
+        # print(context['object_list'])
         users_with_pics = []
         for profile in context['object_list']:
             user = profile.user  # Access the User instance associated with the Profile
             profile_pic = profile.image.url if profile.image else None  # Access the profile picture URL
             users_with_pics.append({'user': user, 'profile_pic': profile_pic})
-        print(users_with_pics)
+        # print(users_with_pics)
         base_template = "base.html"
         context = {
             'form': self.filterset.form,
@@ -134,7 +135,7 @@ class CustomSignupView(CustomRedirectMixin, SignupView):
 class ProfileView(View):
 
     def get(self, request):
-        u_form = UserUpdateForm(instance=request.user)
+        u_form = UserUpdateForm(instance=request.user, user_auth=request.user)
         p_form = ProfileUpdateForm(instance=request.user.profile)
         
         base_template = "base.html"
@@ -145,10 +146,10 @@ class ProfileView(View):
             'base_template': base_template,
         }
 
-        return render(request, "profile/profile.html", context)
+        return render(request, "profile/profile_form.html", context)
 
     def post(self, request):
-        u_form = UserUpdateForm(request.POST, instance=request.user)
+        u_form = UserUpdateForm(request.POST, instance=request.user, user_auth=request.user)
         p_form = ProfileUpdateForm(
             request.POST, request.FILES, instance=request.user.profile)
         if u_form.is_valid() and p_form.is_valid():
@@ -168,10 +169,6 @@ class ProfileView(View):
         else:
             messages.error(request,
                 'Problemas em atualizar a sua conta, veja erros em baixo...')
-        # context = {
-        #     'u_form': u_form,
-        #     'p_form': p_form
-        # }
         base_template = "base.html"
 
         context = {
@@ -180,14 +177,14 @@ class ProfileView(View):
             'base_template': base_template,
         }
 
-        return render(request, "profile/profile.html", context)
+        return render(request, "profile/profile_form.html", context)
     
-@method_decorator(login_required, name='dispatch')
-class ProfileUpdate(View):
+@method_decorator(roles_required(['admin']), name='dispatch')
+class ProfileUpdateView(View):
 
     def get(self, request, pk):
         user = get_object_or_404(User, pk=pk)
-        u_form = UserUpdateForm(instance=user)
+        u_form = UserUpdateForm(instance=user, user_auth=request.user)
         p_form = ProfileUpdateForm(instance=user.profile)
         
         base_template = "base.html"
@@ -199,11 +196,11 @@ class ProfileUpdate(View):
             'base_template': base_template,
         }
 
-        return render(request, "profile/profile.html", context)
+        return render(request, "profile/profile_form.html", context)
 
     def post(self, request, pk):
         user = get_object_or_404(User, pk=pk)
-        u_form = UserUpdateForm(request.POST, instance=user)
+        u_form = UserUpdateForm(request.POST, instance=user, user_auth=request.user)
         p_form = ProfileUpdateForm(
             request.POST, request.FILES, instance=user.profile)
         if u_form.is_valid() and p_form.is_valid():
@@ -223,10 +220,6 @@ class ProfileUpdate(View):
         else:
             messages.error(request,
                 'Problemas em atualizar a sua conta, veja erros em baixo...')
-        # context = {
-        #     'u_form': u_form,
-        #     'p_form': p_form
-        # }
         base_template = "base.html"
 
         context = {
@@ -236,4 +229,20 @@ class ProfileUpdate(View):
             'base_template': base_template,
         }
 
-        return render(request, "profile/profile.html", context)
+        return render(request, "profile/profile_form.html", context)
+    
+@method_decorator(login_required, name='dispatch')
+class ProfileDetailView(DetailView):
+    model = Profile
+    template_name = "users/user_detail.html"
+
+    def get_object(self, queryset=None):
+        user_id = self.kwargs.get('pk')
+        return get_object_or_404(Profile, user_id=user_id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        base_template = "base.html"
+        context['base_template'] = base_template
+
+        return context

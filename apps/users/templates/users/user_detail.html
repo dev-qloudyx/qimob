@@ -1,0 +1,23 @@
+{% extends base_template %}
+{% block content %}
+
+<span id="notification"></span>
+
+<span style="display: flex; margin-right: 20px;"><h2 class="listtitle">{{ object.user.username }}</h2>
+  {% if request.user.role_is_admin %}
+  <a href="{% url 'users:profile_update' object.user.id %}" class="btn btn-primary mb-3">Update</a> 
+  <button class="btn btn-primary mb-3">Delete</button>
+  {% endif %}
+</span>
+
+<div class="detailsview">
+  <h3>User Data</h3>
+  
+    <img class="rounded-circle" style="width: 48px; height: 48px;" src="{{ object.image.url }}">
+    <p><b class="title">Nome Completo:</b> {{ object.full_name }}</p>
+    <p><b class="title">Email:</b> {{ object.user.email }}</p>
+    <p><b class="title">Role:</b> {{ object.user.role }}</p>
+
+</div>
+
+{% endblock %}
