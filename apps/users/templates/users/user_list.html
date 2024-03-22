@@ -1,38 +1,24 @@
 {% extends base_template %}
 {% load crispy_forms_tags %}
 {% load static %}
+{% load i18n %}
 {% block content %}
 
 
 
-<div class="button_tab">
-    <h2 class="mb-3">Equipa</h2>
-    <div>
-        <form action="{% url 'users:users_list' %}" method="get">
-            <div class="row form-group">
-                {% if request.user.is_admin %}
-                <div class="col-md-3">
-                    <a href="{% url 'users:account_signup' %}" class="btn btn-primary">Adicionar Utilizador</a>
-                </div>
-                {% endif %}
-                <div class="col-md-3">
-                    {{ form.user__email__icontains|as_crispy_field }}
-                </div>
-                <div class="col-md-3">
-                    {{ form.user__username__icontains|as_crispy_field }}
-                </div>
-                <div class="col-md-2">
-                    {{ form.user__role|as_crispy_field }}
-                </div>
-                <div class="col-md-1">
-                    <input type="submit" value="Procurar" class="btn btn-primary md-3">
-                </div>
-            </div>
-            
+
+<div class="filter">
+    <form action="{% url 'users:users_list' %}" method="get">
+            {{ user_filter.user__username|as_crispy_field }}
+            {{ user_filter.user__role|as_crispy_field }}
+            {% if request.user.is_admin %}
+                {{ user_filter.user_leaders|as_crispy_field }}
+                {{ user_filter.user__is_active|as_crispy_field }}
+            {% endif %}
+            <input type="submit" value="Submit" class="btn btn-primary">
         </form>
-    </div>
-</div>
- 
+
+
 <div id="cliente-list" class="viewlist">
 
 {% for u in users %}

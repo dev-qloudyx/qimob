@@ -48,7 +48,7 @@ class UserListViewJson(View):
 @method_decorator([login_required], name='dispatch')
 class ListUsersView(ListView):
     model = Profile
-    queryset = Profile.objects.all()
+    queryset = Profile.objects.all().filter(user__is_active=True)
     template_name = 'users/user_list.html'
     context_object_name = 'users'
     paginate_by = 5
@@ -60,14 +60,14 @@ class ListUsersView(ListView):
         if user.role == UserRole.objects.get(role_name="chefe_equipa"):
             leader = TeamLeader.objects.get(team_leader=user.id)
             members = Teams.objects.filter(team_leader=leader)
-            queryset = Profile.objects.filter(user_id__in=members.values_list('team_member', flat=True))
+            queryset = Profile.objects.filter(user_id__in=members.values_list('team_member', flat=True)).filter(user__is_active=True)
         
         if user.role == UserRole.objects.get(role_name="consultor"):
             leader = Teams.objects.get(team_member=user.id).team_leader
             members = Teams.objects.filter(team_leader=leader)
             queryset = Profile.objects.filter(
                 Q(user_id__in=members.values_list('team_member', flat=True)) | 
-                Q(user_id=leader.team_leader.pk))
+                Q(user_id=leader.team_leader.pk)).filter(user__is_active=True)
 
         self.filterset = UserFilter(self.request.GET, queryset=queryset)
         return self.filterset.qs
@@ -91,7 +91,7 @@ class ListUsersView(ListView):
         # print(users_with_pics)
         base_template = "base.html"
         context = {
-            'form': self.filterset.form,
+            'user_filter': self.filterset.form,
             'users': users_with_pics,
             'base_template': base_template, 
         }

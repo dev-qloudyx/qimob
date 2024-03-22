@@ -1,10 +1,13 @@
 import django_filters
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
-from .models import Profile
+from .models import Profile, TeamLeader, Teams
 
 
 class UserFilter(django_filters.FilterSet):
+    user__email = django_filters.CharFilter(lookup_expr='icontains', field_name='user__email', label='E-mail')
+    user__username = django_filters.CharFilter(lookup_expr='icontains', field_name='user__username', label='Username')
+    user_leaders = django_filters.ChoiceFilter(method='leaders_search_filter', label='Chefes Equipa', choices=[[t.pk, t] for t in TeamLeader.objects.all()])
 
     # search = django_filters.CharFilter(method='custom_search', label='Pesquisar')
 
@@ -17,6 +20,13 @@ class UserFilter(django_filters.FilterSet):
             'user__username': ['icontains'],
             'user__role': ['exact']
         }
+
+
+    def leaders_search_filter(self, queryset, name, value):
+        leader_id = value
+        members = Teams.objects.filter(team_leader_id=leader_id)
+        return Profile.objects.filter(user_id__in=members.values_list('team_member', flat=True))
+
 
     def __init__(self, *args, **kwargs):
         super(UserFilter, self).__init__(*args, **kwargs)
