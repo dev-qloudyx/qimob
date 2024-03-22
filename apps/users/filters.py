@@ -18,7 +18,8 @@ class UserFilter(django_filters.FilterSet):
         fields = {
             'user__email': ['icontains'],
             'user__username': ['icontains'],
-            'user__role': ['exact']
+            'user__role': ['exact'],
+            'user__is_active': ['exact'],
         }
 
 
