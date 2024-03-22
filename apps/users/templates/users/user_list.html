@@ -3,34 +3,21 @@
 {% load static %}
 {% block content %}
 
-
+<h2 class="mb-3">Equipa</h2>
 
 <div class="button_tab">
-    <h2 class="mb-3">Equipa</h2>
-    <div>
+    {% if request.user.is_admin %}
+    <a href="{% url 'users:account_signup' %}" class="btn btn-primary mb-3">Adicionar Utilizador</a>
+    {% endif %}
+
+    <div class="filterform">
         <form action="{% url 'users:users_list' %}" method="get">
-            <div class="row form-group">
-                {% if request.user.is_admin %}
-                <div class="col-md-3">
-                    <a href="{% url 'users:account_signup' %}" class="btn btn-primary">Adicionar Utilizador</a>
-                </div>
-                {% endif %}
-                <div class="col-md-3">
-                    {{ form.user__email__icontains|as_crispy_field }}
-                </div>
-                <div class="col-md-3">
-                    {{ form.user__username__icontains|as_crispy_field }}
-                </div>
-                <div class="col-md-2">
-                    {{ form.user__role|as_crispy_field }}
-                </div>
-                <div class="col-md-1">
-                    <input type="submit" value="Procurar" class="btn btn-primary md-3">
-                </div>
-            </div>
-            
+            {{ form.as_p }}
+            <input type="submit" value="Submit" class="btn btn-primary">
         </form>
+
     </div>
+
 </div>
  
 <div id="cliente-list" class="viewlist">
@@ -38,7 +25,7 @@
 {% for u in users %}
     <div class="card">
         <div class="cardcontent">
-          <a href="{% url 'users:profile_detail' u.user.id %}"><h4><b>{{ u.user.username }}  [{{ u.user.role }}]</b></h4></a>
+          <a href="{% url 'users:profile_detail' u.user.id %}"><h4><b>{{ u.user.username }} - {{ u.user.role }}</b></h4></a>
             <div class="cardtable">
                 <img class="rounded-circle" style="height: 54px;" src="{{ u.profile_pic }}">
                 <p>{{ u.user.email }}</p>

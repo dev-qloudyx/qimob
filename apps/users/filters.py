@@ -6,9 +6,7 @@ from .models import Profile
 
 class UserFilter(django_filters.FilterSet):
 
-    # search = django_filters.CharFilter(method='custom_search', label='Pesquisar')
-
-    
+    # search = django_filters.CharFilter(method='imovel_filter', label='Pesquisar')
 
     class Meta:
         model = Profile
@@ -17,21 +15,7 @@ class UserFilter(django_filters.FilterSet):
             'user__username': ['icontains'],
             'user__role': ['exact']
         }
-
-    def __init__(self, *args, **kwargs):
-        super(UserFilter, self).__init__(*args, **kwargs)
         
-        
-        self.filters['user__email__icontains'].label = 'Email'
-        self.filters['user__username__icontains'].label = 'Username'
-        self.filters['user__role'].label = 'Role'
-    
 
-    # def custom_search(self, queryset, name, value):
-    #     if value:
-    #         # Filter queryset based on multiple fields
-    #         queryset = queryset.filter(
-    #             django_filters.Q(user__email__icontains=value) |
-    #             django_filters.Q(user__username__icontains=value)
-    #         )
-    #     return queryset
+    # def general_search_filter(self, queryset, name, value):
+    #     return Imovel.objects.filter(square_footage__icontains=value)

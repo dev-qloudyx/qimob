@@ -83,39 +83,21 @@ display: flex;
  
  .box .btn-primary:hover{
   
-  background-color: var(--primary);
-  border-color: var(--terciary);
-  color: var(--secondary);
+   background-color: var(--primary);
+   border-color: var(--terciary);
+   color: var(--secondary);
   
   }
 
   .box .btn-primary:focus{
   
-  background-color: var(--primary);
-  border-color: var(--terciary);
-  color: var(--secondary);
+    background-color: var(--primary);
+    border-color: var(--terciary);
+    color: var(--secondary);
     
    
    }
  
-* .btn-primary{
-  background-color: var(--secondary);
-  border-color: var(--terciary);
-  border-radius: 20px;
-}
-
-* .btn-primary:hover{
-  background-color: var(--primary);
-  border-color: var(--terciary);
-  color: var(--secondary);
-}
-
-input[type="email"],
-input[type="text"],
-input[type="password"] {
-  border-radius: 20px;
-}
-
 
 
       
