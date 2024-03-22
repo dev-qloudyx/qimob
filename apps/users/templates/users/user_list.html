@@ -18,6 +18,7 @@
             {{ user_filter.user__username|as_crispy_field }}
             {{ user_filter.user__role|as_crispy_field }}
             {% if request.user.is_admin %}
+                {{ user_filter.user_leaders|as_crispy_field }}
                 {{ user_filter.user__is_active|as_crispy_field }}
             {% endif %}
             
