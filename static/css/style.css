@@ -15,11 +15,23 @@
     --bodytext:#000000;
   }
 
-* .btn .btn-primary{
-  background-color: var(--secondary);
-  border-color: var(--terciary);
-  border-radius: 20px;
-}
+  * .btn-primary{
+    background-color: var(--secondary);
+    border-color: var(--terciary);
+    border-radius: 20px;
+  }
+  
+  * .btn-primary:hover{
+    background-color: var(--primary);
+    border-color: var(--terciary);
+    color: var(--secondary);
+  }
+  
+  input[type="email"],
+  input[type="text"],
+  input[type="password"] {
+    border-radius: 20px;
+  }
 
   html, body {
     height: 100svh !important;
@@ -225,6 +237,16 @@ body {
   color: var(--bodytext);
 
 }
+
+.boxfilter img{
+  filter: invert(0%);
+  transition: 0.3s;
+}
+
+
+
+
+
 .boxfilter h3,.boxfilter h4{
   
   font-size: 18px;
@@ -239,6 +261,11 @@ body {
   padding: 10px;
   background-color: var(--secondary);
   color: var(--primary);
+
+
+}
+.boxfilter:hover img{
+  filter: invert(100%);
 
 }
 
@@ -356,6 +383,20 @@ h1 img{
   right: 2%;
   top: 15%;
 }
+
+
+/* filter */
+
+.button_tab > div {
+  display: flex;
+  vertical-align: bottom;
+}
+
+.button_tab form{
+  padding: 0px;
+  vertical-align: bottom;
+}
+
 
 
 

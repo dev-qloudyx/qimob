@@ -24,6 +24,7 @@ from django.core.files.base import ContentFile
 
 # Create your views here.
 
+@method_decorator([login_required], name='dispatch')
 class HomeView(View):
     def get(self, request):
         context = {}
