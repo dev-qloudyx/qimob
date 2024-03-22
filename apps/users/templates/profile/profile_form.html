@@ -19,17 +19,20 @@
                 <div>
                     <h2 class="h2">{{ user.username }}</h2>
                     <p class="text-muted">{{ user.email }}</p>
+                    
                 </div>
             </div>
             <fieldset class="border-bottom pb-4 mb-4">
                 <legend>{% trans "Profile Info" %}</legend>
                 <div class="row g-4">
                     <div class="col-md-6">
+                        Role: {{ user.role }}
                         {{ u_form|crispy }}
                     </div>
                     <div class="col-md-6">
                         {{ p_form|crispy }}
                     </div>
+                    
                 </div>
             </fieldset>
             <div class="d-flex justify-content-end">

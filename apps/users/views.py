@@ -1,5 +1,6 @@
 import os
 from typing import Any
+from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.http import JsonResponse
@@ -53,20 +54,19 @@ class ListUsersView(ListView):
 
     def get_queryset(self):
         user = self.request.user
-        cons_role = UserRole.objects.get(role_name="consultor")
-        chief_role = UserRole.objects.get(role_name="chefe_equipa")
         queryset = super().get_queryset()
         
-        if user.role == cons_role or user.role == chief_role:
-            leader = Teams.objects.filter(team_member=user.id).first()
-            print(leader)
-            print(cons_role)
-            print(chief_role)
-            # if leader and Teams.objects.filter(team_leader=leader).exists():
-            #     members = Teams.objects.filter(team_leader=leader)
-            #     queryset = Profile.objects.filter(user_id__in=members)
-            # else:
-            #     queryset = Profile.objects.none()
+        if user.role == UserRole.objects.get(role_name="chefe_equipa"):
+            leader = TeamLeader.objects.get(team_leader=user.id)
+            members = Teams.objects.filter(team_leader=leader)
+            queryset = Profile.objects.filter(user_id__in=members.values_list('team_member', flat=True))
+        
+        if user.role == UserRole.objects.get(role_name="consultor"):
+            leader = Teams.objects.get(team_member=user.id).team_leader
+            members = Teams.objects.filter(team_leader=leader)
+            queryset = Profile.objects.filter(
+                Q(user_id__in=members.values_list('team_member', flat=True)) | 
+                Q(user_id=leader.team_leader.pk))
 
         self.filterset = UserFilter(self.request.GET, queryset=queryset)
         return self.filterset.qs
@@ -77,9 +77,16 @@ class ListUsersView(ListView):
         # print(context['object_list'])
         users_with_pics = []
         for profile in context['object_list']:
-            user = profile.user  
+            user = profile.user
             profile_pic = profile.image.url if profile.image else None 
-            users_with_pics.append({'user': user, 'profile_pic': profile_pic})
+
+            try:
+                user_leader = Teams.objects.get(team_member=user.id).team_leader 
+            except Teams.DoesNotExist:
+                user_leader = None
+
+            users_with_pics.append({'user': user, 'profile_pic': profile_pic, 'user_leader': user_leader})
+
         # print(users_with_pics)
         base_template = "base.html"
         context = {
@@ -117,14 +124,12 @@ class CustomSignupView(CustomRedirectMixin, SignupView):
             leader = TeamLeader.objects.get(id=leader_id)
             Teams.objects.create(team_leader=leader, team_member=user)
 
-
         if not user.profile.image:
       
             default_image_path = os.path.join(settings.STATIC_ROOT, 'images', 'default.png')  # Path to your default image
             with open(default_image_path, 'rb') as f:         
                 default_image_content = f.read()
                 user.profile.image.save('client.png', ContentFile(default_image_content), save=True)
-
 
         return redirect('users:users_list')
 

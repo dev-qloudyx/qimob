@@ -6,7 +6,9 @@
 <h2 class="mb-3">Equipa</h2>
 
 <div class="button_tab">
+    {% if request.user.is_admin %}
     <a href="{% url 'users:account_signup' %}" class="btn btn-primary mb-3">Adicionar Utilizador</a>
+    {% endif %}
 
     <div class="filterform">
         <form action="{% url 'users:users_list' %}" method="get">
@@ -19,7 +21,7 @@
 </div>
  
 <div id="cliente-list" class="viewlist">
-    
+
 {% for u in users %}
     <div class="card">
         <div class="cardcontent">
@@ -27,11 +29,15 @@
             <div class="cardtable">
                 <img class="rounded-circle" style="height: 54px;" src="{{ u.profile_pic }}">
                 <p>{{ u.user.email }}</p>
+                {% if u.user_leader %}
+                    <p>Chefe Equipa: {{ u.user_leader }}</p>
+                {% endif %}
 
             </div>
         </div>
     </div>
 {% endfor %}
+
 
     <!-- Pagination -->
     {% include '_pagination.html' %}
