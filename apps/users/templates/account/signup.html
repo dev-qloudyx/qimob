@@ -22,19 +22,24 @@
             </div>
 
 
-<script>
-    $(document).ready(function() {
-        $('#div_id_team_leader').hide();
-    
-        $('#id_role').change(function(){
-            var valueSelected = $('#id_role  option:selected').text();
-    
-            if (valueSelected === 'consultor') { 
-                $('#div_id_team_leader').show();
-            } else {
-                $('#div_id_team_leader').hide();
-            }
-        });
-    });
-</script>
+            <script>
+                $(document).ready(function() {
+                    $('#div_id_team_leader').hide();
+                
+                    $('#id_role').change(function(){
+                        var valueSelected = $('#id_role  option:selected').text();
+                
+                        if (valueSelected === 'consultor') { 
+                            $('#div_id_team_leader').show();
+                            $("#id_team_leader").prop('required', true);
+                            $("label[for='id_team_leader']").addClass('requiredField');
+                            $("label[for='id_team_leader']").append('<span class="asteriskField">*</span>');
+                        } else {
+                            $('#div_id_team_leader').hide();
+                            $("#id_team_leader").prop('required', false);
+                            $("label[for='id_team_leader']").removeClass('requiredField');
+                        }
+                    });
+                });
+            </script>
 {% endblock content %}

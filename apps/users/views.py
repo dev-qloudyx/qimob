@@ -117,7 +117,9 @@ class CustomSignupView(CustomRedirectMixin, SignupView):
         PasswordResetView.as_view()(self.request)
 
         user = self.user
-        if user.role == UserRole.objects.get(role_name="chefe_equipa"):
+        leader_role = UserRole.objects.get(role_name="chefe_equipa")
+        admin_role = UserRole.objects.get(role_name="admin")
+        if user.role == leader_role or user.role == admin_role:
             TeamLeader.objects.create(team_leader=user)
 
         if user.role == UserRole.objects.get(role_name="consultor"):
