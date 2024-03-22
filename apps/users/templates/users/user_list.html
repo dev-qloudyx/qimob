@@ -1,5 +1,6 @@
 {% extends base_template %}
 {% load crispy_forms_tags %}
+{% load i18n %}
 {% load static %}
 {% block content %}
 
@@ -12,7 +13,14 @@
 
     <div class="filterform">
         <form action="{% url 'users:users_list' %}" method="get">
-            {{ form.as_p }}
+            
+            {{ user_filter.user__email|as_crispy_field }}
+            {{ user_filter.user__username|as_crispy_field }}
+            {{ user_filter.user__role|as_crispy_field }}
+            {% if request.user.is_admin %}
+                {{ user_filter.user__is_active|as_crispy_field }}
+            {% endif %}
+            
             <input type="submit" value="Submit" class="btn btn-primary">
         </form>
 
