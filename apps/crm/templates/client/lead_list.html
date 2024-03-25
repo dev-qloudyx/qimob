@@ -1,28 +1,40 @@
 {% extends base_template %}
+{% load crispy_forms_tags %}
 {% block content %}
 
-<h2 class="listtitle">Lista Leads</h2>
+<h2 class="listtitle">Leads</h2>
 
 <div class="button_tab">
-    <a href="{% url 'crm:lead_create_view' %}" class="btn btn-primary ">Adicionar Lead</a> 
-        <button class="btn btn-primary ">Filtros</button>
-        <button class="btn btn-primary "><a href="{% url 'crm:lead_list_view' %}?order_by=created_at">Order by Created At</a></button>
-    <div class="filterform">
+   
         <form method="GET">
-            <input type="text" name="q" id="q" class="searchbar" placeholder="Procurar.." value="{{ request.GET.q }}">
-            <button type="submit" class="btn btn-primary">Search</button>
+            <div class="row form-group">
+                <div class="col-md-3">
+                    <a href="{% url 'crm:lead_create_view' %}" class="btn btn-primary ">Adicionar Lead</a>
+                </div>
+
+                <form method="get" action="{% url 'crm:lead_list_view' %}">
+                    <div class="col-md-3">
+                        {{ lead_filter.form.name|as_crispy_field }}            
+                    </div>
+                    <div class="col-md-3">
+                        {{ lead_filter.form.status|as_crispy_field }}            
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary">Apply</button>
+
+                    </div>     
+                </form>
+                
+                
+                
+                
+
+            </div>
+            
         </form>
 
-    </div>
-    
+     
 
-    <div class="filterform">
-        <form method="get" >
-            {{ lead_filter.form.as_p }}
-            <button type="submit">Apply</button>
-        </form>
-
-    </div>
       
 </div>
 

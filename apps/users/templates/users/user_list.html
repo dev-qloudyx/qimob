@@ -47,9 +47,11 @@
           <a href="{% url 'users:profile_detail' u.user.id %}"><h4><b>{{ u.user.username }}  [{{ u.user.role }}]</b></h4></a>
             <div class="cardtable">
                 <img class="rounded-circle" style="height: 54px;" src="{{ u.profile_pic }}">
-                <p>{{ u.user.email }}</p>
+                <p>{{u.user.profile.full_name}} <br>
+                    {{ u.user.email }}</p>
+              
                 {% if u.user_leader %}
-                    <p>Chefe Equipa: {{ u.user_leader }}</p>
+                    <p><b>Chefe Equipa:</b> {{ u.user_leader }}</p>
                 {% endif %}
 
             </div>

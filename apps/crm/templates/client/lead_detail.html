@@ -186,9 +186,11 @@
     document.querySelector('input[name="can_read"]').addEventListener('click', function(event) {
         event.preventDefault();
     });
-    document.querySelector('input[name="can_read"]').addEventListener('click', function(event) {
+    document.querySelectorAll('input[name="can_read"]').forEach(function(input) {
+    input.addEventListener('click', function(event) {
         event.preventDefault();
     });
+});
     
     </script>
   

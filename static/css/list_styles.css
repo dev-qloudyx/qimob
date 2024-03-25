@@ -57,8 +57,7 @@
 
 
 .button_tab form {
-  display: inline-block; /* Display forms in a single line */
-  vertical-align: top; /* Align forms vertically with other elements */
+  vertical-align: bottom !important; /* Align forms vertically with other elements */
 }
 
 .button_tab form input{

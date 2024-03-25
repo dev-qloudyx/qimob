@@ -1,4 +1,5 @@
 {% extends base_template %}
+{% load i18n %}
 {% block content %}
 
 <span id="notification"></span>
@@ -11,12 +12,17 @@
 </span>
 
 <div class="detailsview">
-  <h3>User Data</h3>
-  
-    <img class="rounded-circle" style="width: 48px; height: 48px;" src="{{ object.image.url }}">
-    <p><b class="title">Nome Completo:</b> {{ object.full_name }}</p>
-    <p><b class="title">Email:</b> {{ object.user.email }}</p>
-    <p><b class="title">Role:</b> {{ object.user.role }}</p>
+  <button class="collapsible"><h3>{% trans "User Data" %}</h3></button>
+    <div class="content">
+      <img class="rounded-circle" style="width: 96px; height: 96px;" src="{{ object.image.url }}">
+      <br><br>
+      <p><b class="title">Nome Completo:</b> {{ object.full_name }}</p>
+      <p><b class="title">Email:</b> {{ object.user.email }}</p>
+      <p><b class="title">Role:</b> {{ object.user.role }}</p>
+    </div>
+
+    
+    
 
 </div>
 

@@ -33,6 +33,11 @@
     border-radius: 20px;
   }
 
+  select {
+    border-radius: 20px;
+  }
+
+
   html, body {
     height: 100svh !important;
     width: 100svw;
@@ -321,6 +326,9 @@ h1 img{
 
 }
 
+#id_about{
+  max-height: 100px;
+}
 
 .collapsible {
 
