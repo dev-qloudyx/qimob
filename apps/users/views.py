@@ -224,6 +224,21 @@ class UserUpdateView(View):
             leader_role = UserRole.objects.get(role_name="chefe_equipa")
             admin_role = UserRole.objects.get(role_name="admin")
 
+            # UPDATE TEAM LEADER
+            if 'team_leader' in request.POST:
+                new_team_leader_id = request.POST['team_leader']
+                if new_team_leader_id:
+                    new_team_leader = TeamLeader.objects.get(id=new_team_leader_id)
+
+                    try:
+                        new_team = get_object_or_404(Teams, team_member=this_instance)
+                        new_team.team_leader = new_team_leader
+                        new_team.save()
+                        
+                    except Teams.DoesNotExist:
+                        pass
+
+
             # UPDATE ACTIVE/INACTIVE DATE
             if this_instance.is_active != original_instance.is_active:
                 if this_instance.is_active:
