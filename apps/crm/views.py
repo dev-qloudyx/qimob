@@ -6,7 +6,7 @@ from django.forms import BaseModelForm
 import pandas as pd
 from apps.crm.filters import LeadTypeFilter
 from apps.crm.forms import ClientForm, LeadCreateForm, ClientUpdateForm, LeadShareForm
-from apps.crm.models import Client, ClientAddress, ClientDoc, ClientDocStatus, ClientDocStatusDesc, ClientMessage, Lead, LeadDoc, LeadComment, LeadStatus
+from apps.crm.models import Client, ClientAddress, ClientDoc, ClientDocStatus, ClientDocStatusDesc, ClientMessage, Lead, LeadDoc, LeadComment, LeadShare, LeadStatus
 from apps.crm.utils import handle_not_found, is_image
 from qaddress.views import AddressView, retrieveAddressDataByToken, updateAddressDataByToken
 from qdocs.views import FileDeleteView, FileListView, FileUploadView, FileView
@@ -16,7 +16,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.views import View
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views.decorators.csrf import csrf_exempt
@@ -728,6 +728,15 @@ class LeadDetailView(DetailView):
         lead = self.get_object()
 
 
+
+        if 'cancel' in request.POST:
+            lead = self.get_object()
+            lead.is_active = not lead.is_active
+            lead.save()
+            return HttpResponseRedirect(self.request.path_info)  
+        
+
+
         share_form = LeadShareForm(request.POST)
         if share_form.is_valid():
                 
@@ -737,13 +746,26 @@ class LeadDetailView(DetailView):
             return HttpResponseRedirect(self.request.path_info)
             
 
+        if 'update_share' in request.POST:
+            share_id = request.POST.get('share_id')
+            share_instance = get_object_or_404(LeadShare, id=share_id)
+            can_read = request.POST.get('can_read') == 'on'  # Check if 'can_read' checkbox is checked
+            can_write = request.POST.get('can_write') == 'on'  # Check if 'can_write' checkbox is checked
+            share_instance.can_read = can_read
+            share_instance.can_write = can_write
+            share_instance.save()
+            return HttpResponseRedirect(self.request.path_info)
+        
 
-        if 'cancel' in request.POST:
-            lead = self.get_object()
-            lead.is_active = not lead.is_active
-            lead.save()
-            return HttpResponseRedirect(self.request.path_info)  # Redirect to the same page after processing the POST request
-        return super().post(request, *args, **kwargs)
+        if 'delete_share' in request.POST:
+            share_id = request.POST.get('share_id')
+            share_instance = get_object_or_404(LeadShare, id=share_id)
+            share_instance.delete()
+            return HttpResponseRedirect(self.request.path_info)
+        
+
+
+        return HttpResponseRedirect(self.request.path_info)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -786,13 +808,33 @@ class LeadDetailView(DetailView):
         imoveldata = get_object_or_404(Imovel, id=lead.imovel_id) 
         context['imoveldata'] = imoveldata 
 
-        context['shareform'] = LeadShareForm()
+
+        owner = self.object.owner
+        context['shareform'] = LeadShareForm(lead=self.object, owner=owner)
+
+        sharelist = []
+        shared_with = LeadShare.objects.filter(lead=self.object)
+        for users in shared_with:
+            sharelist.append(users)
+            print(users.user)
+            print(users.can_read)
+            print(users.can_write)
+
+        print(sharelist)
+
+        context['sharelist'] = sharelist
+
 
           
         context['base_template'] = "base.html"
         return context
     
+class LeadShareDelete(DeleteView):
+    model = LeadShare
     
+    def get_success_url(self):
+        # Assuming `path` is an attribute of your view
+        return self.request.path
 
 class LeadUpdateView(UpdateView):
     model = Lead

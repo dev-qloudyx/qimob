@@ -369,8 +369,8 @@ h1 img{
 .popup{
   height: fit-content;
   width: fit-content;
-  background-color: var(--secondary);
-  padding: 10px 20px;
+  background-color: var(--primary);
+  padding: 10px 50px;
   border-radius: 20px;
   position: absolute;
   left: 50%;

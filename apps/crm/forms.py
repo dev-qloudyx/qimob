@@ -1,4 +1,6 @@
 from django import forms
+
+from apps.users.models import User
 from .validators import only_int, only_char
 from qaddress.models import Address
 from apps.crm.models import Client, Lead, ClientAddress, LeadShare
@@ -71,6 +73,21 @@ class LeadCreateForm(forms.ModelForm):
         fields = ['leadtype','short_name', 'district','county', 'client','imovel']
 
 class LeadShareForm(forms.ModelForm):
+
+    def __init__(self, *args, owner=None, lead=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if lead:
+            # Exclude users who are already associated with the lead
+            self.fields['user'].queryset = User.objects.exclude(leadshare__lead=lead)
+            # Exclude the owner of the lead
+            if owner:
+                self.fields['user'].queryset = self.fields['user'].queryset.exclude(pk=owner.pk)
+
     class Meta:
         model = LeadShare
         fields = ['user', 'can_read', 'can_write']
+        labels = {
+            'user': 'Escolher Utilizador',
+            'can_read': 'Pode Ler',  
+            'can_write': 'Pode Escrever'  ,
+        }

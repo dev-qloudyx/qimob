@@ -6,24 +6,34 @@
 
 <span id="notification"></span>
 <h2 class="listtitle">{{ object.short_name}}</h2>
-<span style="display: flex; margin-right: 20px;">
-  
-  <form method="post" style='padding:0px'>
-    {% csrf_token %}
-    <a href="{% url 'crm:lead_update_view' lead.id %}" class="btn btn-primary mb-3">{% trans "Update" %}</a>
-    <a href="#" class="btn btn-primary mb-3">{% trans "Logs" %}</a>
-    <button class="btn btn-primary mb-3">{% trans "Checklist" %}</button>
-    <span class="btn btn-primary mb-3" id="sharebutton">{% trans "Share" %}</span> 
-    {% if buttontext %}
-    <button type="submit" class="btn btn-primary mb-3" name="cancel">{{ buttontext }}</button> 
-    {% endif %}
 
-
+{% if sharelist %}
+  {% for share in sharelist %}
+    {% if share.user == user and share.can_read and not share.can_write %}
+      <div class="tab" style="display: none; margin-right: 20px;">
       
-    
- 
-  </form>
-</span>
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+  {% if user == object.owner or user.role.role_name == 'admin'%}
+      <div class="tab" style="display: flex; margin-right: 20px;">
+        <form method="post" style='padding:0px'>
+          {% csrf_token %}
+          <a href="{% url 'crm:lead_update_view' lead.id %}" class="btn btn-primary mb-3">{% trans "Update" %}</a>
+          <a href="#" class="btn btn-primary mb-3">{% trans "Logs" %}</a>
+          <button class="btn btn-primary mb-3">{% trans "Checklist" %}</button>
+          <span class="btn btn-primary mb-3" id="sharebutton" onclick="pop()">{% trans "Share" %}</span> 
+          {% if buttontext %}
+          <button type="submit" class="btn btn-primary mb-3" name="cancel">{{ buttontext }}</button> 
+          {% endif %}
+        </form>
+      </div>
+  {% endif %}
+
+  
+  
 
 
 
@@ -108,45 +118,6 @@
 
 
 
-
-
-<script>
-
-var coll = document.getElementsByClassName("collapsible");
-var i;
-
-for (i = 0; i < coll.length; i++) {
-  coll[i].addEventListener("click", function() {
-    this.classList.toggle("active");
-    var content = this.nextElementSibling;
-    if (content.style.maxHeight){
-      content.style.maxHeight = null;
-    } else {
-      content.style.maxHeight = content.scrollHeight + "px";
-    } 
-  });
-
-}
-
-let triggerButton = document.getElementById('sharebutton');
-function pop() {
-  if(popup.style.display === 'none'){
-    popup.style.display = 'block';
-    overlay.style.display = 'block';
-    console.log('hello')
-  }
-  else{
-    popup.style.display = 'none';
-    overlay.style.display = 'none';
-    console.log('helloooo')
-  }
-    
-}
-
-triggerButton.addEventListener('click', pop);
-
-</script>
-
 {% endblock %}
 
 
@@ -158,10 +129,71 @@ triggerButton.addEventListener('click', pop);
   <form method="post" action="{% url 'crm:lead_detail_view' pk=lead.pk %}">
     {% csrf_token %}
     {{ shareform|crispy }}
-    <button type="submit" class="btn btn-primary mb-3" name="share_lead">Submit</button>
 
+    <button type="submit" class="btn btn-primary mb-3" name="share_lead">Submit</button>
   </form>
   <h3>Lead partilhada com:</h3>
+  
+  <table class="table">
+    <tr>
+      <th>Utilizador</th>
+      <th>Pode Ler</th>
+      <th>Pode Escrever</th>
+      <th></th>
+      <th></th>
+    </tr>
+    {% for usershared in sharelist %}
+    
+    <tr>
+      <td>{{usershared.user.username}}</td>
+      <td>
+        <form method="post" action="{% url 'crm:lead_detail_view' pk=lead.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="share_id" value="{{ usershared.pk }}">
+          <input type="checkbox" class="form-check-input" name="can_read" {% if usershared.can_read %}checked{% endif %} readonly>
+          
+      </td>
+      <td>
+        <input type="checkbox" class="form-check-input" name="can_write" {% if usershared.can_write %}checked{% endif %}>
+          
+
+      </td>
+      <td>
+        <button class="btn btn-primary" type="submit" name="update_share">{% trans "Update" %}</button>
+        </form>
+
+      </td>
+      <td>
+        <form method="post" action="{% url 'crm:lead_detail_view' pk=lead.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="delete_share" value="1">
+          <input type="hidden" name="share_id" value="{{ usershared.pk }}">
+          <button class="btn btn-primary" type="submit">{% trans "Delete" %}</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor%}
+
+  </table>
+
+  <script>
+    window.onload = function() {
+    
+        var checkbox = document.getElementById('id_can_read');
+        checkbox.readonly = true;
+    };
+
+    document.querySelector('input[name="can_read"]').addEventListener('click', function(event) {
+        event.preventDefault();
+    });
+    document.querySelector('input[name="can_read"]').addEventListener('click', function(event) {
+        event.preventDefault();
+    });
+    
+    </script>
+  
+
 </div>
 
 {% endblock %}
+

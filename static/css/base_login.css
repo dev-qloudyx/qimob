@@ -38,10 +38,9 @@ display: flex;
   margin-left: auto;
   margin-right: auto ;
   width: 500px;
-  transform: translate(0, 50%);
-  background-color: var(--primary);
-  margin-top: auto;
-  margin-bottom: auto;
+  transform: translate(0, 5%);
+
+ 
   
 }
 .box .rounded{
@@ -73,21 +72,9 @@ display: flex;
 }
 
 
-.box .btn-primary{
+
  
-  background-color: var(--secondary);
-  border-color: var(--terciary);
-  border-radius: 20px;
- 
- }
- 
- .box .btn-primary:hover{
-  
-  background-color: var(--primary);
-  border-color: var(--terciary);
-  color: var(--secondary);
-  
-  }
+
 
   .box .btn-primary:focus{
   
