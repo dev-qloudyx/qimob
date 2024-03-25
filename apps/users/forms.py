@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
-from apps.users.models import Profile, UserRole, TeamLeader
+from apps.users.models import Profile, Teams, UserRole, TeamLeader
 from .load_photo_widget import LoadPhotoWidget
 from allauth.account.forms import SignupForm
 
@@ -45,21 +45,27 @@ class CustomSignupForm(SignupForm):
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField()
     role = forms.ModelChoiceField(queryset=UserRole.objects.all(), label='Role')
+    team_leader = forms.ModelChoiceField(TeamLeader.objects.all(), label='Lider Equipa', required=False)
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'role', 'is_active']
+        fields = ['email', 'username', 'role', 'is_active', 'team_leader']
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user_auth', None)  # Obtém o usuário autenticado
+        user_auth = kwargs.pop('user_auth', None)
+        # user = kwargs.pop('instance', None)                                   ZONA EM TESTES!
+        # team_leader = TeamLeader.objects.exclude(team_leader=user.pk)
         super().__init__(*args, **kwargs)
-        if user and not user.is_admin:  # Verifica se o usuário autenticado não é um administrador
+        # self.fields['team_leader'].queryset = team_leader
+
+        if user_auth and not user_auth.is_admin:
             self.fields['role'].widget = forms.HiddenInput()
             self.fields['is_active'].widget = forms.HiddenInput()
 
 
 class ProfileUpdateForm(forms.ModelForm):
     image = forms.ImageField(widget=LoadPhotoWidget)
+
     class Meta:
         model = Profile
         fields = ['image', 'full_name', 'about']

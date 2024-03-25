@@ -186,12 +186,20 @@ class ProfileView(View):
         return render(request, "profile/profile_form.html", context)
     
 @method_decorator(roles_required(['admin']), name='dispatch')
-class ProfileUpdateView(View):
+class UserUpdateView(View):
 
     def get(self, request, pk):
         user = get_object_or_404(User, pk=pk)
         u_form = UserUpdateForm(instance=user, user_auth=request.user)
         p_form = ProfileUpdateForm(instance=user.profile)
+
+        try:
+            team = Teams.objects.get(team_member=user)
+            team_leader = team.team_leader
+            initial = {'team_leader': team_leader}
+            u_form = UserUpdateForm(instance=user, user_auth=request.user, initial=initial)
+        except Teams.DoesNotExist:
+            pass
         
         base_template = "base.html"
 
@@ -207,22 +215,44 @@ class ProfileUpdateView(View):
     def post(self, request, pk):
         user = get_object_or_404(User, pk=pk)
         u_form = UserUpdateForm(request.POST, instance=user, user_auth=request.user)
-        p_form = ProfileUpdateForm(
-            request.POST, request.FILES, instance=user.profile)
+        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=user.profile)
+        
         if u_form.is_valid() and p_form.is_valid():
 
             this_instance = u_form.save(commit=False)
             original_instance = get_object_or_404(User, pk=this_instance.pk)
+            leader_role = UserRole.objects.get(role_name="chefe_equipa")
+            admin_role = UserRole.objects.get(role_name="admin")
+
+            # UPDATE ACTIVE/INACTIVE DATE
             if this_instance.is_active != original_instance.is_active:
                 if this_instance.is_active:
                     this_instance.last_active = timezone.now()
+                    if this_instance.role == leader_role or this_instance.role == admin_role:
+                        TeamLeader.objects.get_or_create(team_leader=this_instance)
                 else:
                     this_instance.last_inactive = timezone.now()
-            
+
+
+            # CHECK NEW ROLE
+            if this_instance.role != original_instance.role:
+
+                # PROMOTED
+                if this_instance.role == leader_role or this_instance.role == admin_role:
+                    TeamLeader.objects.create(team_leader=this_instance)
+
+                    try:
+                        old_member = Teams.objects.filter(team_member=this_instance)
+                        old_member.delete()
+                    except Teams.DoesNotExist:
+                        pass
+
+
             this_instance.save()
             u_form.save()
             p_form.save()
             messages.success(request, 'A sua conta foi atualizada!')
+
         else:
             messages.error(request,
                 'Problemas em atualizar a sua conta, veja erros em baixo...')

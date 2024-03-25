@@ -26,7 +26,9 @@
                 <legend>{% trans "Profile Info" %}</legend>
                 <div class="row g-4">
                     <div class="col-md-6">
-                        Role: {{ user.role }}
+                        {% if not request.user.is_admin %}
+                            Role: {{ user.role }}
+                        {% endif %}
                         {{ u_form|crispy }}
                     </div>
                     <div class="col-md-6">
@@ -45,14 +47,44 @@
 
 
 
+<script>
 
+    $(document).ready(function() {
 
-    <script>
+        function checkInitialRole() {
+            var valueSelected = $('#id_role option:selected').text();
+            if (valueSelected === 'consultor') { 
+                $('#div_id_team_leader').show();
+                $("#id_team_leader").prop('required', true);
+                $("label[for='id_team_leader']").addClass('requiredField').append('<span class="asteriskField">*</span>');
+            }
+        }
+
+        $('#div_id_team_leader').hide();
+
+        checkInitialRole();
+    
+        $('#id_role').change(function(){
+            var valueSelected = $('#id_role  option:selected').text();
+    
+            if (valueSelected === 'consultor') { 
+                $('#div_id_team_leader').show();
+                $("#id_team_leader").prop('required', true);
+                $("label[for='id_team_leader']").addClass('requiredField').append('<span class="asteriskField">*</span>');
+            } else {
+                $('#div_id_team_leader').hide();
+                $("#id_team_leader").prop('required', false);
+                $("label[for='id_team_leader']").removeClass('requiredField').find('.asteriskField').remove();
+            }
+        });
+    });
+
         setTimeout(function() {
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach((alert) => {
                 alert.style.display = 'none';
             });
         }, 2000);
-    </script>
+
+</script>
 {% endblock content%}
