@@ -53,10 +53,14 @@ class UserUpdateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         user_auth = kwargs.pop('user_auth', None)
-        # user = kwargs.pop('instance', None)                                   ZONA EM TESTES!
-        # team_leader = TeamLeader.objects.exclude(team_leader=user.pk)
+        user_instance = kwargs.get('instance')
         super().__init__(*args, **kwargs)
-        # self.fields['team_leader'].queryset = team_leader
+
+        if user_instance and user_instance.pk:
+            team_leader_qs = TeamLeader.objects.exclude(team_leader=user_instance.pk)
+        else:
+            team_leader_qs = TeamLeader.objects.all()
+        self.fields['team_leader'].queryset = team_leader_qs
 
         if user_auth and not user_auth.is_admin:
             self.fields['role'].widget = forms.HiddenInput()
