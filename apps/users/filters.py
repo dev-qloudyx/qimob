@@ -1,20 +1,19 @@
 import django_filters
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
-from .models import Profile, TeamLeader, Teams
+from .models import Profile, TeamLeader, Teams, UserRole
 
 
 class UserFilter(django_filters.FilterSet):
-    user__email = django_filters.CharFilter(lookup_expr='icontains', field_name='user__email', label='E-mail')
-    user__username = django_filters.CharFilter(lookup_expr='icontains', field_name='user__username', label='Username')
-    user_leaders = django_filters.ChoiceFilter(method='leaders_search_filter', label='Chefes Equipa', choices=[[t.pk, t] for t in TeamLeader.objects.all()])
+    user__email = django_filters.CharFilter(lookup_expr='icontains', field_name='user__email', label=_('By E-mail'))
+    user__username = django_filters.CharFilter(lookup_expr='icontains', field_name='user__username', label=_('By Username'))
+    user__is_active = django_filters.BooleanFilter(lookup_expr='exact', label=_('Is Active'))
+    user__role = django_filters.ChoiceFilter(lookup_expr='exact', label=_('By Role'), choices=[[t.pk, t] for t in UserRole.objects.all()])
+    user_leaders = django_filters.ChoiceFilter(method='leaders_search_filter', label=_('By Team Leader'), choices=[[t.pk, t] for t in TeamLeader.objects.all()])
 
     class Meta:
         model = Profile
-        fields = {
-            'user__role': ['exact'],
-            'user__is_active': ['exact'],
-        }
+        exclude = ['id', 'image']
 
     def leaders_search_filter(self, queryset, name, value):
         leader_id = value
