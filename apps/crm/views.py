@@ -711,11 +711,10 @@ class LeadListView(ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         self.filterset = LeadTypeFilter(self.request.GET, queryset=queryset)
-        return self.filterset.qs   # Applying filtering directly
+        return self.filterset.qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # lead_filter = LeadTypeFilter(self.request.GET, queryset=self.get_queryset())
         context['lead_filter'] = self.filterset.form
         
         context['base_template'] = "base.html"
@@ -829,10 +828,8 @@ class LeadDetailView(DetailView):
 
 
         lead_status = get_object_or_404(leads_last_statuses(), lead=lead)
-        config = status_configs(lead_id=lead_status.lead.id, start_status=lead_status.status.code, config_id=1)
-
-        for b in config:
-            print(b.status_code.code)
+        workflow_type = str('LEAD-' + str(lead.leadtype).upper())
+        config = status_configs(workflow_type=workflow_type, start_status=lead_status.status.code, config_id=lead.license.config.id)
         
         context['current_status'] = leads_last_statuses().get(lead=lead)
         context['buttons_config'] = config
