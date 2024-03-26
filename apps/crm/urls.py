@@ -1,4 +1,5 @@
 
+from apps.users.status import Status
 from . import views
 from django.urls import path
 from .views import get_counties, get_locality, get_address_info
@@ -39,15 +40,14 @@ urlpatterns = [
     path('client/messages/list/<int:pk>/', views.ClientMessageListView.as_view(), name='client_messages_list_view'),
 
     # Lead
-
     path('lead/create/', views.LeadCreateView.as_view(), name='lead_create_view'),
     path('lead/list/', views.LeadListView.as_view(), name='lead_list_view'),
     path('lead/detail/<int:pk>/', views.LeadDetailView.as_view(), name='lead_detail_view'),
+    path('lead/detail/<int:lead_id>/<int:status_code>', Status.lead_next_status, name='lead_next_status'),
     path('lead/detail/<int:pk>/update/', views.LeadUpdateView.as_view(), name='lead_update_view'),
     path('lead/docs/upload/<int:pk>/', views.LeadDocsUploadView.as_view(), name='lead_docs_upload_view'),
+
     # Consultant
-
-
     path('get_counties/', get_counties, name='get_counties'),
     path('get_localities/', get_locality, name='get_locality'),
     path('get_address_info/', get_address_info, name='get_address_info'),

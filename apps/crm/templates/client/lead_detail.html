@@ -5,7 +5,7 @@
 
 
 <span id="notification"></span>
-<h2 class="listtitle">{{ object.short_name}}</h2>
+<h2 class="listtitle">{{ object.short_name}} - {{ current_status.status.name }}</h2>
 
 {% if sharelist %}
   {% for share in sharelist %}
@@ -17,7 +17,7 @@
   {% endfor %}
 {% endif %}
 
-  {% if user == object.owner or user.role.role_name == 'admin'%}
+  {% if user == object.owner or user.role.role_name == 'admin' %}
       <div class="tab" style="display: flex; margin-right: 20px;">
         <form method="post" style='padding:0px'>
           {% csrf_token %}
@@ -25,9 +25,13 @@
           <a href="#" class="btn btn-primary mb-3">{% trans "Logs" %}</a>
           <button class="btn btn-primary mb-3">{% trans "Checklist" %}</button>
           <span class="btn btn-primary mb-3" id="sharebutton" onclick="pop()">{% trans "Share" %}</span> 
-          {% if buttontext %}
-          <button type="submit" class="btn btn-primary mb-3" name="cancel">{{ buttontext }}</button> 
+
+          {% if buttons_config %}
+            {% for button in buttons_config %}
+              <a href="{% url 'crm:lead_next_status' lead.id button.status_code.code %}" class="btn btn-primary mb-3">{{ button.label }}</a>
+            {% endfor %}
           {% endif %}
+
         </form>
       </div>
   {% endif %}
@@ -186,11 +190,9 @@
     document.querySelector('input[name="can_read"]').addEventListener('click', function(event) {
         event.preventDefault();
     });
-    document.querySelectorAll('input[name="can_read"]').forEach(function(input) {
-    input.addEventListener('click', function(event) {
+    document.querySelector('input[name="can_read"]').addEventListener('click', function(event) {
         event.preventDefault();
     });
-});
     
     </script>
   
