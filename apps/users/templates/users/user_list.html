@@ -40,8 +40,11 @@
 
 
 <div id="cliente-list" class="viewlist">
+<!-- <div class="row"> -->
+
 
 {% for u in users %}
+<!-- <div class="col-md-6"> -->
     <div class="card">
         <div class="cardcontent">
           <a href="{% url 'users:profile_detail' u.user.id %}"><h4><b>{{ u.user.username }}  [{{ u.user.role }}]</b></h4></a>
@@ -57,7 +60,10 @@
             </div>
         </div>
     </div>
+<!-- </div> -->
+    
 {% endfor %}
+<!-- </div> -->
 
 
     <!-- Pagination -->

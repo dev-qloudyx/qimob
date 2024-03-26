@@ -129,7 +129,7 @@ class Profile(models.Model):
 
 
 class TeamLeader(models.Model):
-    team_leader = models.ForeignKey(User, on_delete=models.CASCADE)
+    team_leader = models.ForeignKey(User, on_delete=models.CASCADE) # unique?
 
     def __str__(self):
         return f'{self.team_leader.username}'
@@ -201,3 +201,6 @@ class WorkflowConfig(models.Model):
     start_status = models.ForeignKey(StatusCode, on_delete=models.CASCADE, related_name='start_status', verbose_name='Estado Inicial')
     end_status = models.ForeignKey(StatusCode, on_delete=models.CASCADE, related_name='end_status', verbose_name='Estado Final')
     available_if = models.ForeignKey(StatusCode, on_delete=models.CASCADE, related_name='available_if', verbose_name='Disponível se', blank=True, null=True)
+
+    def __str__(self):
+        return f'Start: {self.start_status} -> End: {self.end_status}'

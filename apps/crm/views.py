@@ -33,7 +33,7 @@ from django.db.models import Q
 from datetime import datetime
 
 from apps.imovel.models import Imovel
-from apps.users.status import leads_last_statuses
+from apps.users.status import leads_last_statuses, status_configs
 # from apps.users.status import Status
 # Create your views here.
 
@@ -704,17 +704,20 @@ class LeadCreateView(CreateView):
     
 class LeadListView(ListView):
     model = Lead
+    queryset = leads_last_statuses()
     template_name = 'client/lead_list.html'
     context_object_name = 'leads'
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return leads_last_statuses()  # Applying filtering directly
+        self.filterset = LeadTypeFilter(self.request.GET, queryset=queryset)
+        return self.filterset.qs   # Applying filtering directly
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        lead_filter = LeadTypeFilter(self.request.GET, queryset=self.get_queryset())
-        context['lead_filter'] = lead_filter
+        # lead_filter = LeadTypeFilter(self.request.GET, queryset=self.get_queryset())
+        context['lead_filter'] = self.filterset.form
+        
         context['base_template'] = "base.html"
         return context
     
@@ -825,7 +828,16 @@ class LeadDetailView(DetailView):
         context['sharelist'] = sharelist
 
 
-          
+        lead_status = get_object_or_404(leads_last_statuses(), lead=lead)
+        config = status_configs(lead_id=lead_status.lead.id, start_status=lead_status.status.code, config_id=1)
+
+        for b in config:
+            print(b.status_code.code)
+        
+        context['current_status'] = leads_last_statuses().get(lead=lead)
+        context['buttons_config'] = config
+
+
         context['base_template'] = "base.html"
         return context
     

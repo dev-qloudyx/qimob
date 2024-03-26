@@ -14,10 +14,10 @@
 
                 <form method="get" action="{% url 'crm:lead_list_view' %}">
                     <div class="col-md-3">
-                        {{ lead_filter.form.name|as_crispy_field }}            
+                        {{ lead_filter.name|as_crispy_field }}            
                     </div>
                     <div class="col-md-3">
-                        {{ lead_filter.form.status|as_crispy_field }}            
+                        {{ lead_filter.status|as_crispy_field }}            
                     </div>
                     <div class="col-md-3">
                         <button type="submit" class="btn btn-primary">Apply</button>
