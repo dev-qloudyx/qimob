@@ -765,6 +765,18 @@ class LeadDetailView(DetailView):
             share_instance.delete()
             return HttpResponseRedirect(self.request.path_info)
         
+        if 'create_comment' in request.POST:
+            comment_text= self.request.POST.get('comment_text')
+            
+            LeadComment.objects.create(
+                lead=lead,
+                user=self.request.user,
+                comment=comment_text,
+                posted_at=datetime.now()
+                
+            )
+            return HttpResponseRedirect(self.request.path_info)
+        
 
 
         return HttpResponseRedirect(self.request.path_info)

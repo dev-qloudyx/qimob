@@ -108,14 +108,43 @@
 
     <button class="collapsible"><h3>Comments</h3></button>
     <div class="content">
-      <a href="#" class="btn btn-primary mb-3">Add Comment</a> 
-      {% if comments %}
+      
+      <!-- <a class="btn btn-primary mb-3" id="commentButton" onclick="showCommentform()">Add Comment</a>  -->
+      
+        {% if comments %}
         {% for doc in comments %}
-        <p>{{ doc.comment }} - {{doc.user.username}}</a></p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr;">
+          <div>
+            <p>{{ doc.comment }}</p>
+          </div>
+          <div>
+            <p><b>{{doc.user.username}}</b></p>
+          </div>
+          <div>
+            <p><i>{{doc.posted_at}}</i></p>
+            
+        </div>
+      </div>
+        <hr>
         {% endfor %}
       {% else %}
         <p>No comments found</p>
       {% endif %}
+      <div id="commentForm" class="commentForm">
+        <form  method="post"  action="{% url 'crm:lead_detail_view' pk=lead.pk %}" class="form">
+          {% csrf_token %}
+          <div class="row mb-3" >
+            <textarea name="comment_text" id="" cols="30" rows="5" placeholder="Escreva o seu comentário..."></textarea>
+          </div>
+          
+          <div class="row mb-3">
+            <input type="submit" value="Enviar comentário" class="btn btn-primary" style="width: 150px;" name="create_comment">
+          </div>
+          
+        </form>
+      </div>
+
+      
     </div>
 
 </div>
@@ -127,7 +156,6 @@
 
 
 {% block submenu %}
-
 <div class="popup" id="popup">
   <h3>Partilhar Lead com:</h3>
   <form method="post" action="{% url 'crm:lead_detail_view' pk=lead.pk %}">
@@ -154,18 +182,14 @@
         <form method="post" action="{% url 'crm:lead_detail_view' pk=lead.pk %}">
           {% csrf_token %}
           <input type="hidden" name="share_id" value="{{ usershared.pk }}">
-          <input type="checkbox" class="form-check-input" name="can_read" {% if usershared.can_read %}checked{% endif %} readonly>
-          
+          <input type="checkbox" class="form-check-input" name="can_read" {% if usershared.can_read %}checked{% endif %} readonly>     
       </td>
       <td>
         <input type="checkbox" class="form-check-input" name="can_write" {% if usershared.can_write %}checked{% endif %}>
-          
-
       </td>
       <td>
         <button class="btn btn-primary" type="submit" name="update_share">{% trans "Update" %}</button>
         </form>
-
       </td>
       <td>
         <form method="post" action="{% url 'crm:lead_detail_view' pk=lead.pk %}">
@@ -177,7 +201,6 @@
       </td>
     </tr>
     {% endfor%}
-
   </table>
 
   <script>
@@ -194,10 +217,12 @@
         event.preventDefault();
     });
     
-    </script>
-  
 
+    
+
+    </script>
 </div>
+
 
 {% endblock %}
 

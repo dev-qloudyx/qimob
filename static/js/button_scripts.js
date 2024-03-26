@@ -29,23 +29,26 @@ let popup = document.getElementById('popup');
 let overlay = document.getElementById('overlay');
 
 function pop() {
-  if(popup.style.display === 'none'){
-    popup.style.display = 'block'; 
-    overlay.style.display = 'block';
-    console.log('hello')
-  }
-  else{
+
+  if(popup.style.display != 'none'){
     popup.style.display = 'none';
     overlay.style.display = 'none';
-    console.log('helloooo')
+
+  }
+  else{
+    popup.style.display = 'block'; 
+    overlay.style.display = 'block';
   }
     
 }
 
+
+
+
+
 function close() {
   if(overlay.style.display != 'none'){
     overlay.style.display = 'none';
-    console.log('helloooo')
   }
  
 }
@@ -70,5 +73,16 @@ for (i = 0; i < coll.length; i++) {
 
 }
 
+function showCommentform(){
 
- 
+  let commentForm = document.getElementById('commentForm')
+  if (commentForm.style.display != 'none'){
+    commentForm.style.display = 'none'
+  }
+  else{
+    commentForm.style.display = 'block'
+    console.log('hello')
+  }
+
+
+}
