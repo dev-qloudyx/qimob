@@ -1,5 +1,6 @@
 import django_filters
 from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
 from .models import Lead, Client, LeadStatus, LeadType
 
 
@@ -14,3 +15,16 @@ class LeadTypeFilter(django_filters.FilterSet):
     class Meta:
         model = LeadStatus
         fields = ['status', 'name', 'leadtype', 'district', 'county']
+
+
+# class GeneralSearch(django_filters.FilterSet):
+#     name = django_filters.CharFilter(method='custom_filter', label=_('Search'))
+
+#     class Meta:
+#         model = LeadStatus
+#         fields = ['name']
+
+#     def custom_filter(self, queryset, name, value):
+#         return Lead.objects.filter(
+#             Q(county__icontains=value) | Q(district__icontains=value) | Q(short_desc__icontains=value) | Q(short_name__icontains=value)
+#         )
