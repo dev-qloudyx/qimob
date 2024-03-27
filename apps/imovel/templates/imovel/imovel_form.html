@@ -10,7 +10,8 @@
 <form method="post">
     {% csrf_token %}
     <div class="row form-group">
-        <div class="col-md-6">
+        {{ form|crispy }}                       <!--  TEMPORÁRIO -> SÓ PARA APARECEREM TODOS OS CAMPOS -->
+        <!-- <div class="col-md-6">
             {{ form.name|as_crispy_field }}
         </div>
         <div class="col-md-3">
@@ -18,9 +19,6 @@
         </div>
         <div class="col-md-3">
             {{ form.image|as_crispy_field }}
-        </div>
-        <div class="col-md-12">
-            {{ form.address|as_crispy_field }}
         </div>
         <div class="col-md-12">
             {{ form.description|as_crispy_field }}
@@ -36,7 +34,7 @@
         </div>
         <div class="col-md-3">
             {{ form.price|as_crispy_field }}
-        </div>
+        </div> -->
     </div>
 
     

@@ -19,6 +19,11 @@ class ImovelCreateView(CreateView):
     template_name = 'imovel/imovel_form.html'
     success_url = reverse_lazy('imovel:imovel_list')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     
 @method_decorator([login_required], name='dispatch')
 class ImovelListView(ListView):

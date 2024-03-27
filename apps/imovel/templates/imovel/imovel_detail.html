@@ -10,12 +10,18 @@
   <div>
     <p style="font-weight: bold;"><b class="main-title">Nome:</b> {{ object.name }}</p>
     <hr>
-    <p><b class="title">address:</b> {{ object.address }}</p>
     <p><b class="title">price:</b> {{ object.price }}</p>
     <p><b class="title">description:</b> {{ object.description }}</p>
     <p><b class="title">bedrooms:</b> {{ object.bedrooms }}</p>
     <p><b class="title">bathrooms:</b> {{ object.bathrooms }}</p>
     <p><b class="title">square_footage:</b> {{ object.square_footage }}</p>
+    <p><b class="title">imovel_type:</b> {{ object.imovel_type }}</p>
+    <p><b class="title">visit_timeslots:</b> {{ object.visit_timeslots }}</p>
+    <p><b class="title">gps_latitude:</b> {{ object.gps_latitude }}</p>
+    <p><b class="title">gps_longitude:</b> {{ object.gps_longitude }}</p>
+    <p><b class="title">availability:</b> {{ object.availability }}</p>
+    <p><b class="title">created_at:</b> {{ object.created_at }}</p>
+    <p><b class="title">created_by:</b> {{ object.created_by }}</p>
   </div>
   <div>
     <a class="btn btn-size base-but btn-sm mt-1 mb-1" href="{% url 'imovel:imovel_list' %}">{% trans "Cancel" %}</a>
