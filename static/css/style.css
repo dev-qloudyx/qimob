@@ -10,7 +10,7 @@
     --primary: #ffffff;
     --secondary: #FF8647;
     --terciary:#FF7C00;
-    --backcolor:#e6e6e6;
+    --backcolor:#f0f0f0;
     --maintextcolor:#3f3f3f;
     --bodytext:#000000;
   }
@@ -234,17 +234,17 @@ body {
 
 .boxfilter{
   padding: 10px 5px;
-  background-color: var(--primary);
+  background-color: var(--secondary);
   border-radius: 20px;
   width: 135px;
   height: 80px;
   transition: 0.3s;
-  color: var(--bodytext);
+  color: var(--primary);
 
 }
 
 .boxfilter img{
-  filter: invert(0%);
+  filter: invert(100%);
   transition: 0.3s;
 }
 
@@ -264,13 +264,13 @@ body {
 
 .boxfilter:hover{
   padding: 10px;
-  background-color: var(--secondary);
-  color: var(--primary);
+  background-color: var(--primary);
+  color: var(--secondary);
 
 
 }
 .boxfilter:hover img{
-  filter: invert(100%);
+  filter: invert(50%);
 
 }
 

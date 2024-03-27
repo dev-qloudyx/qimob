@@ -11,7 +11,7 @@ from apps.crm.utils import handle_not_found, is_image
 from qaddress.views import AddressView, retrieveAddressDataByToken, updateAddressDataByToken
 from qdocs.views import FileDeleteView, FileListView, FileUploadView, FileView
 from qmessages.views import MessageCreateView, MessageListView
-
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
@@ -37,6 +37,7 @@ from apps.users.status import leads_last_statuses, status_configs
 # from apps.users.status import Status
 # Create your views here.
 
+@method_decorator([login_required], name='dispatch')
 class ClientCreateView(CreateView):
     model = Client
     form_class = ClientForm
@@ -103,7 +104,7 @@ class ClientCreateView(CreateView):
         context['base_template'] = base_template
         
         return context
-
+@method_decorator([login_required], name='dispatch')
 class ClientUpdateView(UpdateView):
     model = Client
     form_class = ClientUpdateForm

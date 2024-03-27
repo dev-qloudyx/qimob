@@ -43,9 +43,50 @@
     {% endif %}
     <button class="btn btn-primary" type="submit">{% trans "Submit" %}</button>
     <a class="btn btn-secondary" href="#" onclick="history.back(); return false;">{% trans "Cancel" %}</a>
+    <button class="btn btn-primary" type="button" id="validate">{% trans "Validate" %}</button>
     {% if update_template %}
         <a class="btn btn-secondary" href="{% url 'imovel:imovel_docs_upload_view' pk=imovel.pk %}">{% trans "Upload photos" %}</a>
     {% endif %}
 </form>
 </div>
+
+<script>
+
+    $(document).ready(function(){
+        
+        $('#validate').click(function(){
+            var postalCodePart1 = $('#id_postal_code1').val();
+            var postalCodePart2 = $('#id_postal_code2').val();
+            var postalCode = postalCodePart1 + postalCodePart2; 
+            if(postalCode){
+                $.ajax({
+                    url: '/crm/get_address_info/',  
+                    type: 'GET',
+                    data: {
+                        'postal_code': postalCode,
+                        'code1': postalCodePart1,
+                        'code2': postalCodePart2
+                    },
+                    success: function(data){
+    
+                        $('#id_district').val(data.district);
+                        $('#id_county').val(data.county);
+    
+                        $('#id_locality').empty();
+                        for (var i = 0; i < data.localitys.length; i++) {
+                            var locality = data.localitys[i].locality;
+                            $('#id_locality').append('<option value="' + locality + '">' + locality + '</option>');
+                        }
+    
+                        $('#id_street').empty();
+                        for (var i = 0; i < data.streets.length; i++) {
+                            var street = data.streets[i].street;
+                            $('#id_street').append('<option value="' + street + '">' + street + '</option>');
+                        }
+                    }
+                });
+            }
+        });
+    });
+    </script>
 {% endblock content %}
