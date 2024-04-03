@@ -87,6 +87,18 @@ class Prospects(models.Model):
     )
     partyemail = models.EmailField(_('third party email'))
 
+    def __str__(self):
+        return self.short_desc
+
+class ProspectsComment(models.Model):
+    prospect = models.ForeignKey(Prospects, on_delete=models.CASCADE)
+    comment = models.CharField(_('comment'), max_length=500)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    posted_at = models.DateTimeField(_('posted_at'), auto_now_add=True)
+
+    def __str__(self):
+        return self.comment
+
 class Contact(models.Model):
     lead = models.ForeignKey(Lead, on_delete=models.CASCADE, related_name='contact')
     name = models.CharField(_("name"), max_length=100)

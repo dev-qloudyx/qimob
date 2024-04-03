@@ -47,7 +47,11 @@ urlpatterns = [
     path('lead/detail/<int:pk>/update/', views.LeadUpdateView.as_view(), name='lead_update_view'),
     path('lead/docs/upload/<int:pk>/', views.LeadDocsUploadView.as_view(), name='lead_docs_upload_view'),
 
-    # Consultant
+    # Prospect
+    path('lead/<int:lead_id>/prospect/create/', views.ProspectCreateView.as_view(), name='prospect_create_view'),
+    path('lead/<int:lead_id>/prospect/<int:pk>/', views.ProspectDetailView.as_view(), name='prospect_detail_view'),
+
+    # Address
     path('get_counties/', get_counties, name='get_counties'),
     path('get_localities/', get_locality, name='get_locality'),
     path('get_address_info/', get_address_info, name='get_address_info'),

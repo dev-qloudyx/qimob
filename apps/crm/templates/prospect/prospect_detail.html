@@ -1,0 +1,95 @@
+{% extends base_template %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+
+<span id="notification"></span>
+<h2 class="listtitle">{{ object.short_name}}</h2>
+
+
+
+  
+  
+
+
+
+<div class="detailsview">
+    
+    
+    <button class="collapsible"><h3>{% trans "Prospect Data" %}</h3></button>
+    <div class="content">
+      <p><b class="title">Cliente:</b> {{ object.partyname}}</p>
+      <p><b class="title">Telemóvel:</b> {{ object.partyphone}}</p>
+      <p><b class="title">Email:</b> {{ object.partyemail }}</p>
+
+    </div>
+
+
+    <button class="collapsible"><h3>{% trans "Client Data" %}</h3></button>
+    <div class="content">
+      <p><b class="title">Cliente:</b> {{ object.partyname}}</p>
+      <p><b class="title">Telemóvel:</b> {{ object.partyphone}}</p>
+      <p><b class="title">Email:</b> {{ object.partyemail }}</p>
+    </div>
+
+
+
+    <button class="collapsible"><h3>Actions</h3> </button>
+    <div class="content">
+      <a href="#" class="btn btn-primary mb-3">Add Action</a>
+    
+    
+    </div>
+
+
+    <button class="collapsible"><h3>Comments</h3></button>
+    <div class="content">
+      
+      <!-- <a class="btn btn-primary mb-3" id="commentButton" onclick="showCommentform()">Add Comment</a>  -->
+      
+        {% if comments %}
+        {% for doc in comments %}
+        <div style="display: grid; grid-template-columns: 1fr 1fr;">
+          <div>
+            <p>{{ doc.comment }}</p>
+          </div>
+          <div>
+            <p><b>{{doc.user.username}}</b></p>
+          </div>
+          <div>
+            <p><i>{{doc.posted_at}}</i></p>
+            
+        </div>
+      </div>
+        <hr>
+        {% endfor %}
+      {% else %}
+        <p>No comments found</p>
+      {% endif %}
+      <div id="commentForm" class="commentForm">
+        <form  method="post"  action="#" class="form">
+          {% csrf_token %}
+          <div class="row mb-3" >
+            <textarea name="comment_text" id="" cols="30" rows="5" placeholder="Escreva o seu comentário..."></textarea>
+          </div>
+          
+          <div class="row mb-3">
+            <input type="submit" value="Enviar comentário" class="btn btn-primary" style="width: 150px;" name="create_comment">
+          </div>
+          
+        </form>
+      </div>
+
+      
+    </div>
+
+</div>
+
+
+
+{% endblock %}
+
+
+
+

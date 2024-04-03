@@ -93,9 +93,15 @@
 
     <button class="collapsible"><h3>Prospects</h3> </button>
     <div class="content">
-      <a href="#" class="btn btn-primary mb-3">Add Prospect</a>
+      <a href="{% url 'crm:prospect_create_view' lead_id=object.id %}" class="btn btn-primary mb-3">Add Prospect</a>
     
-    
+    {% if prospects %}
+      {% for prospect in prospects %}
+      <p> <a href="{% url 'crm:prospect_detail_view' lead_id=object.id pk=prospect.id %}">{{prospect.short_desc}} - {{prospect.partyname}}</a>  </p>
+      {% endfor %}
+    {% else %}
+      <p>No prospects found</p>
+    {% endif %}
     </div>
 
     <button class="collapsible"><h3>Actions</h3> </button>
