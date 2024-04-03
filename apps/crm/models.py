@@ -78,20 +78,29 @@ class LeadShare(models.Model):
     def __str__(self):
         return self.lead.short_name
 
-class Prospects(models.Model):
+class Prospect(models.Model):
     lead = models.ForeignKey(Lead, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner_prospect')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='createdby_prospect')
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     short_desc = models.CharField(_('short description'), max_length=100)
     partyname = models.CharField(_('third party name'), max_length=100)
     partyphone = models.BigIntegerField(
         validators=[MinValueValidator(200000000), MaxValueValidator(999999999)]
     )
     partyemail = models.EmailField(_('third party email'))
+    in_percent = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(10)],
+        default=10
+        )
+    house_desc = models.CharField(_('desc'), max_length=1000, blank=True, null=True)
+    house_url = models.URLField(_('URL'), blank=True, null=True)
 
     def __str__(self):
         return self.short_desc
 
-class ProspectsComment(models.Model):
-    prospect = models.ForeignKey(Prospects, on_delete=models.CASCADE)
+class ProspectComment(models.Model):
+    prospect = models.ForeignKey(Prospect, on_delete=models.CASCADE)
     comment = models.CharField(_('comment'), max_length=500)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     posted_at = models.DateTimeField(_('posted_at'), auto_now_add=True)

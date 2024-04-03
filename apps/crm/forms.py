@@ -3,7 +3,7 @@ from django import forms
 from apps.users.models import User
 from .validators import only_int, only_char
 from qaddress.models import Address
-from apps.crm.models import Client, Lead, ClientAddress, LeadShare
+from apps.crm.models import Client, Lead, ClientAddress, LeadShare, Prospect
 
 class ClientForm(forms.ModelForm):
     postal_code1 = forms.CharField(label= "Código Postal",validators=[only_int],  max_length=4,required=False)
@@ -91,3 +91,8 @@ class LeadShareForm(forms.ModelForm):
             'can_read': 'Pode Ler',  
             'can_write': 'Pode Escrever'  ,
         }
+
+class ProspectCreateForm(forms.ModelForm):
+    class Meta:
+        model=Prospect
+        fields = ['short_desc', 'partyname','partyphone','partyemail','house_url','house_desc']

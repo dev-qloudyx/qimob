@@ -5,8 +5,8 @@ import uuid
 from django.forms import BaseModelForm
 import pandas as pd
 from apps.crm.filters import LeadTypeFilter
-from apps.crm.forms import ClientForm, LeadCreateForm, ClientUpdateForm, LeadShareForm
-from apps.crm.models import Client, ClientAddress, ClientDoc, ClientDocStatus, ClientDocStatusDesc, ClientMessage, Lead, LeadDoc, LeadComment, LeadShare, LeadStatus, Prospects
+from apps.crm.forms import ClientForm, LeadCreateForm, ClientUpdateForm, LeadShareForm, ProspectCreateForm
+from apps.crm.models import Client, ClientAddress, ClientDoc, ClientDocStatus, ClientDocStatusDesc, ClientMessage, Lead, LeadDoc, LeadComment, LeadShare, LeadStatus, Prospect, ProspectComment
 from apps.crm.utils import handle_not_found, is_image
 from qaddress.views import AddressView, retrieveAddressDataByToken, updateAddressDataByToken
 from qdocs.views import FileDeleteView, FileListView, FileUploadView, FileView
@@ -816,7 +816,7 @@ class LeadDetailView(DetailView):
             comment_list.append(comment)
         context['comments'] = comment_list
 
-        lead_prospect = Prospects.objects.filter(lead=self.object)
+        lead_prospect = Prospect.objects.filter(lead=self.object)
         prospect_list = []
         for prospect in lead_prospect:
             prospect_list.append(prospect)
@@ -916,16 +916,20 @@ class LeadDocsUploadView(FileUploadView):
 
 
 class ProspectCreateView(CreateView):
-    model = Prospects
+    model = Prospect
     template_name = 'prospect/prospect_create.html'
-    fields = ['short_desc','partyname', 'partyphone','partyemail']
+    form_class = ProspectCreateForm
+    
+
 
     def form_valid(self, form):
         lead_id = self.kwargs['lead_id']  # Assuming lead_id is passed in URL
         lead = get_object_or_404(Lead, pk=lead_id)
-        
-        # Associate the lead with the prospect
+
         form.instance.lead = lead
+        form.instance.owner = self.request.user
+        form.instance.created_by = self.request.user
+
         
         return super().form_valid(form)
     
@@ -938,13 +942,56 @@ class ProspectCreateView(CreateView):
         return reverse_lazy('crm:lead_detail_view', kwargs={'pk': self.kwargs['lead_id']})
     
 class ProspectDetailView(DetailView):
-    model = Prospects
+    model = Prospect
     template_name = 'prospect/prospect_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        prospect_comments = ProspectComment.objects.filter(prospect=self.object)
+        comment_list = []
+        for comment in prospect_comments:
+            comment_list.append(comment)
+        context['comments'] = comment_list
+
         context['base_template'] = "base.html"
         return context
+    
+    def post(self, request, *args, **kwargs):
+        prospect = self.get_object()
+        
+        if 'create_comment' in request.POST:
+            comment_text= self.request.POST.get('comment_text')
+            
+            ProspectComment.objects.create(
+                prospect=prospect,
+                user=self.request.user,
+                comment=comment_text,
+                posted_at=datetime.now()
+                
+            )
+            return HttpResponseRedirect(self.request.path_info)
+
+        return HttpResponseRedirect(self.request.path_info)
+
+
+class ProspectUpdateView(UpdateView):
+    model = Prospect
+    form_class = ProspectCreateForm
+    template_name = 'prospect/prospect_update.html'
+    
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['base_template'] = "base.html"
+        return context
+    
+    def get_success_url(self):
+        return reverse_lazy('crm:prospect_detail_view', kwargs={
+            'lead_id': self.kwargs['lead_id'],
+            'pk': self.object.pk  
+        })
 
 
 

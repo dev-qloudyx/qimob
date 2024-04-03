@@ -5,10 +5,21 @@
 
 
 <span id="notification"></span>
-<h2 class="listtitle">{{ object.short_name}}</h2>
+<h2 class="listtitle">{{ object.short_desc}}</h2>
 
 
+{% if user == object.owner or user.role.role_name == 'admin' %}
+      <div class="tab" style="display: flex; margin-right: 20px;">
+        <form method="post" style='padding:0px'>
+          {% csrf_token %}
+          <a href="{% url 'crm:prospect_update_view' pk=object.id lead_id=object.lead.id %}" class="btn btn-primary mb-3">{% trans "Update" %}</a>
+          <a href="#" class="btn btn-primary mb-3">{% trans "Logs" %}</a>
+          <button class="btn btn-primary mb-3">{% trans "Checklist" %}</button>
+          <span class="btn btn-primary mb-3" id="sharebutton" onclick="pop()">{% trans "Share" %}</span> 
 
+        </form>
+      </div>
+  {% endif %}
   
   
 
@@ -19,9 +30,11 @@
     
     <button class="collapsible"><h3>{% trans "Prospect Data" %}</h3></button>
     <div class="content">
-      <p><b class="title">Cliente:</b> {{ object.partyname}}</p>
-      <p><b class="title">Telemóvel:</b> {{ object.partyphone}}</p>
-      <p><b class="title">Email:</b> {{ object.partyemail }}</p>
+      <p><b class="title">Lead:</b> <a href="{% url 'crm:lead_detail_view' pk=object.lead.id  %}" >{{ object.lead}}</a></p>
+      <p><b class="title">Rating:</b> {{ object.in_percent}} (0 a 10)</p>
+      <p><b class="title">Owner:</b> {{ object.owner.username}}</p>
+      <p><b class="title">Created by:</b> {{ object.created_by.username }}</p>
+      <p><b class="title">Created at:</b> {{ object.created_at }}</p>
 
     </div>
 
@@ -31,6 +44,15 @@
       <p><b class="title">Cliente:</b> {{ object.partyname}}</p>
       <p><b class="title">Telemóvel:</b> {{ object.partyphone}}</p>
       <p><b class="title">Email:</b> {{ object.partyemail }}</p>
+    </div>
+
+    <button class="collapsible"><h3>Imóvel</h3></button>
+    <div class="content">
+      <p><b class="title">Link:</b><a href="{{ object.house_url}}" target="_blank">{{ object.house_url}}</a> </p>
+      <p><b class="title">Descrição:</b> {{ object.house_desc}}</p>
+      
+    
+    
     </div>
 
 
@@ -45,9 +67,7 @@
 
     <button class="collapsible"><h3>Comments</h3></button>
     <div class="content">
-      
-      <!-- <a class="btn btn-primary mb-3" id="commentButton" onclick="showCommentform()">Add Comment</a>  -->
-      
+         
         {% if comments %}
         {% for doc in comments %}
         <div style="display: grid; grid-template-columns: 1fr 1fr;">
@@ -68,7 +88,7 @@
         <p>No comments found</p>
       {% endif %}
       <div id="commentForm" class="commentForm">
-        <form  method="post"  action="#" class="form">
+        <form  method="post"  action="{% url 'crm:prospect_detail_view' lead_id=object.lead.id pk=object.pk %}" class="form">
           {% csrf_token %}
           <div class="row mb-3" >
             <textarea name="comment_text" id="" cols="30" rows="5" placeholder="Escreva o seu comentário..."></textarea>

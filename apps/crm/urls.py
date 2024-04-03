@@ -50,6 +50,7 @@ urlpatterns = [
     # Prospect
     path('lead/<int:lead_id>/prospect/create/', views.ProspectCreateView.as_view(), name='prospect_create_view'),
     path('lead/<int:lead_id>/prospect/<int:pk>/', views.ProspectDetailView.as_view(), name='prospect_detail_view'),
+    path('lead/<int:lead_id>/prospect/<int:pk>/update/', views.ProspectUpdateView.as_view(), name='prospect_update_view'),
 
     # Address
     path('get_counties/', get_counties, name='get_counties'),
